@@ -54,7 +54,7 @@ class Transformer(torch.nn.Module):
         #Embed the inputs
         # (16,9,100)
                                                 #I explicitly cast this to a tensor because I was getting an error saying that it expected a float but it was getting a double
-        x_timestep, _ = self.timestep_embedding(x.type(torch.FloatTensor).to(DEVICE)
+        x_timestep, _ = self.timestep_embedding(x.type(torch.FloatTensor).to(DEVICE))
         print('hello')
         x_feature, _ = self.feature_embedding(x.type(torch.FloatTensor))
 
