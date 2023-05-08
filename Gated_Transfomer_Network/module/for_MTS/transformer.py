@@ -56,7 +56,7 @@ class Transformer(torch.nn.Module):
                                                 #I explicitly cast this to a tensor because I was getting an error saying that it expected a float but it was getting a double
         x_timestep, _ = self.timestep_embedding(x.type(torch.FloatTensor).to(DEVICE))
         print('hello')
-        x_feature, _ = self.feature_embedding(x.type(torch.FloatTensor))
+        x_feature, _ = self.feature_embedding(x.type(torch.FloatTensor).to(DEVICE)
 
         #Encode them into the two towers
         for encoder in self.timestep_encoderlist:
