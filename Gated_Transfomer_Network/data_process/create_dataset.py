@@ -29,12 +29,12 @@ class Create_Dataset(Dataset):
             window_set.append(np.expand_dims(example, 0))
         
         #Training Dataset  
-        self.dataset = torch.tensor(np.vstack(window_set)).transpose(-1,-2).cpu().to(DEVICE)
+        self.dataset = torch.tensor(np.vstack(window_set)).transpose(-1,-2)
         print('dataset1', self.dataset.get_device())
         
         #Create the training labels. The reason it is starting from window size, is because there is technically labels for what happened after each timestep: however,
         #We created windows of data, so we want to know what is happening at the end of our window. If we started at the beginning, our labels would be off by the size of window_size
-        self.labels = torch.tensor(self.df['Labels'][window_size:].to_numpy()).to(DEVICE)
+        self.labels = torch.tensor(self.df['Labels'][window_size:].to_numpy())
         print('dataset2', self.labels.get_device())
 
         #This is the stratified k fold index so that we can train and test on the whole set. The startified will also keep the label distribution constant in train and test
