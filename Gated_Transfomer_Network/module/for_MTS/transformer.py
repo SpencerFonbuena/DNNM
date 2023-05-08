@@ -7,6 +7,9 @@ import torch
 from module.for_MTS.encoder import Encoder
 from module.for_MTS.embedding import Embedding
 
+DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+print(f'Use device {DEVICE}')
+
 class Transformer(torch.nn.Module):
     def __init__(self,
                  d_model: int,
@@ -51,7 +54,7 @@ class Transformer(torch.nn.Module):
         #Embed the inputs
         # (16,9,100)
                                                 #I explicitly cast this to a tensor because I was getting an error saying that it expected a float but it was getting a double
-        x_timestep, _ = self.timestep_embedding(x.type(torch.FloatTensor))
+        x_timestep, _ = self.timestep_embedding(x.type(torch.FloatTensor)).to(DEVICE)
         print('hello')
         print(x_timestep.get_device())
         x_feature, _ = self.feature_embedding(x.type(torch.FloatTensor))
