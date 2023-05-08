@@ -64,7 +64,7 @@ def train_and_validate(net_class: torch.nn.Module,
         # create network. This represents the transformer
         net = net_class(q=c.q, v=c.v, h=c.h, N=c.N, d_model=c.d_model, d_hidden=c.d_hidden,
                         d_feature=c.d_feature, d_timestep=c.window_size, class_num=4).to(DEVICE)
-        print(train_x.get_device())
+        print(train_X.get_device())
         # create optimizer
         optimizer = None
         if c.optimizer_name == 'Adagrad':
