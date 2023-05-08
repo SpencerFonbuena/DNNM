@@ -28,4 +28,4 @@ class Config:
     window_size = 10
 
     test_interval = 1        # interval of test or validate
-    draw_key = 10            # draw result plot when EPOCH >= draw_key
+    draw_key = 100            # draw result plot when EPOCH >= draw_key
