@@ -76,7 +76,6 @@ def train_and_validate(net_class: torch.nn.Module,
         loss_list = []
         accuracy_on_train = []
         accuracy_on_validate = []
-        counter = 0
 
         net.train()
         loss_sum_min = 99999
@@ -90,9 +89,6 @@ def train_and_validate(net_class: torch.nn.Module,
                 loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
-                if counter % 1000 == 0:
-                  print(counter)
-                  counter += 1
             if loss_sum < loss_sum_min:
                 loss_sum_min = loss_sum
                 best_net = copy.deepcopy(net)
