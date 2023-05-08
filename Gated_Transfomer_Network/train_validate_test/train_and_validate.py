@@ -73,7 +73,6 @@ def train_and_validate(net_class: torch.nn.Module,
             optimizer = torch.optim.Adam(net.parameters(), lr=c.LR)
         assert optimizer is not None, 'optimizer is None!'
 
-        print(net.parameters().get_device())
         loss_list = []
         accuracy_on_train = []
         accuracy_on_validate = []
