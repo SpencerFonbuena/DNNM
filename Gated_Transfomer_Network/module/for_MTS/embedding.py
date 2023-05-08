@@ -34,6 +34,7 @@ class Embedding(torch.nn.Module):
              # (16,9,512)
         elif self.wise == 'timestep':
             #transpose the last two dimensions. The -1, and -2, allow for flexibility in number of dimensions
+            print('test1')
             x = self.embedding(x.transpose(-1, -2)) #Tensor comes in as a (batch, feature, timestep) -> (16, 9, 100) | it leaves as a (batch, timestep, d_model) -> (16,100,512)
             x = position_encode(x)
             #(16,100,512)
