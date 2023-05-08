@@ -5,6 +5,8 @@
 import torch
 import math
 
+DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+print(f'Use device {DEVICE}')
 
 class Embedding(torch.nn.Module):
     def __init__(self,
