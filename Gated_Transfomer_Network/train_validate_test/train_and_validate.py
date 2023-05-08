@@ -81,7 +81,6 @@ def train_and_validate(net_class: torch.nn.Module,
         net.train()
         loss_sum_min = 99999
         best_net = None
-        counter = 0
         for index in range(c.EPOCH):
             loss_sum = 0.0
             for x, y in train_dataloader: #This loop right now takes 45 seconds to complete
@@ -91,8 +90,6 @@ def train_and_validate(net_class: torch.nn.Module,
                 loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
-                counter += 1
-                print(counter)
             if loss_sum < loss_sum_min:
                 loss_sum_min = loss_sum
                 best_net = copy.deepcopy(net)
