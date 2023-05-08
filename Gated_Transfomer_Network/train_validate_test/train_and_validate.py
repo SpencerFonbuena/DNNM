@@ -59,8 +59,8 @@ def train_and_validate(net_class: torch.nn.Module,
         val_dataset = Stratified_Dataset(X=val_X, Y=val_Y)
         #train_dataset = Create_Dataset(datafile=f'{c.datafile}', window_size=100)[:(len(Create_Dataset) * .7)]
         #val_dataset = Create_Dataset(datafile=f'{c.datafile}', window_size=100)[(len(Create_Dataset) * .7):]
-        train_dataloader = DataLoader(dataset=train_dataset, batch_size=c.BATCH_SIZE, shuffle=False, drop_last=True).to(DEVICE)
-        val_dataloader = DataLoader(dataset=val_dataset, batch_size=c.BATCH_SIZE, shuffle=False, drop_last=True).to(DEVICE)
+        train_dataloader = DataLoader(dataset=train_dataset, batch_size=c.BATCH_SIZE, shuffle=False, drop_last=True)
+        val_dataloader = DataLoader(dataset=val_dataset, batch_size=c.BATCH_SIZE, shuffle=False, drop_last=True)
         # create network. This represents the transformer
         net = net_class(q=c.q, v=c.v, h=c.h, N=c.N, d_model=c.d_model, d_hidden=c.d_hidden,
                         d_feature=c.d_feature, d_timestep=c.window_size, class_num=4).to(DEVICE)
