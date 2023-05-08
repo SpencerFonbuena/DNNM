@@ -53,7 +53,7 @@ def train_and_validate(net_class: torch.nn.Module,
 
         # Create training and validation sets based on the stratified k fold splits
         train_X, val_X = all_data.dataset[train_index].to(DEVICE), all_data.dataset[val_index].to(DEVICE)
-        print(train_X.device(), val_X.device())
+        print(train_X.get_device(), val_X.get_device())
         train_Y, val_Y = all_data.labels[train_index].to(DEVICE), all_data.labels[val_index].to(DEVICE)
         #Create the two separate datasets for training and validation
         train_dataset = Stratified_Dataset(X=train_X, Y=train_Y)
