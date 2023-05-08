@@ -160,4 +160,4 @@ def validate(net,
 
         return accuracy_on_train, accuracy_on_validate
 
-train_and_validate(Transformer, Create_Dataset(datafile='Gated_Transfomer_Network/AAPL_1hour_expanded_test.txt', window_size=c.window_size))
+train_and_validate(Transformer, Create_Dataset(datafile='/root/GTN/Gated_Transfomer_Network/AAPL_1hour_expanded_test.txt', window_size=c.window_size))
