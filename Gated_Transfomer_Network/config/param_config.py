@@ -6,14 +6,12 @@ from config.path_config import UCR, UEA, MTS
 
 
 class Config:
-    archive = UEA            # select archive
-    assert archive in [UCR, UEA, MTS], 'Select archive Error!'
     k_fold = 5               # fold number of K_fold Cross Validation
     
     datafile = "hello"
     # Hyper-Parameters
-    EPOCH = 1              # Epoch
-    BATCH_SIZE = 16          # Batch Size
+    EPOCH = 10              # Epoch
+    BATCH_SIZE = 32          # Batch Size
     LR = 1e-4                # Learning rate
 
     d_model = 512            # size of embedding output
