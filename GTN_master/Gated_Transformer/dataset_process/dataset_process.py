@@ -37,16 +37,16 @@ class Create_Dataset(Dataset):
         #Training Dataset
         # self.traindataset = torch.tensor(np.vstack(window_set)).transpose(-1,-2)[:splitlocation, :]  
         self.traindataset = torch.tensor(np.vstack(window_set))[:splitlocation, :]
-        print(self.traindataset.shape)
+        #print(self.traindataset.shape)
         self.valdataset = torch.tensor(np.vstack(window_set))[splitlocation:, :]
-        print(self.valdataset.shape)
+        #print(self.valdataset.shape)
         
         #Create the training labels. The reason it is starting from window size, is because there is technically labels for what happened after each timestep: however,
         #We created windows of data, so we want to know what is happening at the end of our window. If we started at the beginning, our labels would be off by the size of window_size
         self.trainlabels = torch.tensor(df['Labels'][window_size: splitlocation].to_numpy())
         self.vallabels = torch.tensor(df['Labels'][splitlocation:].to_numpy())
-        print('labels dimensions', self.trainlabels.shape)
-        print('labels val dimensions', self.vallabels.shape)
+        #print('labels dimensions', self.trainlabels.shape)
+        #print('labels val dimensions', self.vallabels.shape)
 
 
         
