@@ -59,9 +59,9 @@ class Transformer(Module):
         """
         # step-wise
         # The score matrix is ​​input, and mask and pe are added by default
-        print(x.shape) # (16,100,9)
+        #print(x.shape) # (16,100,9)
         encoding_1 = self.embedding_channel(x.type(torch.FloatTensor))
-        print(encoding_1.shape) # (16,100,512)
+        #print(encoding_1.shape) # (16,100,512)
         input_to_gather = encoding_1
 
         if self.pe:
