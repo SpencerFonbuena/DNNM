@@ -17,7 +17,6 @@ from utils.visualization import result_visualization
 
 # from mytest.gather.main import draw
 
-setup_seed(30)  # 设置随机数种子
 reslut_figure_path = 'result_figure'  # Result image save path
 
 # Dataset path selection
@@ -33,8 +32,8 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\ArabicDigits\\ArabicDigits.mat'  # lenth=6600  input=93 channel=13 output=10
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
-path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
+path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
 test_interval = 5  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -152,7 +151,7 @@ def train():
     end = time()
     time_cost = round((end - begin) / 60, 2)
 
-    # 结果图
+    # result graph
     result_visualization(loss_list=loss_list, correct_on_test=correct_on_test, correct_on_train=correct_on_train,
                          test_interval=test_interval,
                          d_model=d_model, q=q, v=v, h=h, N=N, dropout=dropout, DATA_LEN=DATA_LEN, BATCH_SIZE=BATCH_SIZE,

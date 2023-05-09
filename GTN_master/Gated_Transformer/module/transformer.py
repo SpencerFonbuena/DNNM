@@ -97,7 +97,7 @@ class Transformer(Module):
         # 3D to 2D
         encoding_1 = encoding_1.reshape(encoding_1.shape[0], -1)
         encoding_2 = encoding_2.reshape(encoding_2.shape[0], -1)
-        print(encoding_1.shape, encoding_2.shape) #([16, 51200], [16, 4608])
+        #print(encoding_1.shape, encoding_2.shape) #([16, 51200], [16, 4608])
 
         # gate
         gate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)
