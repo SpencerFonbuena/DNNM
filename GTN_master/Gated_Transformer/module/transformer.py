@@ -83,7 +83,7 @@ class Transformer(Module):
 
         # channel-wise
         # score matrix is ​​channel without mask and pe by default
-        encoding_2 = self.embedding_input(x.transpose(-1, -2))
+        encoding_2 = self.embedding_input(x.transpose(-1, -2).type(Float))
         channel_to_gather = encoding_2
 
         for encoder in self.encoder_list_2:
