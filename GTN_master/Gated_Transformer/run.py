@@ -40,7 +40,7 @@ draw_key = 1  # Greater than or equal to draw_key will save the image
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
 # hyperparameter settings
-EPOCH = 10000
+EPOCH = 10
 BATCH_SIZE = 16
 LR = 1e-4
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
