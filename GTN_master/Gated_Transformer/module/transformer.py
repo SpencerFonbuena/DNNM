@@ -40,8 +40,8 @@ class Transformer(Module):
                                                   dropout=dropout,
                                                   device=device) for _ in range(N)])
 
-        self.embedding_channel = torch.nn.Linear(d_channel, d_model)
-        self.embedding_input = torch.nn.Linear(d_input, d_model)
+        self.embedding_channel = torch.nn.Linear(d_channel, d_model).to(DEVICE)
+        self.embedding_input = torch.nn.Linear(d_input, d_model).to(DEVICE)
 
         self.gate = torch.nn.Linear(d_model * d_input + d_model * d_channel, 2)
         self.output_linear = torch.nn.Linear(d_model * d_input + d_model * d_channel, d_output)
