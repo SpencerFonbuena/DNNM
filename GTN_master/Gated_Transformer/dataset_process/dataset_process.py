@@ -17,7 +17,7 @@ class Create_Dataset(Dataset):
         
         # Gives either the training or the validation set depending on what is requested
         self.mode = mode
-        
+        self.window_size = window_size
         #reading in the entire un windowed dataset with the labels still part
         df = pd.read_csv(datafile, index_col=0, delimiter=',')
         #creating the training dataset without the labels in the file
@@ -30,20 +30,22 @@ class Create_Dataset(Dataset):
         window_set = []
 
         #window the data
-        for i in range(len(labeldf) - window_size):
-            example = labeldf[i: window_size + i]
+        for i in range(len(labeldf) - self.window_size):
+            example = labeldf[i: self.window_size + i]
             window_set.append(np.expand_dims(example, 0))
         
         #Training Dataset
-        # self.traindataset = torch.tensor(np.vstack(window_set)).transpose(-1,-2)[:splitlocation, :]  
-        self.traindataset = torch.tensor(np.vstack(window_set))[:splitlocation, :]
-        #print(self.traindataset.shape)
-        self.valdataset = torch.tensor(np.vstack(window_set))[splitlocation:, :]
+        #The reason it is splitlocation - windowsize is because the if the dataset goes till the same as the labels, it will add in 100 extra examples, whose set contains values 
+        #beyond that of the labels. Similar to the long descripiton of self.trainlabels.
+        self.traindataset = torch.tensor(np.vstack(window_set))[:(splitlocation - self.window_size), :]
+        print(self.traindataset.shape)
+        self.valdataset = torch.tensor(np.vstack(window_set))[(splitlocation - self.window_size):, :]
         #print(self.valdataset.shape)
         
         #Create the training labels. The reason it is starting from window size, is because there is technically labels for what happened after each timestep: however,
-        #We created windows of data, so we want to know what is happening at the end of our window. If we started at the beginning, our labels would be off by the size of window_size
-        self.trainlabels = torch.tensor(df['Labels'][window_size: splitlocation].to_numpy())
+        #We created windows of data, so we want to know what is happening at the end of our window. If we started at the beginning, our labels would be off by the size of self.window_size
+        self.trainlabels = torch.tensor(df['Labels'][self.window_size: splitlocation].to_numpy())
+        print(self.trainlabels.shape)
         self.vallabels = torch.tensor(df['Labels'][splitlocation:].to_numpy())
         #print('labels dimensions', self.trainlabels.shape)
         #print('labels val dimensions', self.vallabels.shape)
@@ -51,7 +53,7 @@ class Create_Dataset(Dataset):
 
         
         self.training_len = self.traindataset.shape[0] # Number of samples in the training set
-        self.input_len = window_size# number of time parts
+        self.input_len = self.window_size# number of time parts
         self.channel_len = self.traindataset.shape[2]# Number of features (Channels)
         self.output_len = 4 # classification category
         self.test_len = self.valdataset.shape[0]
@@ -59,7 +61,7 @@ class Create_Dataset(Dataset):
     
     def __getitem__(self, index):
         if self.mode == 'train':
-            #print(self.traindataset[index].shape, self.trainlabels[index].shape)
+            #print(self.traindataset[index].shape, self.trainlabels[index + self.window_size])
             return self.traindataset[index], self.trainlabels[index]
         elif self.mode == 'test':
             return self.valdataset[index], self.vallabels[index]
