@@ -42,8 +42,8 @@ class Transformer(Module):
                                                   dropout=dropout,
                                                   device=device) for _ in range(N)])
 
-        self.embedding_channel = torch.nn.Linear(d_channel, d_model).to(DEVICE)
-        self.embedding_input = torch.nn.Linear(d_input, d_model).to(DEVICE)
+        self.embedding_channel = torch.nn.Linear(d_channel, d_model)
+        self.embedding_input = torch.nn.Linear(d_input, d_model)
 
         self.gate = torch.nn.Linear(d_model * d_input + d_model * d_channel, 2)
         self.output_linear = torch.nn.Linear(d_model * d_input + d_model * d_channel, d_output)
@@ -62,7 +62,7 @@ class Transformer(Module):
         # step-wise
         # The score matrix is ​​input, and mask and pe are added by default
         #print(x.shape) # (16,100,9)
-        encoding_1 = self.embedding_channel(x.type(torch.FloatTensor))
+        encoding_1 = self.embedding_channel(x.type(torch.FloatTensor)).to(DEVICE)
         #print(encoding_1.shape) # (16,100,512)
         input_to_gather = encoding_1
 
