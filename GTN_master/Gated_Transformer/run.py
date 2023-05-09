@@ -120,14 +120,16 @@ def train():
     pbar = tqdm(total=EPOCH)
     begin = time()
     for index in range(EPOCH):
+        print(index)
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
 
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
 
             loss = loss_function(y_pre, y.to(DEVICE))
-
-            print(f'Epoch:{index + 1}:\t\tloss:{loss.item()}')
+            
+            if i % 1000 == 0:
+                print(f'Epoch:{i + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
 
             loss.backward()
