@@ -62,12 +62,9 @@ class Transformer(Module):
         # step-wise
         # The score matrix is ​​input, and mask and pe are added by default
         #print(x.shape) # (16,100,9)
-        encoding_1 = self.embedding_channel(x.type(torch.FloatTensor))
-        #print(encoding_1.shape) # (16,100,512)
-        #print(x.shape) # (16,100,9)
         encoding_1 = self.embedding_channel(x.type(torch.FloatTensor).to(DEVICE))
         #print(encoding_1.shape) # (16,100,512)
-        input_to_gather = encoding_1
+        input_to_gather = encoding_1 #QUESTION: Why are we using up more memory?
 
         if self.pe:
             pe = torch.ones_like(encoding_1[0])
@@ -81,12 +78,17 @@ class Transformer(Module):
 
             encoding_1 = encoding_1 + pe
 
+        #this applies the encoder, which includes the MHA, Add & Norm, Feed Forward, Add & Norm etc.
         for encoder in self.encoder_list_1:
             encoding_1, score_input = encoder(encoding_1, stage)
+        #print(encoding_1[0])
 
         # channel-wise
         # score matrix is ​​channel without mask and pe by default
+        
+        #print(x.transpose(-1,-2).shape) # (16,9,100)
         encoding_2 = self.embedding_input(x.transpose(-1, -2).type(torch.FloatTensor).to(DEVICE))
+        #print(encoding_2.shape) # (16,9,512)
         channel_to_gather = encoding_2
 
         for encoder in self.encoder_list_2:
@@ -95,6 +97,7 @@ class Transformer(Module):
         # 3D to 2D
         encoding_1 = encoding_1.reshape(encoding_1.shape[0], -1)
         encoding_2 = encoding_2.reshape(encoding_2.shape[0], -1)
+        print(encoding_1.shape, encoding_2.shape) #([16, 51200], [16, 4608])
 
         # gate
         gate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)

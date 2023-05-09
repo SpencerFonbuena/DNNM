@@ -44,7 +44,9 @@ class MultiHeadAttention(Module):
 
         score = F.softmax(score, dim=-1)
 
+        #print(score[0], score.shape) (128,100,100)
         attention = torch.matmul(score, V)
+        #print(attention[0], attention.shape) (128,100,8)
 
         attention_heads = torch.cat(attention.chunk(self._h, dim=0), dim=-1)
 
