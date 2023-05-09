@@ -143,7 +143,8 @@ def train():
 
             if current_accuracy > max_accuracy:
                 max_accuracy = current_accuracy
-                torch.save(net, f'saved_model/{file_name} batch={BATCH_SIZE}.pkl')
+                #torch.save(net, f'saved_model/{file_name} batch={BATCH_SIZE}.pkl')
+                torch.save(net, '/root/GTN/GTN_master//GTN_master/mach0.txt')
 
         pbar.update()
 
