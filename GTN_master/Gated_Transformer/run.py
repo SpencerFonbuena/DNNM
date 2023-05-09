@@ -128,8 +128,8 @@ def train():
 
             loss = loss_function(y_pre, y.to(DEVICE))
             
-            if i % 1000 == 0:
-                print(f'Epoch:{i + 1}:\t\tloss:{loss.item()}')
+            
+            #print(f'Epoch:{i + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
 
             loss.backward()
