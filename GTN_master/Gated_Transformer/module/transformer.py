@@ -5,6 +5,8 @@ from module.encoder import Encoder
 import math
 import torch.nn.functional as F
 
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
+print(f'use device: {DEVICE}')
 
 class Transformer(Module):
     def __init__(self,
