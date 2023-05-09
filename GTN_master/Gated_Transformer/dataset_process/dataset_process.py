@@ -59,7 +59,7 @@ class Create_Dataset(Dataset):
     
     def __getitem__(self, index):
         if self.mode == 'train':
-            print(self.traindataset[index].shape, self.trainlabels[index].shape)
+            #print(self.traindataset[index].shape, self.trainlabels[index].shape)
             return self.traindataset[index], self.trainlabels[index]
         elif self.mode == 'test':
             return self.valdataset[index], self.vallabels[index]
