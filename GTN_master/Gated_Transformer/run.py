@@ -3,6 +3,7 @@
 # @FileName: run.py
 
 import torch
+import torchmetrics as tm
 from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
 import torch.optim as optim
@@ -108,6 +109,7 @@ def test(dataloader, flag='test_set'):
         elif flag == 'train_set':
             correct_on_train.append(round((100 * correct / total), 2))
         print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
+        print(f'Accuracy: {tm.functional.accuracy(y_pre, y)}')
 
         return round((100 * correct / total), 2)
 
