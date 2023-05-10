@@ -42,7 +42,7 @@ class Transformer(Module):
                                                   dropout=dropout,
                                                   device=device) for _ in range(N)])
 
-        self.embedding_channel =  torch.nn.Linear(d_channel, d_model)
+        self.embedding_channel =  F.tanh(torch.nn.Linear(d_channel, d_model))
         self.embedding_input = torch.nn.Linear(d_input, d_model)
         
 
