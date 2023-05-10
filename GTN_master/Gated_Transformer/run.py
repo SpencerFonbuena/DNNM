@@ -32,8 +32,8 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\ArabicDigits\\ArabicDigits.mat'  # lenth=6600  input=93 channel=13 output=10
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
-path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
+path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
 test_interval = 5  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -51,7 +51,7 @@ d_hidden = 1024
 q = 8
 v = 8
 h = 8
-N = 8
+N = 16
 dropout = 0.2
 pe = True # # The setting is in the twin towers score=pe score=channel has no pe by default
 mask = True # set the mask of score=input in the twin towers score=channel has no mask by default
