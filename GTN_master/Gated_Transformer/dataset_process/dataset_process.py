@@ -19,7 +19,7 @@ class Create_Dataset(Dataset):
         self.mode = mode
         self.window_size = window_size
         #reading in the entire un windowed dataset with the labels still part
-        df = pd.read_csv(datafile, index_col=0, delimiter=',')
+        df = torch.nn.functional.normalize(pd.read_csv(datafile, index_col=0, delimiter=',').to_numpy())
         #creating the training dataset without the labels in the file
         labeldf = df.drop(columns='Labels')
 
@@ -38,7 +38,7 @@ class Create_Dataset(Dataset):
         #The reason it is splitlocation - windowsize is because the if the dataset goes till the same as the labels, it will add in 100 extra examples, whose set contains values 
         #beyond that of the labels. Similar to the long descripiton of self.trainlabels.
         self.traindataset = torch.tensor(np.vstack(window_set))[:(splitlocation - self.window_size), :]
-        print(self.traindataset.shape)
+        #print(self.traindataset.shape)
         self.valdataset = torch.tensor(np.vstack(window_set))[(splitlocation - self.window_size):, :]
         #print(self.valdataset.shape)
         
