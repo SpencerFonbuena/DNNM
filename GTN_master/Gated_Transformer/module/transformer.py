@@ -48,7 +48,7 @@ class Transformer(Module):
 
         self.gate = torch.nn.Linear(d_model * d_input + d_model * d_channel, 2)
         self.output_linear = torch.nn.Linear(d_model * d_input + d_model * d_channel, d_output)
-
+        
         self.pe = pe
         self._d_input = d_input
         self._d_model = d_model
