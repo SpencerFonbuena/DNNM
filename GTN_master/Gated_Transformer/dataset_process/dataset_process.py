@@ -19,7 +19,7 @@ class Create_Dataset(Dataset):
         self.mode = mode
         self.window_size = window_size
         #reading in the entire un windowed dataset with the labels still part
-        df = torch.nn.functional.normalize(pd.read_csv(datafile, index_col=0, delimiter=',').to_numpy())
+        df = pd.read_csv(datafile, index_col=0, delimiter=',')
         #creating the training dataset without the labels in the file
         labeldf = df.drop(columns='Labels')
 
@@ -34,19 +34,21 @@ class Create_Dataset(Dataset):
             example = labeldf[i: self.window_size + i]
             window_set.append(np.expand_dims(example, 0))
         
+        window_torch = torch.nn.functional.normalize(torch.tensor(window_set))
+
         #Training Dataset
         #The reason it is splitlocation - windowsize is because the if the dataset goes till the same as the labels, it will add in 100 extra examples, whose set contains values 
         #beyond that of the labels. Similar to the long descripiton of self.trainlabels.
-        self.traindataset = torch.tensor(np.vstack(window_set))[:(splitlocation - self.window_size), :]
+        self.traindataset = np.vstack(window_torch)[:(splitlocation - self.window_size), :]
         #print(self.traindataset.shape)
-        self.valdataset = torch.tensor(np.vstack(window_set))[(splitlocation - self.window_size):, :]
+        self.valdataset = np.vstack(window_torch)[(splitlocation - self.window_size):, :]
         #print(self.valdataset.shape)
         
         #Create the training labels. The reason it is starting from window size, is because there is technically labels for what happened after each timestep: however,
         #We created windows of data, so we want to know what is happening at the end of our window. If we started at the beginning, our labels would be off by the size of self.window_size
-        self.trainlabels = torch.tensor(df['Labels'][self.window_size: splitlocation].to_numpy())
+        self.trainlabels = df['Labels'][self.window_size: splitlocation].to_numpy()
         print(self.trainlabels.shape)
-        self.vallabels = torch.tensor(df['Labels'][splitlocation:].to_numpy())
+        self.vallabels = df['Labels'][splitlocation:].to_numpy()
         #print('labels dimensions', self.trainlabels.shape)
         #print('labels val dimensions', self.vallabels.shape)
 
