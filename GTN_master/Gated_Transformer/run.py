@@ -109,7 +109,7 @@ def test(dataloader, flag='test_set'):
         elif flag == 'train_set':
             correct_on_train.append(round((100 * correct / total), 2))
         accuracy = tm.Accuracy(task='multiclass', num_classes=4).to(DEVICE)
-        precision = tm.Precision(task='multiclass', average='macro', num_classes=4)
+        precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
         print(f'Accuracy: {accuracy(y_pre, y)} | Precision: {precision(y_pre, y)}')
 
