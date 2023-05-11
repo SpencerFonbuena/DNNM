@@ -56,7 +56,7 @@ dropout = 0.2
 pe = True # # The setting is in the twin towers score=pe score=channel has no pe by default
 mask = True # set the mask of score=input in the twin towers score=channel has no mask by default
 # optimizer selection
-optimizer_name = 'Adagrad'
+optimizer_name = 'Adam'
 
 train_dataset = Create_Dataset(datafile=path, window_size=100, split=.8, mode='train')
 test_dataset = Create_Dataset(datafile=path, window_size=100, split=.8, mode='test')
