@@ -111,5 +111,6 @@ class Transformer(Module):
 
         # output
         #output = F.softmax(self.output_linear(encoding), dim=0)
+        #The reason I didn't apply the softmax layer, is that supposedly the torch crossentropyloss expects unnormalized logits for each class. 
         output = self.output_linear(encoding)
         return output, encoding, score_input, score_channel, input_to_gather, channel_to_gather, gate
