@@ -25,6 +25,7 @@ class Transformer(Module):
                  mask: bool = False):
         super(Transformer, self).__init__()
 
+        #These for loops will loop through the encodder N amount of times, which N is the number of heads. So this is creating the "multi" portion of the multi-headed attention layer
         self.encoder_list_1 = ModuleList([Encoder(d_model=d_model,
                                                   d_hidden=d_hidden,
                                                   q=q,
@@ -96,6 +97,9 @@ class Transformer(Module):
             encoding_2, score_channel = encoder(encoding_2, stage)
 
         # 3D to 2D
+        #print(encoding_1.shape, encoding_2.shape) #([16, 100, 512], [16, 9, 512])
+        #print(encoding_1.shape[-1])
+        #A torch.view might be the better option here, so that we don't have to store any new memory
         encoding_1 = encoding_1.reshape(encoding_1.shape[0], -1)
         encoding_2 = encoding_2.reshape(encoding_2.shape[0], -1)
         #print(encoding_1.shape, encoding_2.shape) #([16, 51200], [16, 4608])
@@ -104,7 +108,8 @@ class Transformer(Module):
         gate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)
         encoding = torch.cat([encoding_1 * gate[:, 0:1], encoding_2 * gate[:, 1:2]], dim=-1)
 
+
         # output
-        output = self.output_linear(encoding)
+        output = F.softmax(self.output_linear(encoding))
 
         return output, encoding, score_input, score_channel, input_to_gather, channel_to_gather, gate

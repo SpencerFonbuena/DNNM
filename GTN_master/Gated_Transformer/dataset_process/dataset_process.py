@@ -29,10 +29,11 @@ class Create_Dataset(Dataset):
        #temporarily store the windowed data
         window_set = []
 
-        #window the data
+        #window the data | This can be optimmized to be much faster
         for i in range(len(labeldf) - self.window_size):
             example = labeldf[i: self.window_size + i]
             window_set.append(np.expand_dims(example, 0))
+        window_set = np.array(window_set)
         
         window_torch = torch.nn.functional.normalize(torch.tensor(window_set))
 
@@ -46,9 +47,9 @@ class Create_Dataset(Dataset):
         
         #Create the training labels. The reason it is starting from window size, is because there is technically labels for what happened after each timestep: however,
         #We created windows of data, so we want to know what is happening at the end of our window. If we started at the beginning, our labels would be off by the size of self.window_size
-        self.trainlabels = df['Labels'][self.window_size: splitlocation].to_numpy()
-        print(self.trainlabels.shape)
-        self.vallabels = df['Labels'][splitlocation:].to_numpy()
+        self.trainlabels = pd.get_dummies(df['Labels'][self.window_size: splitlocation]).to_numpy()
+        #print(self.trainlabels.shape)
+        self.vallabels = pd.get_dummies(df['Labels'][splitlocation:]).to_numpy()
         #print('labels dimensions', self.trainlabels.shape)
         #print('labels val dimensions', self.vallabels.shape)
 

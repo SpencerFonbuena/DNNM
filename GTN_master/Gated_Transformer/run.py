@@ -33,8 +33,8 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\ArabicDigits\\ArabicDigits.mat'  # lenth=6600  input=93 channel=13 output=10
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
-path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
+path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
 test_interval = 5  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -65,7 +65,7 @@ test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffl
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
 d_input = train_dataset.input_len # number of time parts
-d_channel = train_dataset.channel_len # time series dimension
+d_channel = train_dataset.channel_len # feature dimension
 d_output = train_dataset.output_len # classification category
 
 # Dimension display
@@ -140,6 +140,8 @@ def train():
             loss.backward()
 
             optimizer.step()
+
+
 
         if ((index + 1) % test_interval) == 0:
             current_accuracy = test(test_dataloader)

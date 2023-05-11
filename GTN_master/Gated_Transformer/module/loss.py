@@ -8,7 +8,7 @@ class Myloss(Module):
         self.loss_function = CrossEntropyLoss()
 
     def forward(self, y_pre, y_true):
-        y_true = y_true.long()
+        y_true = y_true.type(torch.FloatTensor)
         loss = self.loss_function(y_pre, y_true)
 
         return loss
