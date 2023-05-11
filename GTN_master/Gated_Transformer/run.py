@@ -108,7 +108,7 @@ def test(dataloader, flag='test_set'):
         #    correct_on_test.append(round((100 * correct / total), 2))
         #elif flag == 'train_set':
         #    correct_on_train.append(round((100 * correct / total), 2))
-        accuracy = tm.Accuracy(task='multiclass', num_classes=4).to(DEVICE)
+        accuracy = tm.Accuracy(task='multiclass', num_classes=4, average='macro').to(DEVICE)
         precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         recall = tm.Recall(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         checo = tm.F1Score(task='multiclass', num_classes=4).to(DEVICE)
