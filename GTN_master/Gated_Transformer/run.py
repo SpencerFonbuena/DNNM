@@ -110,8 +110,10 @@ def test(dataloader, flag='test_set'):
             correct_on_train.append(round((100 * correct / total), 2))
         accuracy = tm.Accuracy(task='multiclass', num_classes=4).to(DEVICE)
         precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
+        recall = tm.Recall(task='multiclass', average='macro', num_classes=4).to(DEVICE)
+        checo = tm.F1Score(task='multiclass', num_classes=4).to(DEVICE)
         #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
-        print(f'Accuracy: {accuracy(y_pre, y)} | Precision: {precision(y_pre, y)}')
+        print(f'Accuracy: {accuracy(y_pre, y)} | Precision: {precision(y_pre, y)} | Recall: {recall(y_pre, y)} | F1-Score: {checo(y_pre, y)} |')
 
         return round((100 * correct / total), 2)
 
