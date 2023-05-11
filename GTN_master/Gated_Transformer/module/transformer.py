@@ -110,6 +110,6 @@ class Transformer(Module):
 
 
         # output
-        output = F.softmax(self.output_linear(encoding))
+        output = F.softmax(self.output_linear(encoding), dim=0)
 
         return output, encoding, score_input, score_channel, input_to_gather, channel_to_gather, gate
