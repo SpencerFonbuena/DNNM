@@ -43,7 +43,7 @@ file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file 
 # hyperparameter settings
 EPOCH = 100
 BATCH_SIZE = 64
-LR = 1e-6
+LR = 1e-4
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 d_model = 512
