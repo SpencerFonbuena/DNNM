@@ -102,12 +102,12 @@ def test(dataloader, flag='test_set'):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre, _, _, _, _, _, _ = net(x, 'test')
             _, label_index = torch.max(y_pre.data, dim=-1)
-            total += label_index.shape[0]
-            correct += (label_index == y.long()).sum().item()
-        if flag == 'test_set':
-            correct_on_test.append(round((100 * correct / total), 2))
-        elif flag == 'train_set':
-            correct_on_train.append(round((100 * correct / total), 2))
+            #total += label_index.shape[0]
+            #correct += (label_index == y.long()).sum().item()
+        #if flag == 'test_set':
+        #    correct_on_test.append(round((100 * correct / total), 2))
+        #elif flag == 'train_set':
+        #    correct_on_train.append(round((100 * correct / total), 2))
         accuracy = tm.Accuracy(task='multiclass', num_classes=4).to(DEVICE)
         precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         recall = tm.Recall(task='multiclass', average='macro', num_classes=4).to(DEVICE)
@@ -115,7 +115,7 @@ def test(dataloader, flag='test_set'):
         #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
         print(f'Accuracy: {accuracy(y_pre, y)} | Precision: {precision(y_pre, y)} | Recall: {recall(y_pre, y)} | F1-Score: {checo(y_pre, y)} |')
 
-        return round((100 * correct / total), 2)
+        #return round((100 * correct / total), 2)
 
 
 # training function
