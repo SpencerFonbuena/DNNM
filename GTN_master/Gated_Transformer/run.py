@@ -36,7 +36,7 @@ reslut_figure_path = 'result_figure'  # Result image save path
 path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
 #path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
-test_interval = 5  # Test interval unit: epoch
+test_interval = 2  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
@@ -112,10 +112,14 @@ def test(dataloader, flag='test_set'):
         precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         recall = tm.Recall(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         checo = tm.F1Score(task='multiclass', num_classes=4).to(DEVICE)
-        #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
-        print(f'Accuracy: {accuracy(y_pre, y)} | Precision: {precision(y_pre, y)} | Recall: {recall(y_pre, y)} | F1-Score: {checo(y_pre, y)} |')
 
-        #return round((100 * correct / total), 2)
+        raccuracy = accuracy(y_pre, y)
+        rprecisions = precision(y_pre, y)
+        rrecall = recall(y_pre, y)
+        #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
+        print(f'Accuracy: {raccuracy} | Precision: {rprecisions} | Recall: {rrecall}')
+
+        return raccuracy
 
 
 # training function
