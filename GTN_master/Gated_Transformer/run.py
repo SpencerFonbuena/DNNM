@@ -43,7 +43,7 @@ file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file 
 # hyperparameter settings
 EPOCH = 100
 BATCH_SIZE = 128
-LR = 10
+LR = 1e-4
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 d_model = 512
@@ -58,9 +58,9 @@ mask = True # set the mask of score=input in the twin towers score=channel has n
 # optimizer selection
 optimizer_name = 'Adam'
 
-train_dataset = Create_Dataset(datafile=path, window_size=100, split=.8, mode='train')
-test_dataset = Create_Dataset(datafile=path, window_size=100, split=.8, mode='test')
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+train_dataset = Create_Dataset(datafile=path, window_size=30, split=.9, mode='train')
+test_dataset = Create_Dataset(datafile=path, window_size=30, split=.9, mode='test')
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=False)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
