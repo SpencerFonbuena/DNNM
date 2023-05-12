@@ -33,8 +33,8 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\ArabicDigits\\ArabicDigits.mat'  # lenth=6600  input=93 channel=13 output=10
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
-path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
+path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
 test_interval = 2  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -115,7 +115,7 @@ def test(dataloader, flag='test_set'):
         rprecisions = precision(y_pre, y)
         rrecall = recall(y_pre, y)
         #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
-        print(f'Accuracy: {raccuracy} | Precision: {rprecisions} | Recall: {rrecall}')
+        print(f'Accuracy: {raccuracy} | Precision: {rprecisions} | Recall: {rrecall} | Loss: {loss_list[-1]}')
 
         return raccuracy
 

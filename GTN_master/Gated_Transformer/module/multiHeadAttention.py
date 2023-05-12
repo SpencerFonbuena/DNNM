@@ -34,6 +34,7 @@ class MultiHeadAttention(Module):
         K = torch.cat(self.W_k(x).chunk(self._h, dim=-1), dim=0)
         V = torch.cat(self.W_v(x).chunk(self._h, dim=-1), dim=0)
 
+        #This creates the attention, which means that self.score is the un-softmaxed attnention weights
         score = torch.matmul(Q, K.transpose(-1, -2)) / math.sqrt(self._q)
         self.score = score
 
@@ -44,12 +45,13 @@ class MultiHeadAttention(Module):
 
         score = F.softmax(score, dim=-1)
 
-        #print(score[0], score.shape) (128,100,100)
+        #print(score[0], score.shape) #(128,100,100)
         attention = torch.matmul(score, V)
-        #print(attention[0], attention.shape) (128,100,8)
+        #print(attention[0], attention.shape) #(128,100,8)
 
         attention_heads = torch.cat(attention.chunk(self._h, dim=0), dim=-1)
 
         self_attention = self.W_o(attention_heads)
-
+        
+        #print(score[0], self.score[0], score.shape, self.score.shape)
         return self_attention, self.score
