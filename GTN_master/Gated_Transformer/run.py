@@ -43,15 +43,15 @@ file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file 
 # hyperparameter settings
 EPOCH = 100
 BATCH_SIZE = 128
-LR = 1e-4
+LR = 1e-3
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 d_model = 512
 d_hidden = 1024
-q = 8
-v = 8
-h = 8
-N = 16
+q = 16
+v = 16
+h = 16
+N = 32
 dropout = 0.2
 pe = True # # The setting is in the twin towers score=pe score=channel has no pe by default
 mask = True # set the mask of score=input in the twin towers score=channel has no mask by default
