@@ -108,16 +108,16 @@ def test(dataloader, flag='test_set'):
         #    correct_on_test.append(round((100 * correct / total), 2))
         #elif flag == 'train_set':
         #    correct_on_train.append(round((100 * correct / total), 2))
-        accuracy = tm.Accuracy(task='multiclass', num_classes=4, average='macro').to(DEVICE)
+        #accuracy = tm.Accuracy(task='multiclass', num_classes=4, average='macro').to(DEVICE)
         precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         recall = tm.Recall(task='multiclass', average='macro', num_classes=4).to(DEVICE)
-        raccuracy = accuracy(y_pre, y)
+        #raccuracy = accuracy(y_pre, y)
         rprecisions = precision(y_pre, y)
         rrecall = recall(y_pre, y)
         #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
-        print(f'Accuracy: {raccuracy} | Precision: {rprecisions} | Recall: {rrecall} | Loss: {loss_list[-1]}')
+        print(f'Precision: {rprecisions} | Recall: {rrecall} | Loss: {loss_list[-1]}')
 
-        return raccuracy
+        return rprecisions
 
 
 # training function
