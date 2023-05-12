@@ -143,14 +143,14 @@ def train():
 
 
         if ((index + 1) % test_interval) == 0:
-            current_accuracy = test(test_dataloader)
+            #current_accuracy = test(test_dataloader)
             test(train_dataloader, 'train_set')
             #print(f'current maximum accuracy\t test set: {max(correct_on_test)}%\t training set: {max(correct_on_train)}%')
 
-            if current_accuracy > max_accuracy:
-                max_accuracy = current_accuracy
+            #if current_accuracy > max_accuracy:
+                #max_accuracy = current_accuracy
                 #torch.save(net, f'saved_model/{file_name} batch={BATCH_SIZE}.pkl')
-                torch.save(net, '/root/GTN/GTN_master/mach0.txt')
+                #torch.save(net, '/root/GTN/GTN_master/mach0.txt')
 
         pbar.update()
 
