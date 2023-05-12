@@ -42,7 +42,7 @@ file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file 
 
 # hyperparameter settings
 EPOCH = 100
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 LR = 1e-4
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
@@ -111,8 +111,6 @@ def test(dataloader, flag='test_set'):
         accuracy = tm.Accuracy(task='multiclass', num_classes=4, average='macro').to(DEVICE)
         precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
         recall = tm.Recall(task='multiclass', average='macro', num_classes=4).to(DEVICE)
-        checo = tm.F1Score(task='multiclass', num_classes=4).to(DEVICE)
-
         raccuracy = accuracy(y_pre, y)
         rprecisions = precision(y_pre, y)
         rrecall = recall(y_pre, y)
@@ -136,7 +134,6 @@ def train():
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
 
             loss = loss_function(y_pre, y.to(DEVICE))
-            
             
             #print(f'Epoch:{i + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
