@@ -126,7 +126,6 @@ def train():
     pbar = tqdm(total=EPOCH)
     begin = time()
     for index in range(EPOCH):
-        print(index)
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
 
@@ -150,6 +149,7 @@ def train():
         if ((index + 1) % test_interval) == 0:
             #current_accuracy = test(test_dataloader)
             test(train_dataloader, 'train_set')
+            print(loss)
             #print(f'current maximum accuracy\t test set: {max(correct_on_test)}%\t training set: {max(correct_on_train)}%')
 
             #if current_accuracy > max_accuracy:
