@@ -42,9 +42,9 @@ draw_key = 1  # Greater than or equal to draw_key will save the image
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
 # hyperparameter settings
-EPOCH = 100
+EPOCH = 225
 BATCH_SIZE = 128
-LR = 1e-4
+LR = 2e-4
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 d_model = 512
@@ -141,10 +141,10 @@ def train():
 
             optimizer.step()
 
-            if i % 20 == 0:
-                print(loss)
-            if i % 60 == 0:
-                print(np.array(loss_list).mean())
+            #if i % 20 == 0:
+             #   print(loss)
+            #if i % 60 == 0:
+             #   print(np.array(loss_list).mean())
 
 
         if ((index + 1) % test_interval) == 0:
