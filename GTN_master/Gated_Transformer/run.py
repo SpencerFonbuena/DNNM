@@ -36,7 +36,7 @@ reslut_figure_path = 'result_figure'  # Result image save path
 path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
 #path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
-test_interval = 2  # Test interval unit: epoch
+test_interval = 10  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
