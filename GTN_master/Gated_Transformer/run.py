@@ -10,6 +10,7 @@ import torch.optim as optim
 from time import time
 from tqdm import tqdm
 import os
+import numpy as np
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -33,8 +34,8 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\ArabicDigits\\ArabicDigits.mat'  # lenth=6600  input=93 channel=13 output=10
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
-path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
+path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
 test_interval = 10  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -142,7 +143,8 @@ def train():
 
             if i % 20 == 0:
                 print(loss)
-
+            if i % 60 == 0:
+                print(np.array(loss_list).mean())
 
 
         if ((index + 1) % test_interval) == 0:
