@@ -101,7 +101,7 @@ def test(dataloader, flag='test_set'):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre, _, _, _, _, _, _ = net(x, 'test')
-            _, label_index = torch.max(y_pre.data, dim=-1)
+            #_, label_index = torch.max(y_pre.data, dim=-1)
             #total += label_index.shape[0]
             #correct += (label_index == y.long()).sum().item()
         #if flag == 'test_set':
@@ -115,7 +115,7 @@ def test(dataloader, flag='test_set'):
         #rprecisions = precision(y_pre, y)
         #rrecall = recall(y_pre, y)
         #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
-        print(f' Loss: {loss_list[-1]}')
+        #print(f' Loss: {loss_list[-1]}')
 
 
 # training function
@@ -139,6 +139,9 @@ def train():
             loss.backward()
 
             optimizer.step()
+
+            if i % 20 == 0:
+                print(loss)
 
 
 
