@@ -59,8 +59,8 @@ mask = True # set the mask of score=input in the twin towers score=channel has n
 # optimizer selection
 optimizer_name = 'Adam'
 
-train_dataset = Create_Dataset(datafile=path, window_size=30, split=.85, mode='train')
-test_dataset = Create_Dataset(datafile=path, window_size=30, split=.85, mode='test')
+train_dataset = Create_Dataset(datafile=path, window_size=120, split=.85, mode='train')
+test_dataset = Create_Dataset(datafile=path, window_size=120, split=.85, mode='test')
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=False)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
