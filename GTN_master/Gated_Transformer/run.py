@@ -11,7 +11,6 @@ from time import time
 from tqdm import tqdm
 import os
 import numpy as np
-from torchinfo import summary
 
 from module.transformer import Transformer
 from module.loss import Myloss
