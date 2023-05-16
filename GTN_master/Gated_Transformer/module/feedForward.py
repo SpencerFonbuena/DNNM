@@ -14,12 +14,12 @@ class FeedForward(Module):
     def forward(self, x):
 
         x = self.linear_1(x)
-        with torch.no_grad():
-            print("F",x.max(), x.min(), x.mean())
+        #with torch.no_grad():
+            #print("F",x.max(), x.min(), x.mean())
         x = F.relu(x)
-        with torch.no_grad():
-            print('F',x.max(), x.min(), x.mean())
+        #with torch.no_grad():
+            #print('F',x.max(), x.min(), x.mean())
         x = self.linear_2(x)
-        with torch.no_grad():
-            print('F', x.max(), x.min(), x.mean())
+        #with torch.no_grad():
+            #print('F', x.max(), x.min(), x.mean())
         return x
