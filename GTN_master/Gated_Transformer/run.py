@@ -35,7 +35,7 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
 path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/Users/spencerfonbuena/Desktop/AAPL_1hour_expanded_test 3.txt'
 
 test_interval = 2  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -109,10 +109,12 @@ def test(dataloader, flag=str):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre, _, _, _, _, _, _ = net(x, 'test')
-
+            #print(y_pre[:15], y[:15])
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
+            #print(total)
             correct += (label_index == y.long()).sum().item()
+            #print(correct)
         if flag == "train_set":
             print(f"Train Accuracy: {correct / total * 100}")
         if flag == "test_set":

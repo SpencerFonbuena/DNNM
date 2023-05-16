@@ -9,7 +9,7 @@ from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-print(f'Use device {DEVICE}')
+#print(f'Use device {DEVICE}')
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):

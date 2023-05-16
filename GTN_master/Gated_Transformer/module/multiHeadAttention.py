@@ -31,11 +31,19 @@ class MultiHeadAttention(Module):
 
     def forward(self, x, stage):
         Q = torch.cat(self.W_q(x).chunk(self._h, dim=-1), dim=0)
+        with torch.no_grad():
+            print('M', Q.min(), Q.max(), Q.mean())
         K = torch.cat(self.W_k(x).chunk(self._h, dim=-1), dim=0)
+        with torch.no_grad():
+            print('M', K.min(), K.max(), K.mean())
         V = torch.cat(self.W_v(x).chunk(self._h, dim=-1), dim=0)
+        with torch.no_grad():
+            print('M', V.min(), V.max(), V.mean())
 
         #This creates the attention, which means that self.score is the un-softmaxed attnention weights
         score = torch.matmul(Q, K.transpose(-1, -2)) / math.sqrt(self._q)
+        with torch.no_grad():
+            print('M', score.max(), score.min(), score.mean())
         self.score = score
 
         if self.mask and stage == 'train':
@@ -44,14 +52,16 @@ class MultiHeadAttention(Module):
             score = torch.where(mask > 0, score, torch.Tensor([-2**32+1]).expand_as(score[0]).to(self.device))
 
         score = F.softmax(score, dim=-1)
-
-        #print(score[0], score.shape) #(128,100,100)
+        with torch.no_grad():
+            print('M', score.max(), score.min(), score.mean())
+        #print('M', score[0], score.shape) #(128,100,100)
         attention = torch.matmul(score, V)
-        #print(attention[0], attention.shape) #(128,100,8)
+        #print('M', attention[0], attention.shape) #(128,100,8)
 
         attention_heads = torch.cat(attention.chunk(self._h, dim=0), dim=-1)
 
         self_attention = self.W_o(attention_heads)
-        
-        #print(score[0], self.score[0], score.shape, self.score.shape)
+        with torch.no_grad():
+            print('M', self_attention.max(), self_attention.min(), self_attention.mean())
+        #print('M', score[0], self.score[0], score.shape, self.score.shape)
         return self_attention, self.score
