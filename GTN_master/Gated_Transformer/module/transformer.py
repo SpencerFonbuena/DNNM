@@ -102,15 +102,15 @@ class Transformer(Module):
         #A torch.view might be the better option here, so that we don't have to store any new memory
         encoding_1 = encoding_1.reshape(encoding_1.shape[0], -1)
         encoding_2 = encoding_2.reshape(encoding_2.shape[0], -1)
-        with torch.no_grad():
-            print('t', encoding_1.max(), encoding_1.min(), encoding_1.mean())
-            print('t', encoding_2.max(), encoding_2.min(), encoding_2.mean())
+        #with torch.no_grad():
+            #print('t', encoding_1.max(), encoding_1.min(), encoding_1.mean())
+            #print('t', encoding_2.max(), encoding_2.min(), encoding_2.mean())
         #print(encoding_1.shape, encoding_2.shape) #([16, 51200], [16, 4608])
 
         # gate
         gate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)
-        with torch.no_grad():
-            print('t', gate.max(), gate.min(), gate.mean())
+        #with torch.no_grad():
+            #print('t', gate.max(), gate.min(), gate.mean())
         encoding = torch.cat([encoding_1 * gate[:, 0:1], encoding_2 * gate[:, 1:2]], dim=-1)
 
 
@@ -118,6 +118,6 @@ class Transformer(Module):
         #output = F.softmax(self.output_linear(encoding), dim=0)
         #The reason I didn't apply the softmax layer, is that supposedly the torch crossentropyloss expects unnormalized logits for each class. 
         output = self.output_linear(encoding)
-        with torch.no_grad():
-            print('t', output.max(), output.min(), output.mean())
+        #with torch.no_grad():
+            #print('t', output.max(), output.min(), output.mean())
         return output, encoding, score_input, score_channel, input_to_gather, channel_to_gather, gate

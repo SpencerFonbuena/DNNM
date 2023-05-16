@@ -25,18 +25,18 @@ class Encoder(Module):
     def forward(self, x, stage):
         
         residual = x
-        with torch.no_grad():
-            print('e', residual.max(), residual.min(), residual.mean())
+        #with torch.no_grad():
+            #print('e', residual.max(), residual.min(), residual.mean())
         x, score = self.MHA(x, stage)
         x = self.dropout(x)
         x = self.layerNormal_1(x + residual)
-        with torch.no_grad():
-            print('e', x.max(), x.min(), x.mean())
+        #with torch.no_grad():
+            #print('e', x.max(), x.min(), x.mean())
 
         residual = x
         x = self.feedforward(x)
         x = self.dropout(x)
         x = self.layerNormal_2(x + residual)
-        with torch.no_grad():
-            print('e', x.max(), x.min(), x.mean())
+        #with torch.no_grad():
+            #print('e', x.max(), x.min(), x.mean())
         return x, score
