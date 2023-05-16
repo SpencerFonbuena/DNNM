@@ -81,9 +81,9 @@ net = Transformer(d_model=d_model, d_input=d_input, d_channel=d_channel, d_outpu
                   q=q, v=v, h=h, N=N, dropout=dropout, pe=pe, mask=mask, device=DEVICE).to(DEVICE)
 
 #print the model summary
-    #print(net)
+#print(net)
 #Print the number of parameters
-    #print(sum([param.nelement() for param in net.parameters()])) (Currently there are: 101M parameters)
+#print(sum([param.nelement() for param in net.parameters()])) (Currently there are: 101M parameters)
 
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
@@ -128,26 +128,12 @@ def train():
     for index in range(EPOCH):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
-
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
-
             loss = loss_function(y_pre, y.to(DEVICE))
-            
-            #print(loss)
-            #print(f'Epoch:{i + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
-
             loss.backward()
-
-            
             optimizer.step()
-
-            #if i % 20 == 0:
-             #   print(loss)
-            #if i % 60 == 0:
-             #   print(np.array(loss_list).mean())
-
-
+        #validate training accuracy and test accuracy
         if ((index + 1) % test_interval) == 0:
             #current_accuracy = test(test_dataloader)
             test(train_dataloader, 'train_set')
