@@ -11,6 +11,7 @@ from time import time
 from tqdm import tqdm
 import os
 import numpy as np
+from torchinfo import summary
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -34,8 +35,8 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\ArabicDigits\\ArabicDigits.mat'  # lenth=6600  input=93 channel=13 output=10
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
-path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
+path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
 test_interval = 10  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -61,8 +62,8 @@ optimizer_name = 'Adam'
 
 train_dataset = Create_Dataset(datafile=path, window_size=120, split=.85, mode='train')
 test_dataset = Create_Dataset(datafile=path, window_size=120, split=.85, mode='test')
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=False)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
 d_input = train_dataset.input_len # number of time parts
@@ -78,6 +79,12 @@ print(f'Number of classes: {d_output}')
 # Create a Transformer model
 net = Transformer(d_model=d_model, d_input=d_input, d_channel=d_channel, d_output=d_output, d_hidden=d_hidden,
                   q=q, v=v, h=h, N=N, dropout=dropout, pe=pe, mask=mask, device=DEVICE).to(DEVICE)
+
+#print the model summary
+    #print(net)
+#Print the number of parameters
+    #print(sum([param.nelement() for param in net.parameters()])) (Currently there are: 101M parameters)
+
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
 if optimizer_name == 'Adagrad':
@@ -94,30 +101,23 @@ time_cost = 0
 
 
 # test function
-def test(dataloader, flag='test_set'):
+def test(dataloader, flag=str):
     correct = 0
     total = 0
+
+    net.eval()
     with torch.no_grad():
-        net.eval()
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre, _, _, _, _, _, _ = net(x, 'test')
-            #_, label_index = torch.max(y_pre.data, dim=-1)
-            #total += label_index.shape[0]
-            #correct += (label_index == y.long()).sum().item()
-        #if flag == 'test_set':
-        #    correct_on_test.append(round((100 * correct / total), 2))
-        #elif flag == 'train_set':
-        #    correct_on_train.append(round((100 * correct / total), 2))
-        #accuracy = tm.Accuracy(task='multiclass', num_classes=4, average='macro').to(DEVICE)
-        #precision = tm.Precision(task='multiclass', average='macro', num_classes=4).to(DEVICE)
-        #recall = tm.Recall(task='multiclass', average='macro', num_classes=4).to(DEVICE)
-        #raccuracy = accuracy(y_pre, y)
-        #rprecisions = precision(y_pre, y)
-        #rrecall = recall(y_pre, y)
-        #print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
-        #print(f' Loss: {loss_list[-1]}')
 
+            _, label_index = torch.max(y_pre.data, dim=-1)
+            total += label_index.shape[0]
+            correct += (label_index == y.long()).sum().item()
+        if flag == "train_set":
+            print(f"Train Accuracy: {correct / total * 100}")
+        if flag == "test_set":
+            print(f"Test Accuracy: {correct / total * 100}")
 
 # training function
 def train():
@@ -133,11 +133,13 @@ def train():
 
             loss = loss_function(y_pre, y.to(DEVICE))
             
+            #print(loss)
             #print(f'Epoch:{i + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
 
             loss.backward()
 
+            
             optimizer.step()
 
             #if i % 20 == 0:
@@ -149,7 +151,7 @@ def train():
         if ((index + 1) % test_interval) == 0:
             #current_accuracy = test(test_dataloader)
             test(train_dataloader, 'train_set')
-            print(loss)
+            test(test_dataloader, 'test_set')
             #print(f'current maximum accuracy\t test set: {max(correct_on_test)}%\t training set: {max(correct_on_train)}%')
 
             #if current_accuracy > max_accuracy:
