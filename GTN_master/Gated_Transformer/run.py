@@ -35,17 +35,17 @@ reslut_figure_path = 'result_figure'  # Result image save path
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\ArabicDigits\\ArabicDigits.mat'  # lenth=6600  input=93 channel=13 output=10
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\PEMS\\PEMS.mat'
 # path = 'E:\PyCharmWorkSpace\\dataset\\MTS_dataset\\Wafer\\Wafer.mat'
-#path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
-path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
+path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test.txt'
+#path = '/Users/spencerfonbuena/Documents/Python/Trading Models/gtn/GTN_master/AAPL_1hour_expanded_test.txt'
 
-test_interval = 10  # Test interval unit: epoch
+test_interval = 2  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
 # hyperparameter settings
 EPOCH = 225
 BATCH_SIZE = 16
-LR = 2e-4
+LR = 1e-4
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 d_model = 512
@@ -136,6 +136,7 @@ def train():
         #validate training accuracy and test accuracy
         if ((index + 1) % test_interval) == 0:
             #current_accuracy = test(test_dataloader)
+            print(loss)
             test(train_dataloader, 'train_set')
             test(test_dataloader, 'test_set')
             #print(f'current maximum accuracy\t test set: {max(correct_on_test)}%\t training set: {max(correct_on_train)}%')
