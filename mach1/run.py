@@ -93,12 +93,9 @@ def test(dataloader, flag=str):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre, _, _, _, _, _, _ = net(x, 'test')
-            #print(y_pre[:15], y[:15])
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
-            #print(total)
             correct += (label_index == y.long()).sum().item()
-            #print(correct)
         if flag == "train_set":
             print(f"Train Accuracy: {correct / total * 100}")
         if flag == "test_set":
@@ -107,7 +104,6 @@ def test(dataloader, flag=str):
 # training function
 def train():
     net.train()
-    begin = time()
     for index in range(EPOCH):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
@@ -118,22 +114,12 @@ def train():
             optimizer.step()
         #validate training accuracy and test accuracy
         if ((index + 1) % test_interval) == 0:
-            #current_accuracy = test(test_dataloader)
             print(loss)
             test(train_dataloader, 'train_set')
             test(test_dataloader, 'test_set')
-            #print(f'current maximum accuracy\t test set: {max(correct_on_test)}%\t training set: {max(correct_on_train)}%')
 
-            #if current_accuracy > max_accuracy:
-                #max_accuracy = current_accuracy
-                #torch.save(net, f'saved_model/{file_name} batch={BATCH_SIZE}.pkl')
-                #torch.save(net, '/root/GTN/GTN_master/mach0.txt')
 
-    os.rename(f'saved_model/{file_name} batch={BATCH_SIZE}.pkl',
-              f'saved_model/{file_name} {max_accuracy} batch={BATCH_SIZE}.pkl')
 
-    end = time()
-    time_cost = round((end - begin) / 60, 2)
 
 if __name__ == '__main__':
     train()
