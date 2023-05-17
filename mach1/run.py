@@ -24,8 +24,8 @@ wandb.init(
     project='test projectvm'
 )
 
-path = 'gtn/mach1/AAPL_1hour_expand.txt'
-#path = '/Users/spencerfonbuena/Desktop/AAPL_1hour_expanded_test 3.txt'
+#path = 'gtn/mach1/AAPL_1hour_expand.txt'
+path = '/root/GTN/GTN_master/AAPL_1hour_expand.txt'
 
 test_interval = 2  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
