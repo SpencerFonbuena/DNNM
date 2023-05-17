@@ -11,6 +11,7 @@ from time import time
 from tqdm import tqdm
 import os
 import numpy as np
+import wandb
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -19,7 +20,11 @@ from module.hyperparameters import HyperParameters as hp
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
-path = '/root/GTN/GTN_master/AAPL_1hour_expand.txt'
+wandb.init(
+    project='test projectvm'
+)
+
+path = 'gtn/mach1/AAPL_1hour_expand.txt'
 #path = '/Users/spencerfonbuena/Desktop/AAPL_1hour_expanded_test 3.txt'
 
 test_interval = 2  # Test interval unit: epoch
@@ -28,8 +33,8 @@ file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file 
 
 
 
-train_dataset = Create_Dataset(datafile=path, window_size=120, split=.85, mode='train')
-test_dataset = Create_Dataset(datafile=path, window_size=120, split=.85, mode='test')
+train_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='train')
+test_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='test')
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2)
 
@@ -80,10 +85,12 @@ def test(dataloader, flag=str):
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
+            accuracy = correct / total * 100
         if flag == "train_set":
             print(f"Train Accuracy: {correct / total * 100}")
         if flag == "test_set":
             print(f"Test Accuracy: {correct / total * 100}")
+        wandb.log({"acc": accuracy})
 
 # training function
 def train():
