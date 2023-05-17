@@ -95,6 +95,7 @@ def test(dataloader, flag=str):
 # training function
 def train():
     net.train()
+    wandb.watch(net, log='all')
     for index in range(hp.EPOCH):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
