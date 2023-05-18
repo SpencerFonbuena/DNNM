@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
 import torch.optim as optim
 from time import time
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import os
 import numpy as np
 import wandb
@@ -102,7 +102,7 @@ def test(dataloader, flag=str):
 def train():
     net.train()
     wandb.watch(net, log='all')
-    for index in range(hp.EPOCH):
+    for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
