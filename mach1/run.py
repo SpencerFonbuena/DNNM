@@ -104,7 +104,7 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
-            wandb.log(loss)
+            wandb.log({'loss': loss})
         #validate training accuracy and test accuracy
         if ((index + 1) % test_interval) == 0:
             test(train_dataloader, 'train_set')
