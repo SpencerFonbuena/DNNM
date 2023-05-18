@@ -20,7 +20,7 @@ wandb.init(
     name='randomseedtestchangerelu'
 )
 
-path = 'gtn/mach1/AAPL_1hour_expand.txt'
+path = '/root/GTN/mach1/AAPL_1hour_expand.txt'
 
 #Hyperparameters
 hiddenlayers = 1024
