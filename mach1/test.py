@@ -70,8 +70,8 @@ class Create_Dataset(Dataset):
 
 train_dataset = Create_Dataset(datafile=path, split=.6, mode='train')
 test_dataset = Create_Dataset(datafile=path, split=.6, mode='validate')
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=False, num_workers=4)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=10, shuffle=False, num_workers=4)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=False, num_workers=2)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=10, shuffle=False, num_workers=2)
 
 
 class My_Loss(Module):
