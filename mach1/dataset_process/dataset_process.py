@@ -15,58 +15,54 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 class Create_Dataset(Dataset):
     def __init__(self, datafile, window_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
-        # Gives either the training or the validation set depending on what is requested
         self.mode = mode
-        self.window_size = window_size
-        #reading in the entire un windowed dataset with the labels still part
-        df = pd.read_csv(datafile, index_col=0, delimiter=',')
-        #creating the training dataset without the labels in the file
-        labeldf = df.drop(columns='Labels')
-
-        #Take the lengthof the data, and multiply it by the percentage of the data you want to train on (split)
-        splitlocation = int(len(labeldf) * split)
-
-       #temporarily store the windowed data
-        window_set = []
-
-        #window the data | This can be optimmized to be much faster
-        for i in range(len(labeldf) - self.window_size):
-            example = labeldf[i: self.window_size + i]
-            window_set.append(np.expand_dims(example, 0))
-        window_set = np.array(window_set)
         
-        window_torch = torch.nn.functional.normalize(torch.tensor(window_set))
-
-        #Training Dataset
-        #The reason it is splitlocation - windowsize is because the if the dataset goes till the same as the labels, it will add in 100 extra examples, whose set contains values 
-        #beyond that of the labels. Similar to the long descripiton of self.trainlabels.
-        self.traindataset = np.vstack(window_torch)[:(splitlocation - self.window_size), :]
-        self.valdataset = np.vstack(window_torch)[(splitlocation - self.window_size):, :]
+        df = pd.read_csv(datafile, delimiter=';')
+        print(len(df))
+        #Create the training and label datasets
+        labeldata = df['Labels'].to_numpy()[window_size -1:]
+        rawtrainingdata = df.drop(columns='Labels').to_numpy()
         
-        #Create the training labels. The reason it is starting from window size, is because there is technically labels for what happened after each timestep: however,
-        #We created windows of data, so we want to know what is happening at the end of our window. If we started at the beginning, our labels would be off by the size of self.window_size
-        self.trainlabels = torch.tensor(df['Labels'][self.window_size: splitlocation].to_numpy()).type(torch.LongTensor)
-        self.vallabels = torch.tensor(df['Labels'][splitlocation:].to_numpy()).type(torch.LongTensor)
+        #create a split value to separate valadate from training
+        self.split = int(len(df) * split)
+        
+       #window the datasets
+        window_array = np.array([np.arange(window_size)])
+        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
+        indexdata = window_array + dataset_array
+        print(indexdata)
+
+        trainingdata = rawtrainingdata[indexdata]
+        print(trainingdata.shape)
+
+        #create the training data and labels
+        self.trainingdata = torch.tensor(trainingdata[:self.split]).to(torch.float32)
+        self.traininglabels = torch.tensor(labeldata[:self.split]).to(torch.float32)
+        
+
+        #create the validation data and labels
+        self.valdata = torch.tensor(trainingdata[self.split:]).to(torch.float32)
+        self.vallabels = torch.tensor(labeldata[self.split:]).to(torch.float32)
 
 
         
-        self.training_len = self.traindataset.shape[0] # Number of samples in the training set
-        self.input_len = self.window_size# number of time parts
-        self.channel_len = self.traindataset.shape[2]# Number of features (Channels)
+        self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
+        self.input_len = window_size# number of time parts
+        self.channel_len = self.trainingdata.shape[2]# Number of features (Channels)
         self.output_len = 4 # classification category
-        self.test_len = self.valdataset.shape[0]
+        self.test_len = self.valdata.shape[0]
         
     
     def __getitem__(self, index):
         if self.mode == 'train':
-            return self.traindataset[index], self.trainlabels[index]
+            return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
-            return self.valdataset[index], self.vallabels[index]
+            return self.valdata[index], self.vallabels[index]
     
     def __len__(self):
         if self.mode == 'train':
-            return len(self.traindataset)
+            return len(self.trainingdata)
         if self.mode == 'test':
-            return len(self.valdataset)
+            return len(self.vallabels)
         
 
