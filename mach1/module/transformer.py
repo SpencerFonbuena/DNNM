@@ -4,6 +4,13 @@ from torch.nn import ModuleList
 from module.encoder import Encoder
 import math
 import torch.nn.functional as F
+import numpy as np
+import random
+
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 #print(f'use device: {DEVICE}')

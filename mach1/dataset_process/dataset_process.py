@@ -7,6 +7,12 @@ from torch.utils.data import Dataset
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
+import random
+
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 #print(f'Use device {DEVICE}')

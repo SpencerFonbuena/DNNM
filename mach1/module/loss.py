@@ -1,6 +1,13 @@
 from torch.nn import Module
 import torch
 from torch.nn import CrossEntropyLoss
+import numpy as np
+import random
+
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 #print(f'use device: {DEVICE}')
