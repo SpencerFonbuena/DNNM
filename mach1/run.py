@@ -21,11 +21,12 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='test projectvm'
+    project='test projectacc',
+    name='transformer overfitting'
 )
 
-#path = 'gtn/mach1/AAPL_1hour_expand.txt'
-path = '/root/GTN/GTN_master/AAPL_1hour_expand.txt'
+path = 'gtn/mach1/AAPL_1hour_expand.txt'
+#path = '/root/GTN/GTN_master/AAPL_1hour_expand.txt'
 
 test_interval = 2  # Test interval unit: epoch
 draw_key = 1  # Greater than or equal to draw_key will save the image
@@ -54,7 +55,7 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
                   q=hp.q, v=hp.v, h=hp.h, N=hp.N, dropout=hp.dropout, pe=hp.pe, mask=hp.mask, device=DEVICE).to(DEVICE)
 
 #print the model summary
-#print(net)
+print(net)
 #Print the number of parameters
 #print(sum([param.nelement() for param in net.parameters()])) (Currently there are: 101M parameters)
 
