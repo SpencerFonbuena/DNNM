@@ -87,10 +87,6 @@ def test(dataloader, flag=str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-        if flag == "train_set":
-            print(f"Train Accuracy: {correct / total * 100}")
-        if flag == "test_set":
-            print(f"Test Accuracy: {correct / total * 100}")
         wandb.log({"acc": accuracy})
 
 # training function

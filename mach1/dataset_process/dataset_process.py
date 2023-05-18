@@ -18,7 +18,7 @@ class Create_Dataset(Dataset):
         self.mode = mode
         
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
-        print(len(df))
+
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
         rawtrainingdata = df.drop(columns='Labels').to_numpy()
@@ -30,10 +30,10 @@ class Create_Dataset(Dataset):
         window_array = np.array([np.arange(window_size)])
         dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
         indexdata = window_array + dataset_array
-        print(indexdata)
+
 
         trainingdata = rawtrainingdata[indexdata]
-        print(trainingdata.shape)
+
 
         #create the training data and labels
         self.trainingdata = torch.tensor(trainingdata[:self.split]).to(torch.float32)
