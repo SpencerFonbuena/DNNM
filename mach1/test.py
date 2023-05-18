@@ -34,11 +34,11 @@ class Create_Dataset(Dataset):
         
         self.mode = mode
         
-        df = pd.read_csv(datafile, delimiter=';')
+        df = pd.read_csv(datafile, index_col=0, delimiter=',')
 
         #Create the training and label datasets
-        labeldata = df['quality']
-        trainingdata = df.drop(columns='quality')
+        labeldata = df['Labels']
+        trainingdata = df.drop(columns='Labels')
 
         #create a split value to separate valadate from training
         self.split = int(len(df) * split)
@@ -106,7 +106,7 @@ class Base_Model(Module):
 
 
 #instantiate the model
-model = Base_Model(d_input=11, d_output=hiddenlayers, class_num=10)
+model = Base_Model(d_input=9, d_output=hiddenlayers, class_num=4)
 #instantiate loss function
 loss = My_Loss()
 #instantiate optimizer
