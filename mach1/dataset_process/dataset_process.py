@@ -17,7 +17,7 @@ class Create_Dataset(Dataset):
         
         self.mode = mode
         
-        df = pd.read_csv(datafile, delimiter=';')
+        df = pd.read_csv(datafile, delimiter=',', index_col=0)
         print(len(df))
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
