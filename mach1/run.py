@@ -12,10 +12,16 @@ from tqdm import tqdm
 import os
 import numpy as np
 import wandb
+import random
 
 from module.transformer import Transformer
 from module.loss import Myloss
 from module.hyperparameters import HyperParameters as hp
+
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
