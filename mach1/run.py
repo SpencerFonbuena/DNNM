@@ -28,7 +28,7 @@ print(f'use device: {DEVICE}')
 
 wandb.init(
     project='test vmbaseline',
-    name='changed metrics tracked'
+    name='set random seed'
 )
 
 #path = 'gtn/mach1/AAPL_1hour_expand.txt'
