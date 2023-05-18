@@ -21,8 +21,8 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='test projectacc',
-    name='transformer overfitting'
+    project='test vmbaseline',
+    name='test over all architecture'
 )
 
 #path = 'gtn/mach1/AAPL_1hour_expand.txt'
