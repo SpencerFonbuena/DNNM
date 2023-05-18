@@ -16,8 +16,8 @@ torch.manual_seed(seed)
 
 
 wandb.init(
-    project='test modelacc',
-    name='randomseedtestchangerelu'
+    project='test vmdataq',
+    name='machbetterdata'
 )
 
 path = '/root/GTN/mach1/AAPL_1hour_expand.txt'
@@ -30,27 +30,36 @@ testime = 5
 class Create_Dataset(Dataset):
 
 
-    def __init__(self, datafile, split, mode = str): 
+    def __init__(self, datafile, split, window_size, mode = str): 
         
         self.mode = mode
         
-        df = pd.read_csv(datafile, index_col=0, delimiter=',')
-
+        df = pd.read_csv(datafile, delimiter=',', index_col=0)
+        print(len(df))
         #Create the training and label datasets
-        labeldata = df['Labels']
-        trainingdata = df.drop(columns='Labels')
-
+        labeldata = df['Labels'].to_numpy()[window_size -1:]
+        rawtrainingdata = df.drop(columns='Labels').to_numpy()
+        
         #create a split value to separate valadate from training
         self.split = int(len(df) * split)
         
+       #window the datasets
+        window_array = np.array([np.arange(window_size)])
+        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
+        indexdata = window_array + dataset_array
+        print(indexdata)
+
+        trainingdata = rawtrainingdata[indexdata]
+        print(trainingdata.shape)
+
         #create the training data and labels
-        self.trainingdata = torch.tensor(trainingdata[:self.split].to_numpy()).to(torch.float32)
-        self.traininglabels = torch.tensor(labeldata[:self.split].to_numpy()).to(torch.float32)
+        self.trainingdata = torch.tensor(trainingdata[:self.split]).to(torch.float32)
+        self.traininglabels = torch.tensor(labeldata[:self.split]).to(torch.float32)
         
 
         #create the validation data and labels
-        self.valdata = torch.tensor(trainingdata[self.split:].to_numpy()).to(torch.float32)
-        self.vallabels = torch.tensor(labeldata[self.split:].to_numpy()).to(torch.float32)
+        self.valdata = torch.tensor(trainingdata[self.split:]).to(torch.float32)
+        self.vallabels = torch.tensor(labeldata[self.split:]).to(torch.float32)
         #print('labels', self.valdata.shape, self.vallabels.shape, self.valdata[0])
 
         
