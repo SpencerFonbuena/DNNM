@@ -26,6 +26,7 @@ path = '/root/GTN/mach1/AAPL_1hour_expand.txt'
 hiddenlayers = 1024
 epoch = 1000
 testime = 5
+window_size = 10
 
 class Create_Dataset(Dataset):
 
@@ -77,8 +78,8 @@ class Create_Dataset(Dataset):
         elif self.mode == 'validate':
             return len(self.valdata)
 
-train_dataset = Create_Dataset(datafile=path, split=.6, mode='train')
-test_dataset = Create_Dataset(datafile=path, split=.6, mode='validate')
+train_dataset = Create_Dataset(datafile=path, split=.6, window_size=window_size, mode='train')
+test_dataset = Create_Dataset(datafile=path, split=.6, window_size=window_size, mode='validate')
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=False, num_workers=2)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=10, shuffle=False, num_workers=2)
 
