@@ -22,7 +22,7 @@ print(f'use device: {DEVICE}')
 
 wandb.init(
     project='test vmbaseline',
-    name='test over all architecture'
+    name='changed metrics tracked'
 )
 
 #path = 'gtn/mach1/AAPL_1hour_expand.txt'
@@ -87,7 +87,10 @@ def test(dataloader, flag=str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-        wandb.log({"acc": accuracy})
+        if flag == 'train':
+            wandb.log({"training acc": accuracy})
+        if flag == 'test':
+            wandb.log({"test acc": accuracy})
 
 # training function
 def train():
@@ -101,9 +104,9 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
+            wandb.log(loss)
         #validate training accuracy and test accuracy
         if ((index + 1) % test_interval) == 0:
-            print(loss)
             test(train_dataloader, 'train_set')
             test(test_dataloader, 'test_set')
 
