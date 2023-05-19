@@ -33,8 +33,8 @@ wandb.init(
     name='Overfit'
 )
 
-#path = 'gtn/mach1/AAPL_1hour_expanded_test 2.txt'
-path = '/root/GTN/mach1/walkrun3.csv'
+#path = 'gtn/mach1/walkrun3.csv'
+path = '/root/GTN/mach1/datasets/AAPL_1min_expanded.txt'
 
 test_interval = 2  # Test interval unit: epoch
 
