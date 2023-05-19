@@ -33,8 +33,8 @@ wandb.init(
     name='Accuracy Test'
 )
 
-#path = 'gtn/mach1/AAPL_1hour_expand.txt'
-path = '/root/GTN/GTN_master/AAPL_1hour_expand.txt'
+#path = 'gtn/mach1/AAPL_1hour_expanded_test 2.txt'
+path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test 2.txt'
 
 test_interval = 2  # Test interval unit: epoch
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
@@ -110,9 +110,11 @@ def test(dataloader, flag = str):
 
     net.eval()
     with torch.no_grad():
-        for x, y in dataloader:
+        for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre, _, _, _, _, _, _ = net(x, 'test')
+            if i % 300 == 0:
+                print(y_pre, y)
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
