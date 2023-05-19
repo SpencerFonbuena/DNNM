@@ -23,12 +23,12 @@ class Create_Dataset(Dataset):
         
         self.mode = mode
         #, names=['Date','Open','High','Low','Close','Volume','50SMA','200SMA','RSI','Labels']
-        df = pd.read_csv(datafile, delimiter=',', index_col=0, header=None)
+        df = pd.read_csv(datafile, delimiter=',', index_col=0)
 
         print(df.head())
         #Create the training and label datasets
-        labeldata = df['Labels'].to_numpy()[window_size -1:]
-        prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns='Labels').to_numpy()))
+        labeldata = df[9].to_numpy()[window_size -1:]
+        prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=[9]).to_numpy()))
         #prerawtrainingdata = torch.nn.functional.normalize(preprerawtrain)
         rawtrainingdata = pd.DataFrame(prerawtrain).to_numpy()
         
