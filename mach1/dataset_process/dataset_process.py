@@ -27,8 +27,8 @@ class Create_Dataset(Dataset):
 
         
         #Create the training and label datasets
-        labeldata = df['Labels'].to_numpy()[window_size -1:]
-        prerawtrainingdata = torch.nn.functional.normalize(df.drop(columns='Labels'))
+        labeldata = df['activity'].to_numpy()[window_size -1:]
+        prerawtrainingdata = torch.nn.functional.normalize(df.drop(columns='activity'))
         rawtrainingdata = pd.DataFrame(prerawtrainingdata).to_numpy()
         
         #Find the distributions of each label
