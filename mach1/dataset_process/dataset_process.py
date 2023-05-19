@@ -26,8 +26,8 @@ class Create_Dataset(Dataset):
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
 
         #Create the training and label datasets
-        labeldata = df['Labels'].to_numpy()[window_size -1:]
-        rawtrainingdata = df.drop(columns='Labels').to_numpy()
+        labeldata = df['activity'].to_numpy()[window_size -1:]
+        rawtrainingdata = df.drop(columns='activity').to_numpy()
         
         #Find the distributions of each label
         distlabel = pd.DataFrame(labeldata).value_counts()
@@ -69,7 +69,7 @@ class Create_Dataset(Dataset):
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
         self.input_len = window_size# number of time parts
         self.channel_len = self.trainingdata.shape[2]# Number of features (Channels)
-        self.output_len = 4 # classification category
+        self.output_len = 2 # classification category
         self.test_len = self.valdata.shape[0]
         
     
