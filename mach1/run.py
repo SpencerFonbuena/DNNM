@@ -49,8 +49,8 @@ samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(tra
 samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 
 #Load the data
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertrain)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertest)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
 d_input = train_dataset.input_len # number of time parts
@@ -118,6 +118,7 @@ def train():
         #validate training accuracy and test accuracy
         if (i % 5000) == 0:
             test(test_dataloader)
+            wandb.log({'index': index})
 
 
 
