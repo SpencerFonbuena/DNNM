@@ -23,7 +23,7 @@ class Create_Dataset(Dataset):
         
         self.mode = mode
         
-        df = pd.read_csv(datafile, delimiter=',', index_col=0)
+        df = pd.read_csv(datafile, delimiter=',', index_col=0, header=None, names=['Date','Open','High','Low','Close','Volume','50SMA','200SMA','RSI','Labels'])
 
         
         #Create the training and label datasets
