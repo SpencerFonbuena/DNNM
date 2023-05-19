@@ -85,6 +85,23 @@ loss_list = []
 time_cost = 0
 
 
+# training function
+def train():
+    net.train()
+    wandb.watch(net, log='all')
+    for index in tqdm(range(hp.EPOCH)):
+        for i, (x, y) in enumerate(train_dataloader):
+            optimizer.zero_grad()
+            y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
+            loss = loss_function(y_pre, y.to(DEVICE))
+            loss_list.append(loss.item())
+            loss.backward()
+            optimizer.step()
+            wandb.log({'loss': loss})
+            wandb.log({'index': index})
+        #validate training accuracy and test accuracy
+        test(test_dataloader)
+
 # test function
 def test(dataloader):
     correct = 0
@@ -101,25 +118,6 @@ def test(dataloader):
             accuracy = correct / total * 100
         print('Test Accuracy:', accuracy)
         wandb.log({"test acc": accuracy})
-
-# training function
-def train():
-    net.train()
-    wandb.watch(net, log='all')
-    for index in tqdm(range(hp.EPOCH)):
-        for i, (x, y) in enumerate(train_dataloader):
-            optimizer.zero_grad()
-            y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
-            loss = loss_function(y_pre, y.to(DEVICE))
-            loss_list.append(loss.item())
-            loss.backward()
-            optimizer.step()
-            wandb.log({'loss': loss})
-            wandb.log({'index': index})
-        #validate training accuracy and test accuracy
-        if (i % 1000) == 0:
-            test(test_dataloader)
-
 
 
 
