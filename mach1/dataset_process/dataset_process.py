@@ -22,8 +22,8 @@ class Create_Dataset(Dataset):
     def __init__(self, datafile, window_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
         self.mode = mode
-        
-        df = pd.read_csv(datafile, delimiter=',', index_col=0, header=None, names=['Date','Open','High','Low','Close','Volume','50SMA','200SMA','RSI','Labels'])
+        #, names=['Date','Open','High','Low','Close','Volume','50SMA','200SMA','RSI','Labels']
+        df = pd.read_csv(datafile, delimiter=',', index_col=0, header=None)
 
         print(df.head())
         #Create the training and label datasets
