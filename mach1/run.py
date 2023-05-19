@@ -30,11 +30,11 @@ print(f'use device: {DEVICE}')
 
 wandb.init(
     project='test vmbaseline',
-    name='Accuracy Test'
+    name='Overfit'
 )
 
 #path = 'gtn/mach1/AAPL_1hour_expanded_test 2.txt'
-path = '/root/GTN/GTN_master/AAPL_1hour_expanded_test 2.txt'
+path = '/root/GTN/mach1/AAPL_1hour_expanded_test 2.txt'
 
 test_interval = 2  # Test interval unit: epoch
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
