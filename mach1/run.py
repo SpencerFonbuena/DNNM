@@ -119,7 +119,7 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
         #validate training accuracy and test accuracy
-        if ((index + 1) % test_interval) == 0:
+        if ((index) % test_interval) == 0:
             test(train_dataloader, 'train_set')
             test(test_dataloader, 'test_set')
 
