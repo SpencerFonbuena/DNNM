@@ -109,7 +109,7 @@ def test(dataloader, flag=str):
 def train():
     net.train()
     wandb.watch(net, log='all')
-    for index in tqdm(range(hp.EPOCH)):
+    for index in range(hp.EPOCH):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')

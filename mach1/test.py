@@ -7,6 +7,8 @@ import torch.nn.functional as F
 from torch.nn import Module
 import random
 from torch.utils.data import WeightedRandomSampler as wrs
+import matplotlib.pyplot as plt
+
 #set random seed for reproducibility
 seed = 10
 np.random.seed(seed)
@@ -91,6 +93,13 @@ train_dataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=Fals
 
 samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset.df), replacement=True)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=10, shuffle=False, sampler=samplertest)
+
+labelhist = np.array([])
+
+for i, (data, labels) in enumerate(train_dataloader):
+    labelhist = np.append(labelhist, labels)
+
+print(pd.DataFrame(labelhist).value_counts())
 
 
 class My_Loss(Module):
