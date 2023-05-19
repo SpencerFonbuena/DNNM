@@ -30,7 +30,7 @@ print(f'use device: {DEVICE}')
 
 wandb.init(
     project='testing 1hour',
-    name='Overfit1'
+    name='testing big learning rate'
 )
 
 #path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
