@@ -115,11 +115,10 @@ def train():
             loss.backward()
             optimizer.step()
             wandb.log({'loss': loss})
-            wandb.log({'i': i})
-        #validate training accuracy and test accuracy
-        if (i % 5000) == 0:
-            test(test_dataloader)
             wandb.log({'index': index})
+        #validate training accuracy and test accuracy
+        if (i % 1000) == 0:
+            test(test_dataloader)
 
 
 
