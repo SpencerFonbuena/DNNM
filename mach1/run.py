@@ -34,7 +34,7 @@ wandb.init(
 )
 
 #path = 'gtn/mach1/AAPL_1hour_expanded_test 2.txt'
-path = '/root/GTN/mach1/AAPL_1hour_expanded_test 2.txt'
+path = '/root/GTN/mach1/AAPL_1hour_expand 2 2.csv'
 
 test_interval = 2  # Test interval unit: epoch
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
