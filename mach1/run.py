@@ -33,8 +33,8 @@ wandb.init(
     name='Overfit1'
 )
 
-#path = 'gtn/mach1/walkrun3.csv'
-path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
+path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
+#path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
 
 test_interval = 2  # Test interval unit: epoch
 
@@ -89,7 +89,7 @@ def train():
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
-        for i, (x, y) in enumerate(tqdm(train_dataloader)):
+        for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
             loss = loss_function(y_pre, y.to(DEVICE))
