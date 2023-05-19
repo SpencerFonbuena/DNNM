@@ -25,9 +25,11 @@ class Create_Dataset(Dataset):
         
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
 
+        
         #Create the training and label datasets
-        labeldata = df['activity'].to_numpy()[window_size -1:]
-        rawtrainingdata = df.drop(columns='activity').to_numpy()
+        labeldata = df['Labels'].to_numpy()[window_size -1:]
+        prerawtrainingdata = torch.nn.functional.normalize(df.drop(columns='Labels'))
+        rawtrainingdata = pd.DataFrame(prerawtrainingdata).to_numpy()
         
         #Find the distributions of each label
         distlabel = pd.DataFrame(labeldata).value_counts()

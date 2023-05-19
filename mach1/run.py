@@ -29,7 +29,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='test vmbaseline',
+    project='test full 1min',
     name='Overfit'
 )
 
@@ -37,7 +37,6 @@ wandb.init(
 path = '/root/GTN/mach1/walkrun3.csv'
 
 test_interval = 2  # Test interval unit: epoch
-file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
 
 #create the dataset to be loaded
@@ -90,7 +89,7 @@ def train():
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
-        for i, (x, y) in enumerate(train_dataloader):
+        for i, (x, y) in enumerate(tqdm(train_dataloader)):
             optimizer.zero_grad()
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
             loss = loss_function(y_pre, y.to(DEVICE))
@@ -99,8 +98,10 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
             wandb.log({'index': index})
+            if i % 5000 == 0:
+                print(i)
         #validate training accuracy and test accuracy
-        test(train_dataloader, 'train')
+        test(train_dataloader[:2000], 'train')
         test(test_dataloader, 'test')
 
 # test function
