@@ -86,7 +86,7 @@ time_cost = 0
 
 
 # test function
-def test(dataloader, flag=str):
+def test(dataloader):
     correct = 0
     total = 0
 
@@ -99,12 +99,8 @@ def test(dataloader, flag=str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-        if flag == 'train':
-            print('training accuracy:', accuracy)
-            wandb.log({"training acc": accuracy})
-        if flag == 'test':
-            print('Test Accuracy:', accuracy)
-            wandb.log({"test acc": accuracy})
+        print('Test Accuracy:', accuracy)
+        wandb.log({"test acc": accuracy})
 
 # training function
 def train():
@@ -120,9 +116,8 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
         #validate training accuracy and test accuracy
-        if (i % 2000) == 0:
-            test(train_dataloader, 'train_set')
-            test(test_dataloader, 'test_set')
+        if (i % 5000) == 0:
+            test(test_dataloader)
 
 
 
