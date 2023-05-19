@@ -120,10 +120,8 @@ def test(dataloader, flag = str):
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
         if flag == 'train':
-            print('Train Accuracy:', accuracy)
             wandb.log({"Train acc": accuracy})
         if flag == 'test':
-            print('Test Accuracy:', accuracy)
             wandb.log({"Test acc": accuracy})
 
 
