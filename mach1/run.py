@@ -113,8 +113,6 @@ def test(dataloader, flag = str):
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre, _, _, _, _, _, _ = net(x, 'test')
-            if i % 300 == 0:
-                print(y_pre, y)
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
