@@ -29,7 +29,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='test full 1hour',
+    project='testing 1hour',
     name='Overfit1'
 )
 
