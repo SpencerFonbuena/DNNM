@@ -101,15 +101,17 @@ def test(dataloader, flag=str):
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
         if flag == 'train':
+            print('training accuracy:', accuracy)
             wandb.log({"training acc": accuracy})
         if flag == 'test':
+            print('Test Accuracy:', accuracy)
             wandb.log({"test acc": accuracy})
 
 # training function
 def train():
     net.train()
     wandb.watch(net, log='all')
-    for index in range(hp.EPOCH):
+    for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
