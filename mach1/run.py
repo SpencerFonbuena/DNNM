@@ -100,11 +100,11 @@ def train():
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
-        test(train_dataloader)
-        test(test_dataloader)
+        test(train_dataloader, 'train')
+        test(test_dataloader, 'test')
 
 # test function
-def test(dataloader):
+def test(dataloader, flag = str):
     correct = 0
     total = 0
 
@@ -117,8 +117,12 @@ def test(dataloader):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-        print('Test Accuracy:', accuracy)
-        wandb.log({"test acc": accuracy})
+        if flag == 'train':
+            print('Train Accuracy:', accuracy)
+            wandb.log({"Train acc": accuracy})
+        if flag == 'test':
+            print('Test Accuracy:', accuracy)
+            wandb.log({"Test acc": accuracy})
 
 
 
