@@ -46,8 +46,8 @@ train_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=
 test_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='test')
 
 #create the sampler
-samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset.df), replacement=True)
-samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset.df), replacement=True)
+samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
+samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 
 #Load the data
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2)
