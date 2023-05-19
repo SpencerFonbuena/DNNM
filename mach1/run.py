@@ -37,7 +37,6 @@ wandb.init(
 path = '/root/GTN/GTN_master/AAPL_1hour_expand.txt'
 
 test_interval = 2  # Test interval unit: epoch
-draw_key = 1  # Greater than or equal to draw_key will save the image
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
 

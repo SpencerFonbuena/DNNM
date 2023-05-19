@@ -90,16 +90,20 @@ test_dataset = Create_Dataset(datafile=path, split=.6, window_size=window_size, 
 
 samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset.df), replacement=True)
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=False, sampler= samplertrain )
+#This is there to provide a baseline for the sampler
+#train_ubdataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=False )
 
 samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset.df), replacement=True)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=10, shuffle=False, sampler=samplertest)
 
-labelhist = np.array([])
-
-for i, (data, labels) in enumerate(train_dataloader):
-    labelhist = np.append(labelhist, labels)
-
-print(pd.DataFrame(labelhist).value_counts())
+#This is there to check and make sure that the sampling is working as intended. Uncomment as needed
+#labelhist = np.array([])
+#ublibalehist = np.array([])
+#for i, (data, labels) in enumerate(train_dataloader):
+#    labelhist = np.append(labelhist, labels)
+#for i, (data, labels) in enumerate(train_ubdataloader):
+#    ublibalehist = np.append(ublibalehist, labels)
+#print(pd.DataFrame(labelhist).value_counts(), pd.DataFrame(ublibalehist).value_counts())
 
 
 class My_Loss(Module):
