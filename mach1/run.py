@@ -29,12 +29,12 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='test full 1min',
-    name='Overfit'
+    project='test full 1hour',
+    name='Overfit1'
 )
 
 #path = 'gtn/mach1/walkrun3.csv'
-path = '/root/GTN/mach1/datasets/AAPL_1min_expanded.txt'
+path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
 
 test_interval = 2  # Test interval unit: epoch
 
