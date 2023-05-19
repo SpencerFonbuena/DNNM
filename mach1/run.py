@@ -98,8 +98,6 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
             wandb.log({'index': index})
-            if i % 5000 == 0:
-                print(i)
         #validate training accuracy and test accuracy
         test(train_dataloader[:2000], 'train')
         test(test_dataloader, 'test')
