@@ -29,6 +29,10 @@ class Create_Dataset(Dataset):
         labeldata = df['Labels'].to_numpy()[window_size -1:]
         rawtrainingdata = df.drop(columns='Labels').to_numpy()
         
+        #Find the distributions of each label
+        distlabel = pd.DataFrame(labeldata).value_counts()
+        print(distlabel)
+        
         #create a split value to separate valadate from training
         self.split = int(len(df) * split)
         
@@ -44,12 +48,22 @@ class Create_Dataset(Dataset):
         #create the training data and labels
         self.trainingdata = torch.tensor(trainingdata[:self.split]).to(torch.float32)
         self.traininglabels = torch.tensor(labeldata[:self.split]).to(torch.float32)
-        
+        self.normtraininglabels = labeldata[:self.split]
+
+        #Find the distributions of each label in the training set
+        self.distlabel = 1 / (pd.DataFrame(labeldata).value_counts())
+        self.trainsampleweights = [self.distlabel[i] for i in self.normtraininglabels]
+
 
         #create the validation data and labels
         self.valdata = torch.tensor(trainingdata[self.split:]).to(torch.float32)
         self.vallabels = torch.tensor(labeldata[self.split:]).to(torch.float32)
+        
+        #can't call the iterate through a torch, so this is to create all of the weights
+        self.normvallabels = labeldata[self.split:]
 
+        #Find the distributions of each label in the validation set
+        self.testsampleweights = [self.distlabel[i] for i in self.normvallabels]
 
         
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set

@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
 from torch.nn import Module
 import random
-
+from torch.utils.data import WeightedRandomSampler as wrs
 #set random seed for reproducibility
 seed = 10
 np.random.seed(seed)
@@ -20,7 +20,7 @@ wandb.init(
     name='machbetterdata'
 )
 
-path = '/root/GTN/mach1/AAPL_1hour_expand.txt'
+path = '/Users/spencerfonbuena/Desktop/AAPL_1hour_expand.txt'
 
 #Hyperparameters
 hiddenlayers = 1024
@@ -34,13 +34,13 @@ class Create_Dataset(Dataset):
     def __init__(self, datafile, split, window_size, mode = str): 
         
         self.mode = mode
-        
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
-        print(len(df))
+        self.df = df
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
         rawtrainingdata = df.drop(columns='Labels').to_numpy()
         
+
         #create a split value to separate valadate from training
         self.split = int(len(df) * split)
         
@@ -54,12 +54,19 @@ class Create_Dataset(Dataset):
         #create the training data and labels
         self.trainingdata = torch.tensor(trainingdata[:self.split]).to(torch.float32)
         self.traininglabels = torch.tensor(labeldata[:self.split]).to(torch.float32)
-        
+        self.normtraininglabels = labeldata[:self.split]
+
+        #Find the distributions of each label in the training set
+        self.distlabel = 1 / (pd.DataFrame(labeldata).value_counts())
+        self.trainsampleweights = [self.distlabel[i] for i in self.normtraininglabels]
 
         #create the validation data and labels
         self.valdata = torch.tensor(trainingdata[self.split:]).to(torch.float32)
         self.vallabels = torch.tensor(labeldata[self.split:]).to(torch.float32)
-        #print('labels', self.valdata.shape, self.vallabels.shape, self.valdata[0])
+        self.normvallabels = labeldata[self.split:]
+
+        #Find the distributions of each label in the validation set
+        self.testsampleweights = [self.distlabel[i] for i in self.normvallabels]
 
         
     
@@ -78,8 +85,12 @@ class Create_Dataset(Dataset):
 
 train_dataset = Create_Dataset(datafile=path, split=.6, window_size=window_size, mode='train')
 test_dataset = Create_Dataset(datafile=path, split=.6, window_size=window_size, mode='validate')
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=False, num_workers=2)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=10, shuffle=False, num_workers=2)
+
+samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset.df), replacement=True)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=10, shuffle=False, sampler= samplertrain )
+
+samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset.df), replacement=True)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=10, shuffle=False, sampler=samplertest)
 
 
 class My_Loss(Module):

@@ -6,6 +6,7 @@ import torch
 import torchmetrics as tm
 from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
+from torch.utils.data import WeightedRandomSampler as wrs
 import torch.optim as optim
 from time import time
 from tqdm.auto import tqdm
@@ -13,6 +14,7 @@ import os
 import numpy as np
 import wandb
 import random
+
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -39,9 +41,15 @@ draw_key = 1  # Greater than or equal to draw_key will save the image
 file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # get file name
 
 
-
+#create the dataset to be loaded
 train_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='train')
 test_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='test')
+
+#create the sampler
+samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset.df), replacement=True)
+samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset.df), replacement=True)
+
+#Load the data
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2)
 
@@ -62,8 +70,7 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
 
 #print the model summary
 print(net)
-#Print the number of parameters
-#print(sum([param.nelement() for param in net.parameters()])) (Currently there are: 101M parameters)
+
 
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
