@@ -25,7 +25,7 @@ class Create_Dataset(Dataset):
         
         df = pd.read_csv(datafile, delimiter=',', index_col=0, header=None, names=['Date','Open','High','Low','Close','Volume','50SMA','200SMA','RSI','Labels'])
 
-        
+        print(df.head())
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
         prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns='Labels').to_numpy()))
