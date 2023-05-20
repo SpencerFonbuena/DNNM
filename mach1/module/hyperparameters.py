@@ -2,7 +2,7 @@ class HyperParameters:
 
     # hyperparameter settings
     EPOCH = 225
-    BATCH_SIZE = 32
+    BATCH_SIZE = 16
     WINDOW_SIZE = 360
     LR = 5
     d_model = 512
@@ -10,9 +10,9 @@ class HyperParameters:
     q = 8
     v = 8
     h = 8
-    N = 10
+    N = 32
     dropout = 0.2
-    split = .97
+    split = .85
     pe = True # # The setting is in the twin towers score=pe score=channel has no pe by default
     mask = True # set the mask of score=input in the twin towers score=channel has no mask by default
     # optimizer selection

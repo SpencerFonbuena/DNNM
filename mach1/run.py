@@ -99,7 +99,7 @@ def train():
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
-        test(train_dataloader[:2000], 'train')
+        test(train_dataloader, 'train')
         test(test_dataloader, 'test')
 
 # test function
