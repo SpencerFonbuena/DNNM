@@ -41,14 +41,17 @@ test_interval = 2  # Test interval unit: epoch
 
 #create the dataset to be loaded
 train_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='train')
+val_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='validate')
 test_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='test')
 
 #create the sampler
 samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
 samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
+samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
 #Load the data
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertrain)
+validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertrainval)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertest)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
@@ -99,7 +102,7 @@ def train():
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
-        test(train_dataloader, 'train')
+        test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
 
 # test function

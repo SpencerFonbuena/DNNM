@@ -45,26 +45,46 @@ class Create_Dataset(Dataset):
 
         trainingdata = rawtrainingdata[indexdata]
 
+        #[beginning of creating test data and labels]
 
         #create the training data and labels
         self.trainingdata = torch.tensor(trainingdata[:self.split]).to(torch.float32)
         self.traininglabels = torch.tensor(labeldata[:self.split]).to(torch.float32)
+        #can't call the iterate through a torch, so this is to create all of the weights
         self.normtraininglabels = labeldata[:self.split]
 
         #Find the distributions of each label in the training set
         self.distlabel = 1 / (pd.DataFrame(labeldata).value_counts())
         self.trainsampleweights = [self.distlabel[i] for i in self.normtraininglabels]
 
+        #[end of creating training data and labels]
 
+        #[beginning of creating validation data and labels]
+        
         #create the validation data and labels
         self.valdata = torch.tensor(trainingdata[self.split:]).to(torch.float32)
         self.vallabels = torch.tensor(labeldata[self.split:]).to(torch.float32)
-        
         #can't call the iterate through a torch, so this is to create all of the weights
         self.normvallabels = labeldata[self.split:]
 
-        #Find the distributions of each label in the validation set
+        #Find the distributions of each label in the test set
         self.testsampleweights = [self.distlabel[i] for i in self.normvallabels]
+
+        #[end of creating validation data and labels]
+        
+        #[beginning of creating trainvalidation data and labels]
+
+        #create the trainvalidation data and labels
+        self.trainvaldata = torch.tensor(trainingdata[:10_000]).to(torch.float32)
+        self.trainvallabels = torch.tensor(labeldata[:10_000]).to(torch.float32)
+        #can't call the iterate through a torch, so this is to create all of the weights
+        self.normtrainvallabels = labeldata[:10_000]
+
+        #Find the distributions of each label in the test set
+        self.trainvalsampleweights = [self.distlabel[i] for i in self.normtrainvallabels]
+
+
+        
 
         
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
@@ -79,6 +99,8 @@ class Create_Dataset(Dataset):
             return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
+        elif self.mode == 'validate':
+            return self.trainvaldata[index], self.trainvallabels[index]
     
     def __len__(self):
         if self.mode == 'train':
