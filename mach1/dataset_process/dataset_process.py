@@ -107,5 +107,8 @@ class Create_Dataset(Dataset):
             return len(self.trainingdata)
         if self.mode == 'test':
             return len(self.vallabels)
+        if self.mode == 'validate':
+            return len(self.trainvallabels)
+        
         
 
