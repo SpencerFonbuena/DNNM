@@ -32,8 +32,7 @@ wandb.init(
     project='mach1 1hour',
     name='testing big learning rate'
 )
-
-#path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
+#path = 'gtn/mach1/datasets/AAPL_1hour_expand_batch.txt'
 path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
 
 test_interval = 2  # Test interval unit: epoch

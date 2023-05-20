@@ -11,7 +11,7 @@ class HyperParameters:
     v = 8
     h = 8
     N = 24
-    dropout = 0.2
+    dropout = 0.0
     split = .85
     pe = True # # The setting is in the twin towers score=pe score=channel has no pe by default
     mask = True # set the mask of score=input in the twin towers score=channel has no mask by default

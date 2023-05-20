@@ -17,7 +17,7 @@ class MultiHeadAttention(Module):
                  h: int,
                  device: str,
                  mask: bool=False,
-                 dropout: float = 0.2):
+                 dropout: float = 0.0):
         super(MultiHeadAttention, self).__init__()
 
         self.W_q = torch.nn.Linear(d_model, q * h)

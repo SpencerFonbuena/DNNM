@@ -27,7 +27,7 @@ class Transformer(Module):
                  h: int,
                  N: int,
                  device: str,
-                 dropout: float = 0.2,
+                 dropout: float = 0.0,
                  pe: bool = False,
                  mask: bool = False):
         super(Transformer, self).__init__()

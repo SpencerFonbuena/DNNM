@@ -20,7 +20,7 @@ class Encoder(Module):
                  h: int,
                  device: str,
                  mask: bool = False,
-                 dropout: float = 0.1):
+                 dropout: float = 0.0):
         super(Encoder, self).__init__()
 
         self.MHA = MultiHeadAttention(d_model=d_model, q=q, v=v, h=h, mask=mask, device=device, dropout=dropout)
