@@ -7,9 +7,9 @@ class HyperParameters:
     LR = .0003
     d_model = 512
     d_hidden = 1024
-    q = 8
-    v = 8
-    h = 8
+    q = 16
+    v = 16
+    h = 16
     N = 24
     dropout = 0.0
     split = .85
