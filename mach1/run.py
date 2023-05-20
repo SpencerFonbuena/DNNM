@@ -14,7 +14,8 @@ import os
 import numpy as np
 import wandb
 import random
-
+from torch.utils.tensorboard import SummaryWriter
+import tensorboard
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -28,11 +29,14 @@ torch.manual_seed(seed)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
+#writer = SummaryWriter()
+
 wandb.init(
     project='mach1 1hour',
-    name='testing big learning rate'
+    name='testing big learning rate',
+    sync_tensorboard=True
 )
-#path = 'gtn/mach1/datasets/AAPL_1hour_expand_batch.txt'
+#path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
 path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
 
 test_interval = 2  # Test interval unit: epoch
