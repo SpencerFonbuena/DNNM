@@ -14,15 +14,11 @@ import os
 import numpy as np
 import wandb
 import random
-from torchview import draw_graph
-from torch.utils.tensorboard import SummaryWriter
 
 from module.transformer import Transformer
 from module.loss import Myloss
 from module.hyperparameters import HyperParameters as hp
 
-
-writer = SummaryWriter("runs/test")
 
 seed = 10
 np.random.seed(seed)
@@ -35,8 +31,7 @@ print(f'use device: {DEVICE}')
 
 wandb.init(
     project='mach1 1hour',
-    name='testing big learning rate',
-    sync_tensorboard=True
+    name='testing big learning rate'
 )
 #path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
 path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
@@ -75,15 +70,7 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
                   q=hp.q, v=hp.v, h=hp.h, N=hp.N, dropout=hp.dropout, pe=hp.pe, mask=hp.mask, device=DEVICE).to(DEVICE)
 
 
-#print the model summary
-#print(net)
-#traind, labels = next(iter(train_dataloader))
-#viz = net(x=traind, stage='train')
 
-#writer.add_graph(viz, traind)
-
-#model_graph = draw_graph(viz, input_size=(16,120,9))
-#model_graph.visual_graph
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
 
@@ -107,7 +94,6 @@ def train():
             optimizer.zero_grad()
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
             loss = loss_function(y_pre, y.to(DEVICE))
-            writer.add_scalar("loss", loss, i)
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
