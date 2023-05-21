@@ -53,9 +53,9 @@ samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_d
 samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
 #Load the data
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False,  sampler=samplertrain)
-validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False,  sampler=samplertrainval)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False,  sampler=samplertest)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertrain)
+validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertrainval)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertest)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
 d_input = train_dataset.input_len # number of time parts
@@ -74,7 +74,8 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
 
 #print the model summary
 print(net)
-writer.add_graph(net, train_dataloader)
+dummyinput = torch.tensor(np.random.randint(0,100, (1000,3)))
+writer.add_graph(net, dummyinput)
 
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
