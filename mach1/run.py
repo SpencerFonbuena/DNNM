@@ -74,9 +74,7 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
 
 #print the model summary
 print(net)
-dataiter = iter(train_dataloader)
-traind, labels = next(dataiter)
-writer.add_graph(net, traind)
+writer.add_graph(net, train_dataloader)
 
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
