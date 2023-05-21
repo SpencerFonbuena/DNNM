@@ -75,6 +75,7 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
 #print the model summary
 print(net)
 
+writer.add_graph(net)
 
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
@@ -104,7 +105,6 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
             wandb.log({'index': index})
-            writer.add_scalar('training loss', loss)
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
