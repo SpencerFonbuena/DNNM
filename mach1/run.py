@@ -29,7 +29,7 @@ torch.manual_seed(seed)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
-#writer = SummaryWriter()
+writer = SummaryWriter("runs")
 
 wandb.init(
     project='mach1 1hour',
@@ -104,6 +104,7 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
             wandb.log({'index': index})
+            writer.add_scalar('training loss', loss)
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
