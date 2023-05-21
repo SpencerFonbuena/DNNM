@@ -74,8 +74,8 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
 
 #print the model summary
 print(net)
-dummyinput = torch.tensor(np.random.randint(0,100, (1000,9)))
-writer.add_graph(net(x=dummyinput, stage='train'), dummyinput)
+traind, labels = next(iter(train_dataloader))
+writer.add_graph(net(stage='train'), traind)
 
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
