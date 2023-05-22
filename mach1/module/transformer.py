@@ -103,11 +103,11 @@ class Transformer(Module):
         encoding_1 = encoding_1.reshape(encoding_1.shape[0], -1)
         encoding_2 = encoding_2.reshape(encoding_2.shape[0], -1)
 
-        gate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)
-        encoding = torch.cat([encoding_1 * gate[:, 0:1], encoding_2 * gate[:, 1:2]], dim=-1)
+        self.fgate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)
+        encoding = torch.cat([encoding_1 * self.fgate[:, 0:1], encoding_2 * self.fgate[:, 1:2]], dim=-1)
 
 
         # output
         #The reason I didn't apply the softmax layer, is that supposedly the torch crossentropyloss expects unnormalized logits for each class. 
         output = self.output_linear(encoding)
-        return output, encoding, score_input, score_channel, input_to_gather, channel_to_gather, gate
+        return output, encoding, score_input, score_channel, input_to_gather, channel_to_gather, self.fgate

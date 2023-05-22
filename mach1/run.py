@@ -99,9 +99,11 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
             wandb.log({'index': index})
+            wandb.log({'gate weight': net.fgate})
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
+        
 
 # test function
 def test(dataloader, flag = str):
