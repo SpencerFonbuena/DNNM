@@ -92,7 +92,7 @@ def train():
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
-            y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
+            y_pre, encoding, _, _, _, _, _ = net(x.to(DEVICE), 'train')
             loss = loss_function(y_pre, y.to(DEVICE))
             loss_list.append(loss.item())
             loss.backward()
@@ -101,6 +101,7 @@ def train():
             wandb.log({'index': index})
             if i % 500 == 0:
                 print(net.fgate)
+                print(encoding)
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
