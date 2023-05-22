@@ -14,11 +14,14 @@ import os
 import numpy as np
 import wandb
 import random
+import tensorboard
+from torch.utils.tensorboard import SummaryWriter
 
 from module.transformer import Transformer
 from module.loss import Myloss
 from module.hyperparameters import HyperParameters as hp
 
+writer = SummaryWriter()
 
 seed = 10
 np.random.seed(seed)
@@ -28,11 +31,15 @@ torch.manual_seed(seed)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
-
+wandb.tensorboard.patch(tensorboard_x = False)
 wandb.init(
-    project='mach1 1hour',
-    name='testing big learning rate'
+    project='mach2 tensor',
+    name='test',
+    tensorboard=True
+
 )
+
+
 #path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
 path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
 
@@ -84,7 +91,7 @@ correct_on_test = []
 loss_list = []
 time_cost = 0
 
-
+#traind, label = next(iter(train_dataloader))
 # training function
 def train():
     net.train()
@@ -97,6 +104,8 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
+            writer.add_scalar(loss)
+            writer.add_graph(net(x, "train"), x)
             wandb.log({'loss': loss})
             wandb.log({'index': index})
             if i % 500 == 0:
