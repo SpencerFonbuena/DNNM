@@ -31,7 +31,7 @@ torch.manual_seed(seed)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
-wandb.tensorboard.patch(tensorboard_x = False)
+#wandb.tensorboard.patch(tensorboard_x = False)
 wandb.init(
     project='mach2 tensor',
     name='test',
