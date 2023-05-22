@@ -104,7 +104,7 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
-            writer.add_scalar(loss)
+            writer.add_scalar('loss', loss, i)
             writer.add_graph(net(x, "train"), x)
             wandb.log({'loss': loss})
             wandb.log({'index': index})
