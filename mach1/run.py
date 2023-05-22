@@ -99,7 +99,8 @@ def train():
             optimizer.step()
             wandb.log({'loss': loss})
             wandb.log({'index': index})
-            wandb.log({'gate weight': net.fgate})
+            if i % 500 == 0:
+                print(net.fgate)
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
