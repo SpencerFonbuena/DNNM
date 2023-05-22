@@ -103,7 +103,6 @@ class Transformer(Module):
         encoding_channel = encoding_channel.reshape(encoding_channel.shape[0], -1)
         encoding_timestep = encoding_timestep.reshape(encoding_timestep.shape[0], -1)
 
-        print(encoding_channel.shape, encoding_timestep.shape)
         self.fgate = F.softmax(self.gate(torch.cat([encoding_channel, encoding_timestep], dim=-1)), dim=-1)
         encoding = torch.cat([encoding_channel * self.fgate[:, 0:1], encoding_timestep * self.fgate[:, 1:2]], dim=-1)
 
