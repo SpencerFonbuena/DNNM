@@ -58,9 +58,9 @@ samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_d
 samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
 #Load the data
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertrain)
-validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertrainval)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=2, sampler=samplertest)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False,  sampler=samplertrain)
+validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False,  sampler=samplertrainval)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False,  sampler=samplertest)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
 d_input = train_dataset.input_len # number of time parts
@@ -77,10 +77,14 @@ print(f'Number of classes: {d_output}')
 net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_output=d_output, d_hidden=hp.d_hidden,
                   q=hp.q, v=hp.v, h=hp.h, N=hp.N, dropout=hp.dropout, pe=hp.pe, mask=hp.mask, device=DEVICE).to(DEVICE)
 
-traind, label = next(iter(train_dataloader))
-y = net(traind, 'train')
+# [Beginning creating and visualizing computation graph]
 
-make_dot(y.mean(), params=dict(net.named_parameters()))
+#traind, label = next(iter(train_dataloader))
+#y, _, _, _, _, _, _ = net(traind, 'train')
+#make_dot(y.mean(), params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
+
+#[End of creating and visualizing computation graph]
+
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
 

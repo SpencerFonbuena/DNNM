@@ -33,7 +33,7 @@ class Transformer(Module):
         super(Transformer, self).__init__()
 
         #These for loops will loop through the encodder N amount of times, which N is the number of heads. So this is creating the "multi" portion of the multi-headed attention layer
-        self.encoder_list_1 = ModuleList([Encoder(d_model=d_model,
+        self.encoder_channel = ModuleList([Encoder(d_model=d_model,
                                                   d_hidden=d_hidden,
                                                   q=q,
                                                   v=v,
@@ -42,7 +42,7 @@ class Transformer(Module):
                                                   dropout=dropout,
                                                   device=device) for _ in range(N)])
 
-        self.encoder_list_2 = ModuleList([Encoder(d_model=d_model,
+        self.encoder_timestep = ModuleList([Encoder(d_model=d_model,
                                                   d_hidden=d_hidden,
                                                   q=q,
                                                   v=v,
@@ -50,8 +50,8 @@ class Transformer(Module):
                                                   dropout=dropout,
                                                   device=device) for _ in range(N)])
 
-        self.embedding_channel =  torch.nn.Linear(d_channel, d_model)
-        self.embedding_input = torch.nn.Linear(d_input, d_model)
+        self.embedding_channel =  torch.nn.Linear(d_input, d_model)
+        self.embedding_timestep = torch.nn.Linear(d_channel, d_model)
         
 
         self.gate = torch.nn.Linear(d_model * d_input + d_model * d_channel, 2)
@@ -70,11 +70,11 @@ class Transformer(Module):
         """
         # step-wise
         # The score matrix is ​​input, and mask and pe are added by default
-        encoding_1 = self.embedding_channel(x.type(torch.FloatTensor).to(DEVICE)) 
-        input_to_gather = encoding_1 
+        encoding_timestep = self.embedding_timestep(x.type(torch.FloatTensor).to(DEVICE)) 
+        input_to_gather = encoding_timestep
 
         if self.pe:
-            pe = torch.ones_like(encoding_1[0])
+            pe = torch.ones_like(encoding_timestep[0])
             position = torch.arange(0, self._d_input).unsqueeze(-1)
             temp = torch.Tensor(range(0, self._d_model, 2))
             temp = temp * -(math.log(10000) / self._d_model)
@@ -83,28 +83,29 @@ class Transformer(Module):
             pe[:, 0::2] = torch.sin(temp)
             pe[:, 1::2] = torch.cos(temp)
 
-            encoding_1 = encoding_1 + pe
+            encoding_timestep = encoding_timestep + pe
 
         #this applies the encoder, which includes the MHA, Add & Norm, Feed Forward, Add & Norm etc.
-        for encoder in self.encoder_list_1:
-            encoding_1, score_input = encoder(encoding_1, stage)
+        for encoder in self.encoder_timestep:
+            encoding_timestep, score_input = encoder(encoding_timestep, stage)
 
         # channel-wise
         # score matrix is ​​channel without mask and pe by default
         
-        encoding_2 = self.embedding_input(x.transpose(-1, -2).type(torch.FloatTensor).to(DEVICE))
-        channel_to_gather = encoding_2
+        encoding_channel = self.embedding_channel(x.transpose(-1, -2).type(torch.FloatTensor).to(DEVICE))
+        channel_to_gather = encoding_channel
 
-        for encoder in self.encoder_list_2:
-            encoding_2, score_channel = encoder(encoding_2, stage)
+        for encoder in self.encoder_channel:
+            encoding_channel, score_channel = encoder(encoding_channel, stage)
 
         # 3D to 2D
         #A torch.view might be the better option here, so that we don't have to store any new memory
-        encoding_1 = encoding_1.reshape(encoding_1.shape[0], -1)
-        encoding_2 = encoding_2.reshape(encoding_2.shape[0], -1)
+        encoding_channel = encoding_channel.reshape(encoding_channel.shape[0], -1)
+        encoding_timestep = encoding_timestep.reshape(encoding_timestep.shape[0], -1)
 
-        self.fgate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)
-        encoding = torch.cat([encoding_1 * self.fgate[:, 0:1], encoding_2 * self.fgate[:, 1:2]], dim=-1)
+        print(encoding_channel.shape, encoding_timestep.shape)
+        self.fgate = F.softmax(self.gate(torch.cat([encoding_channel, encoding_timestep], dim=-1)), dim=-1)
+        encoding = torch.cat([encoding_channel * self.fgate[:, 0:1], encoding_timestep * self.fgate[:, 1:2]], dim=-1)
 
 
         # output
