@@ -29,8 +29,7 @@ class Encoder(Module):
         self.layerNormal_1 = torch.nn.LayerNorm(d_model)
         self.layerNormal_2 = torch.nn.LayerNorm(d_model)
 
-    def forward(self, x, stage):
-        
+    def forward(self, x, stage):  
         residual = x
         x, score = self.MHA(x, stage)
         x = self.dropout(x)

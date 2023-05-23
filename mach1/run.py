@@ -32,7 +32,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='mach trash',
+    project='mach test',
     name='test'
 
 )
@@ -79,6 +79,9 @@ print(f'Number of classes: {d_output}')
 net = Transformer(d_model=hp.d_model, d_timestep=d_input, d_channel=d_channel, d_output=d_output, d_hidden=hp.d_hidden,
                   q=hp.q, v=hp.v, h=hp.h, N=hp.N, dropout=hp.dropout, pe=hp.pe, mask=hp.mask, device=DEVICE).to(DEVICE)
 
+
+print(net)
+
 # [Beginning creating and visualizing computation graph]
 
 #from torchviz import make_dot
@@ -109,16 +112,13 @@ def train():
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
-            y_pre, encoding, _, _, _, _, _ = net(x.to(DEVICE), 'train')
+            y_pre = net(x.to(DEVICE), 'train')
             loss = loss_function(y_pre, y.to(DEVICE))
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
             wandb.log({'loss': loss})
             wandb.log({'index': index})
-            if i % 500 == 0:
-                print(net.fgate)
-                print(encoding)
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')

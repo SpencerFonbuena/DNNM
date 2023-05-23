@@ -21,6 +21,6 @@ class FeedForward(Module):
     def forward(self, x):
 
         x = self.linear_1(x)
-        x = F.tanh(x)
+        x = F.relu(x)
         x = self.linear_2(x)
         return x
