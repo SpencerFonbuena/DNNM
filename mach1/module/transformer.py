@@ -81,7 +81,7 @@ class Transformer(Module):
         #Embedding time-step 
         time_input = F.tanh(self.embedding_timestep(x))
             #add the positional encoding for time_step
-        time_input = time_input + torch.tensor(positional_code)
+        time_input = time_input + torch.tensor(positional_code).to(DEVICE)
             #cast to a float32
         time_input = time_input.to(torch.float32)
 
