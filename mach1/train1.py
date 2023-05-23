@@ -86,7 +86,7 @@ def train(dataloader_train: DataLoader,
             x,y = x.to(device),(y.view(-1)).to(device)
             optimiser.zero_grad()
             out = model(x)
-            loss = criterion(out.type(torch.FloatTensor), y.type(torch.LongTensor).to(DEVICE))
+            loss = criterion(out.type(torch.FloatTensor), y.type(torch.LongTensor))
             loss.requires_grad = True
             wandb.log({'loss': loss})
             loss.backward()
