@@ -6,6 +6,10 @@ from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
 from tqdm import tqdm, trange
 
+from torch.nn import Module
+import torch
+from torch.nn import CrossEntropyLoss
+
 from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
 from torch.utils.data import WeightedRandomSampler as wrs
@@ -20,6 +24,17 @@ from module.transformer import Transformer
 from module.loss import Myloss
 from module.hyperparameters import HyperParameters as hp
 from baselines.FCN import ConvNet
+
+wandb.init(
+    project='mach1 1hour',
+    name='test'
+
+)
+
+if torch.cuda.is_available():
+    path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
+else:
+    path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
@@ -45,19 +60,23 @@ d_input = train_dataset.input_len # number of time parts
 d_channel = train_dataset.channel_len # feature dimension
 d_output = train_dataset.output_len # classification category
 
-fcnmodel = ConvNet(7,4)
+fcnmodel = ConvNet(26,4)
 
-def train(dataloader_train: train_dataloader,
-          dataloader_test: test_dataloader,
-          device: DEVICE,
-          model: fcnmodel,
-          epochs: 100,
-          learning_rate: .0003,
-          save: False):
+print(fcnmodel)
+
+
+def train(dataloader_train: DataLoader,
+          dataloader_test: DataLoader,
+          device: str,
+          model: nn.Module,
+          epochs: int,
+          learning_rate: float,
+          save: bool):
 
     optimiser = optim.Adam(model.parameters(),lr=learning_rate)
+    criterion = torch.nn.CrossEntropyLoss().requires_grad_(True)
     history = []
-
+    wandb.watch(model, log='all')
     epoch_bar = trange(epochs)
     for epoch in epoch_bar:
 
@@ -66,12 +85,11 @@ def train(dataloader_train: train_dataloader,
         for batch,data in enumerate(dataloader_train):
             x,y = data
             x,y = x.to(device),(y.view(-1)).to(device)
-
             optimiser.zero_grad()
-
             out = model(x)
-            loss = F.cross_entropy(out,y)
-
+            loss = criterion(out.type(torch.FloatTensor), y.type(torch.LongTensor).to(DEVICE))
+            loss.requires_grad = True
+            wandb.log({'loss': loss})
             loss.backward()
             optimiser.step()
 
@@ -101,3 +119,5 @@ def train(dataloader_train: train_dataloader,
         pass
 
     return model,history
+
+train(train_dataloader, test_dataloader, DEVICE, fcnmodel, 100, .0003, False)
