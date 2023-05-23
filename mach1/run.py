@@ -138,6 +138,8 @@ def test(dataloader, flag = str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
+            if i % 500 == 0:
+                print(net.fgate)
         if flag == 'train':
             wandb.log({"Train acc": accuracy})
         if flag == 'test':

@@ -108,8 +108,8 @@ class Transformer(Module):
         channel_input = channel_input.reshape(channel_input.shape[0], -1)
         
         #Package together all the information
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([time_input, channel_input], dim=-1)), dim=-1)
-        gate_out = torch.cat([time_input * gate[:, 0:1], channel_input * gate[:, 1:2]], dim=-1)
+        self.fgate = torch.nn.functional.softmax(self.gate(torch.cat([time_input, channel_input], dim=-1)), dim=-1)
+        gate_out = torch.cat([time_input * self.fgate[:, 0:1], channel_input * self.fgate[:, 1:2]], dim=-1)
         out = self.output_linear(gate_out)
         # [End Package Features]
 
