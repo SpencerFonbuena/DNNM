@@ -99,7 +99,7 @@ def train(dataloader_train: DataLoader,
             x,y = x.to(device),(y.view(-1)).to(device)
             outs = model(x)
 
-            test_acc = ((torch.argmax(outs,1))== y).cpu().detach().numpy().sum()/len(y)*100
+            test_acc = ((torch.argmax(outs,1))== y).detach().numpy().sum()/len(y)*100
             test_loss = F.cross_entropy(outs,y).item()
             running_acc  += test_acc*x.size(0)
             running_loss += test_loss*x.size(0)

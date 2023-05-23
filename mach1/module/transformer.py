@@ -18,7 +18,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 class Transformer(Module):
     def __init__(self,
                  d_model: int,
-                 d_input: int,
+                 d_timestep: int,
                  d_channel: int,
                  d_output: int,
                  d_hidden: int,
@@ -50,17 +50,19 @@ class Transformer(Module):
                                                   dropout=dropout,
                                                   device=device) for _ in range(N)])
 
-        self.embedding_channel =  torch.nn.Linear(d_input, d_model)
+        self.embedding_channel =  torch.nn.Linear(d_timestep, d_model)
         self.embedding_timestep = torch.nn.Linear(d_channel, d_model)
         
 
-        self.gate = torch.nn.Linear(d_model * d_input + d_model * d_channel, 2)
-        self.output_linear = torch.nn.Linear(d_model * d_input + d_model * d_channel, d_output)
+        self.gate = torch.nn.Linear(d_model * d_timestep + d_model * d_channel, 2)
+        self.output_linear = torch.nn.Linear(d_model * d_timestep + d_model * d_channel, d_output)
 
         self.pe = pe
-        self._d_input = d_input
-        self._d_model = d_model
+        self.d_timestep = d_timestep
+        self.d_model = d_model
 
     def forward(self, x , stage):
+
+        
 
         return 

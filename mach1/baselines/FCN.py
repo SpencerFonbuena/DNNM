@@ -18,7 +18,6 @@ class ConvNet(nn.Module):
         self.conv3 = nn.Conv1d(256, 128, 3,2)
         self.bn3   = nn.BatchNorm1d(128)
 
-        self.fc4   = nn.Linear(128,4)
 
         #nn.Conv2d(in_channels=1,out_channels=128,kernel_size=(7,1),stride=1,padding=(3,0))
         
@@ -26,11 +25,10 @@ class ConvNet(nn.Module):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-
+        print(x.shape)
 
         x = F.avg_pool2d(x,2)
-        x = torch.flatten(x)
-        x = self.fc4(x)
+        print(x.shape)
         print(x.shape, x)
         x = x.reshape(1,4).type(torch.LongTensor)
 

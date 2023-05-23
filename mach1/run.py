@@ -32,7 +32,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='mach1 1hour',
+    project='mach trash',
     name='test'
 
 )
@@ -76,7 +76,7 @@ print(f'mytest data size: [{train_dataset.test_len, d_input, d_channel}]')
 print(f'Number of classes: {d_output}')
 
 # Create a Transformer model
-net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_output=d_output, d_hidden=hp.d_hidden,
+net = Transformer(d_model=hp.d_model, d_timestep=d_input, d_channel=d_channel, d_output=d_output, d_hidden=hp.d_hidden,
                   q=hp.q, v=hp.v, h=hp.h, N=hp.N, dropout=hp.dropout, pe=hp.pe, mask=hp.mask, device=DEVICE).to(DEVICE)
 
 # [Beginning creating and visualizing computation graph]

@@ -21,29 +21,49 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 class Create_Dataset(Dataset):
     def __init__(self, datafile, window_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
-        self.mode = mode
-        #, names=['Date','Open','High','Low','Close','Volume','50SMA','200SMA','RSI','Labels']
+        # [Reading in and pre-processing data]
+
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
+        #normalize the data inputs
         prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns='Labels').to_numpy()))
-        #prerawtrainingdata = torch.nn.functional.normalize(preprerawtrain)
+        #recasting data as pandas dataframe. I couldn't find a way to normalize with pandas, so I cast it first to torch, then back to pandas.
         rawtrainingdata = pd.DataFrame(prerawtrain).to_numpy()
         
-        #Find the distributions of each label
-        distlabel = pd.DataFrame(labeldata).value_counts()
-        print(distlabel)
-        
+        # [End pre-processing]
+
+
+
+        # [General Functionalities]
+
+        #The data we want will depend if we are in train, validate, or test mode.
+        self.mode = mode
         #create a split value to separate valadate from training
         self.split = int(len(df) * split)
+
+        # [End Functionalities]
+
+
+
+
+  
         
-       #window the datasets
+        # [Window the dataset]
+        
+        #First array is a row vector, which broadcasts with dataset_array
         window_array = np.array([np.arange(window_size)])
+        #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
         dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
+        #broadcast the data together
         indexdata = window_array + dataset_array
-
-
+        # Index into the raw training data with our preset windows to create datasets quickly
         trainingdata = rawtrainingdata[indexdata]
+
+        #[End windowing dataset]
+
+
+
 
         #[beginning of creating test data and labels]
 
@@ -56,8 +76,12 @@ class Create_Dataset(Dataset):
         #Find the distributions of each label in the training set
         self.distlabel = 1 / (pd.DataFrame(labeldata).value_counts())
         self.trainsampleweights = [self.distlabel[i] for i in self.normtraininglabels]
+        
 
         #[end of creating training data and labels]
+
+
+
 
         #[beginning of creating validation data and labels]
         
@@ -72,6 +96,9 @@ class Create_Dataset(Dataset):
 
         #[end of creating validation data and labels]
         
+
+
+
         #[beginning of creating trainvalidation data and labels]
 
         #create the trainvalidation data and labels
@@ -83,9 +110,12 @@ class Create_Dataset(Dataset):
         #Find the distributions of each label in the test set
         self.trainvalsampleweights = [self.distlabel[i] for i in self.normtrainvallabels]
 
-
+         #[end of creating trainvalidation data and labels]
         
 
+
+
+        # [Creating dimension variables for easy computing on other sheets]
         
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
         self.input_len = window_size# number of time parts
@@ -93,6 +123,9 @@ class Create_Dataset(Dataset):
         self.output_len = 4 # classification category
         self.test_len = self.valdata.shape[0]
         
+        #[End dimension variables]
+
+    
     
     def __getitem__(self, index):
         if self.mode == 'train':
