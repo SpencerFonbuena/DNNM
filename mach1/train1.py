@@ -59,7 +59,7 @@ d_input = train_dataset.input_len # number of time parts
 d_channel = train_dataset.channel_len # feature dimension
 d_output = train_dataset.output_len # classification category
 
-fcnmodel = ConvNet(26,4)
+fcnmodel = ConvNet(26,4).to(DEVICE)
 
 print(fcnmodel)
 
