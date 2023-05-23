@@ -44,6 +44,8 @@ else:
     path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
 
 
+
+
 test_interval = 2  # Test interval unit: epoch
 
 
