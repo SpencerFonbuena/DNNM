@@ -133,7 +133,7 @@ def test(dataloader, flag = str):
     with torch.no_grad():
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre, _, _, _, _, _, _ = net(x, 'test')
+            y_pre = net(x, 'test')
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
