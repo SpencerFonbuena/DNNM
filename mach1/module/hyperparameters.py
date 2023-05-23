@@ -7,10 +7,10 @@ class HyperParameters:
     LR = .0003
     d_model = 512
     d_hidden = 1024
-    q = 16
-    v = 16
-    h = 16
-    N = 24
+    q = 8
+    v = 8
+    h = 8
+    N = 1
     dropout = 0.0
     split = .85
     pe = True # # The setting is in the twin towers score=pe score=channel has no pe by default

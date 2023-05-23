@@ -79,10 +79,10 @@ net = Transformer(d_model=hp.d_model, d_input=d_input, d_channel=d_channel, d_ou
 
 # [Beginning creating and visualizing computation graph]
 
-#from torchviz import make_dot
-#traind, label = next(iter(train_dataloader))
-#y, _, _, _, _, _, _ = net(traind, 'train')
-#make_dot(y.mean(), params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
+from torchviz import make_dot
+traind, label = next(iter(train_dataloader))
+y, _, _, _, _, _, _ = net(traind, 'train')
+make_dot(y.mean(), show_attrs=True, show_saved=True,  params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
 
 #[End of creating and visualizing computation graph]
 
