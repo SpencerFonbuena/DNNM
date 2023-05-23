@@ -61,7 +61,6 @@ d_output = train_dataset.output_len # classification category
 
 fcnmodel = ConvNet(26,4).to(DEVICE)
 
-print(fcnmodel)
 
 
 def train(dataloader_train: DataLoader,

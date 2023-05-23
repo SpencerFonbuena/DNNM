@@ -24,21 +24,15 @@ class ConvNet(nn.Module):
         
     def forward(self, x: torch.Tensor):
         x = F.relu(self.bn1(self.conv1(x)))
-        print(x.shape)
         x = F.relu(self.bn2(self.conv2(x)))
-        print(x.shape)
         x = F.relu(self.bn3(self.conv3(x)))
-        print(x.shape)
 
 
         x = F.avg_pool2d(x,2)
-        print(x.shape)
         x = torch.flatten(x)
-        print(x.shape)
         x = self.fc4(x)
         print(x.shape, x)
         x = x.reshape(1,4).type(torch.LongTensor)
-        print(x.shape)
 
         return x
     
