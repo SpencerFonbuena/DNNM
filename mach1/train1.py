@@ -26,7 +26,7 @@ from module.hyperparameters import HyperParameters as hp
 from baselines.FCN import ConvNet
 
 wandb.init(
-    project='mach1 1hour',
+    project='mach baseline',
     name='test'
 
 )
