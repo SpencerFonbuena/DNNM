@@ -25,7 +25,7 @@ print(f'use device: {DEVICE}')
 
 wandb.init(
     project='mach fcn',
-    name='test'
+    name='bigger batch and window'
 )
 # [End Initialization]
 
