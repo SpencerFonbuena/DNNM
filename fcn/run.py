@@ -59,12 +59,14 @@ test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shu
 
 # [Initialize functions for training]
 loss_function = Myloss()
-model = FCN(9,4)
+model = FCN(9,4).to(DEVICE)
 
-
+#Choose Optimizer
 if hp.optimizer_name == 'Adam':
     optimizer = optim.Adam(model.parameters(), lr=hp.LR)
 # [End training initialization]
+
+
 
 # Used to record the accuracy rate change
 correct_on_train = []
