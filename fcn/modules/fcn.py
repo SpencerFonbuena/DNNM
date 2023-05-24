@@ -23,20 +23,12 @@ class FCN(nn.Module):
         
     def forward(self, x):
         x = torch.tensor(x).transpose(-1,-2)
-        print(x.shape)
         x = F.relu(self.bn1(self.conv1(x)))
-        print(x.shape)
         x = F.relu(self.bn2(self.conv2(x)))
-        print(x.shape)
         x = F.relu(self.bn3(self.conv3(x)))
-        print(x.shape)
         x = torch.tensor(self.gap(x))
         x = x.reshape(x.shape[0], -1)
-        print(x.shape)
         x = self.fc(x)
-        print(x.shape)
-        print(x)
         x = F.softmax(x, 1)
-        print(x)
         return x
     

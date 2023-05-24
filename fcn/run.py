@@ -79,10 +79,9 @@ time_cost = 0
 # training function
 def train():
     model.train()
-    #wandb.watch(model, log='all')
+    wandb.watch(model, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
-            print(x.shape)
             optimizer.zero_grad()
             y_pre = model(x.to(DEVICE))
             loss = loss_function(y_pre, y.to(DEVICE))
@@ -105,13 +104,11 @@ def test(dataloader, flag = str):
     with torch.no_grad():
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = model(x, 'test')
+            y_pre = model(x)
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-            if i % 500 == 0:
-                print(model.fgate)
         if flag == 'train':
             wandb.log({"Train acc": accuracy})
         if flag == 'test':
