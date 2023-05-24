@@ -24,7 +24,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 wandb.init(
-    project='mach test',
+    project='mach fcn',
     name='test'
 )
 # [End Initialization]
