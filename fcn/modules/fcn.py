@@ -2,6 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import random
+
+# [Initialize stat-tracking]
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 
 class FCN(nn.Module):
     def __init__(self, data_in, data_out, layers=[128, 256, 512], kss=[8, 5, 3]):
