@@ -31,9 +31,11 @@ wandb.init(
 
 
 # [Initialize functions for dataset]
-path = 'fcn/datasets/AAPL_1hour_expand.txt'
+if torch.cuda.is_available():
+    path = '/root/GTN/fcn/datasets/AAPL_1hour_expand.txt'
+else:
+    path = 'models/fcn/datasets/AAPL_1hour_expand.txt'
 # [End Initialization]
-
 
 
 

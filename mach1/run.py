@@ -41,7 +41,7 @@ wandb.init(
 if torch.cuda.is_available():
     path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
 else:
-    path = 'gtn/mach1/datasets/AAPL_1hour_expand.txt'
+    path = 'models/mach1/datasets/AAPL_1hour_expand.txt'
 
 
 
