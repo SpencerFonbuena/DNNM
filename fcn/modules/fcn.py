@@ -58,43 +58,44 @@ class FCN(nn.Module):
 
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-
         x = x + identity
         identity = x
+
         x = F.relu(self.bn4(self.conv4(x)))
         x = F.relu(self.bn5(self.conv5(x)))
         x = x + identity
         identity = x
+
         x = F.relu(self.bn6(self.conv6(x)))
         x = F.relu(self.bn7(self.conv7(x)))
-        
         x = x + identity
         identity = x
+
         x = F.relu(self.bn8(self.conv8(x)))
         x = F.relu(self.bn9(self.conv9(x)))
-        
         x = x + identity
         identity = x
+
         x = F.relu(self.bn10(self.conv10(x)))
         x = F.relu(self.bn11(self.conv11(x)))
-        
         x = x + identity
         identity = x
+
         x = F.relu(self.bn12(self.conv12(x)))
         x = F.relu(self.bn13(self.conv13(x)))
         x = x + identity
-        
         identity = x
+
         x = F.relu(self.bn14(self.conv14(x)))
         x = F.relu(self.bn15(self.conv15(x)))
         x = x + identity
-        
         identity = x
+        
         x = F.relu(self.bn16(self.conv16(x)))
         x = F.relu(self.bn17(self.conv17(x)))
         x = x + identity
-        
         identity = x
+        
         x = F.relu(self.bnout(self.convout(x)))
         x = self.gap(x)
         x = x.reshape(x.shape[0], -1)
