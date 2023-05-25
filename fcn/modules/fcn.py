@@ -8,24 +8,24 @@ class FCN(nn.Module):
     def __init__(self, data_in, data_out, layers=[128, 256, 512], kss=[7, 5, 3]):
         super().__init__()
 
-        self.conv1 = nn.Conv1d(data_in, layers[1], kss[0], 1, 3)
-        self.conv2 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv3 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv4 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv5 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv6 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv7 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv8 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv9 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv10 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv11 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv12 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv13 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv14 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv15 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv16 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.conv17 = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
-        self.convout = nn.Conv1d(layers[1], layers[1], kss[0], 1, 3)
+        self.conv1 = nn.Conv1d(data_in, layers[1], kss[1], 1, 3)
+        self.conv2 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv3 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv4 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv5 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv6 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv7 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv8 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv9 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv10 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv11 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv12 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv13 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv14 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv15 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv16 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.conv17 = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
+        self.convout = nn.Conv1d(layers[1], layers[1], kss[1], 1, 2)
         
         self.bn1 = nn.BatchNorm1d(layers[1])
         self.bn2= nn.BatchNorm1d(layers[1])
@@ -55,14 +55,14 @@ class FCN(nn.Module):
         x = x.transpose(-1,-2)
         x = F.relu(self.bn1(self.conv1(x)))
         identity = x
+        
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        
+
         x = x + identity
         identity = x
         x = F.relu(self.bn4(self.conv4(x)))
         x = F.relu(self.bn5(self.conv5(x)))
-        
         x = x + identity
         identity = x
         x = F.relu(self.bn6(self.conv6(x)))
