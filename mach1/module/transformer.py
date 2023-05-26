@@ -42,6 +42,7 @@ class Transformer(Module):
                  qkpair = int,
                  value_count = int,
                  device = str,
+                 stack = int,
                  
                  #FFN Variables
                  inner_size = int,
@@ -86,7 +87,7 @@ class Transformer(Module):
                  device = device,
                  
                  inner_size = inner_size
-            ) for _ in range(heads)
+            ) for _ in range(stack)
         ])
 
         #Timestep Init
@@ -99,7 +100,7 @@ class Transformer(Module):
                  device = device,
                  
                  inner_size = inner_size
-            ) for _ in range(heads)
+            ) for _ in range(stack)
         ])
         # [End Init]
 
