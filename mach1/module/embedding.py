@@ -60,7 +60,6 @@ class Embedding(Module):
 '''====================================================================================================='''
 
 def positional_encoding(max_position, d_model, min_freq=1e-4):
-    print(max_position, d_model)
     '''max_position: window size
         d_model: out_size from the embedding class'''
     position = np.arange(max_position)
