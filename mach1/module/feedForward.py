@@ -10,6 +10,11 @@ np.random.seed(seed)
 random.seed(seed)
 torch.manual_seed(seed)
 
+
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
+
 class FeedForward(Module):
     def __init__(self,
                  d_model: int,
@@ -18,12 +23,26 @@ class FeedForward(Module):
 
         self.in_layer = nn.Linear(d_model, inner_size)
         self.out_layer = nn.Linear(inner_size, d_model)
+
+        self.layernorm = nn.LayerNorm(normalized_shape=d_model)
+
+    '''-----------------------------------------------------------------------------------------------------'''
+    '''====================================================================================================='''
+    
     def forward(self, x):
+        residual = x
+
         x = self.in_layer(x) #(16,120,2048)
         x = F.relu(x) #(16,120,2048)
         x = self.out_layer(x) #(16,120,512)
+
+        x = self.layernorm(x + residual)
         return x 
     
+
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
 # [Mock test the FFN]
 '''
 mockdata = torch.tensor(np.random.randn(16,120,512)).to(torch.float32)

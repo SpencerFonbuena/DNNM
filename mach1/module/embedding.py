@@ -15,19 +15,22 @@ random.seed(seed)
 torch.manual_seed(seed)
 # [End init]
 
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
 class Embedding(Module):
     def __init__(self,
-                 stage = str,
                  channel_in = str,
                  timestep_in = str,
                  d_model = str,
-                 window_size = int):
+                 window_size = int,
+                 tower = str):
         super(Embedding, self).__init__()
 
         # [Making init variables class-wide available]
-        self.stage = stage
         self.d_model = d_model
         self.window_size = window_size
+        self.tower = tower
         # [End availability]
 
         '''-----------------------------------------------------------------------------------------------------'''
@@ -39,16 +42,23 @@ class Embedding(Module):
         # positional encoding of some sort
         # [End Init]
     
-    def forward(self, x, tower):
-        pe = positional_encoding(max_position=self.window_size, d_model=self.d_model)
-        if tower == 'channel':
+        '''-----------------------------------------------------------------------------------------------------'''
+        '''====================================================================================================='''
+    
+    def forward(self, x):
+
+        if self.tower == 'channel':
             x = x.transpose(-1,-2)
             x = self.ffchannelembedding(x) #(16,9,512)
-        if tower == 'timestep':
+        if self.tower == 'timestep':
+            pe = positional_encoding(max_position=self.window_size, d_model=self.d_model)
             x = self.fftimestepembedding(x) # (16,120,512)
             x = pe + x #(16,120,512)
         return x
     
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
 def positional_encoding(max_position, d_model, min_freq=1e-4):
     print(max_position, d_model)
     '''max_position: window size
@@ -64,11 +74,13 @@ def positional_encoding(max_position, d_model, min_freq=1e-4):
     '''End Possible Error'''
     return pos_enc
 
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
 # [Mock test the embedding]
 '''
 mockdata = torch.tensor(np.random.randn(16,120,9)).to(torch.float32)
-test_emb = Embedding(stage='train', channel_in=mockdata.shape[2], timestep_in=mockdata.shape[1], d_model=512,window_size=mockdata.shape[1])
-test_emb(mockdata, 'timestep')
-test_emb(mockdata, 'channel')
+test_emb = Embedding(channel_in=mockdata.shape[2], timestep_in=mockdata.shape[1], d_model=512,window_size=mockdata.shape[1], tower='timestep')
+test_emb(mockdata)
 '''
 # [End mock embedding]

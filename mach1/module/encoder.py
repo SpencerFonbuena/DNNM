@@ -5,13 +5,21 @@ import numpy as np
 import random
 
 
-from module.multiHeadAttention import MultiHeadAttention
-from module.feedForward import FeedForward
+from multiHeadAttention import MultiHeadAttention
+from feedForward import FeedForward
+
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
+#print(f'use device: {DEVICE}')
 
 seed = 10
 np.random.seed(seed)
 random.seed(seed)
 torch.manual_seed(seed)
+
+
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
 
 class Encoder(Module):
     def __init__(self,
@@ -23,36 +31,42 @@ class Encoder(Module):
                  
                  inner_size = int):
         super(Encoder, self).__init__()
-        
-        # [Making init variables class-wide available]
-        self.qkpair = qkpair
-        self.heads = heads
-        self.device=device
-        self.d_model = d_model
-        self.value_count = value_count
 
-        self.inner_size = inner_size
-        # [End availability]
+        self.multi_head_func = MultiHeadAttention(
+                heads = heads,
+                d_model = d_model,
+                qkpair = qkpair,
+                value_count = value_count,
+                device = device
+        )
+        self.ffn_func = FeedForward( 
+                d_model = d_model,
+                inner_size= inner_size,
+        )
 
-        multi_head_func = MultiHeadAttention(
-                heads = int,
-                d_model = int,
-                qkpair = int,
-                value_count = int,
-                device = str
-        )
-        ffn_func = FeedForward( 
-                d_model = int,
-                inner_size= int,
-        )
+        self.layernorm = nn.LayerNorm(d_model)
+
+
+        '''-----------------------------------------------------------------------------------------------------'''
+        '''====================================================================================================='''
 
     def forward(self, x, stage):
-        
-        recurrence = x
-        x = MultiHeadAttention(x)
-        x = nn.LayerNorm(recurrence + x)
-        recurrence = nn.LayerNorm(recurrence + x)
+        recurrence = x #(16,120,512)
 
-        x = FeedForward(x)
-        x = nn.LayerNorm(recurrence + x)
+        x = self.multi_head_func(x, stage) #(16,120,512)
+        x = self.layernorm(recurrence + x) #(16,120,512)
+
+        x = self.ffn_func(x) #(16,120,512)
+
         return x
+
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
+# [Mock test the MHA]
+'''
+mockdata = torch.tensor(np.random.randn(16,120,512)).to(torch.float32)
+test_init = Encoder(heads=8, d_model=512, qkpair=8, value_count=8, device=DEVICE, inner_size=2048)
+test_init(mockdata, 'train')
+'''
+# [End Mock Test]
