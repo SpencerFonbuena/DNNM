@@ -22,39 +22,55 @@ from module.loss import Myloss
 from module.hyperparameters import HyperParameters as hp
 
 
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
 
+# [General Initialization]
+
+# Set random seed
 seed = 10
 np.random.seed(seed)
 random.seed(seed)
 torch.manual_seed(seed)
 
+# Make us of GPU
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
+# Log on Weights and Biases
 wandb.init(
     project='mach test',
     name='test'
-
 )
 
-
+#switch datasets depending on local or virtual run
 if torch.cuda.is_available():
     path = '/root/GTN/mach1/datasets/AAPL_1hour_expand.txt'
 else:
     path = 'models/mach1/datasets/AAPL_1hour_expand.txt'
 
 
+# Use this sleeper function if you want to look at the computational graph
+#print(net)
+#from torchviz import make_dot
+#traind, label = next(iter(train_dataloader))
+#y, _, _, _, _, _, _ = net(traind, 'train')
+#make_dot(y.mean(), show_attrs=True, show_saved=True,  params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
+
+# [End General Init]
+
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
 
 
-test_interval = 2  # Test interval unit: epoch
+#[Create and load the dataset]
 
-
-#create the dataset to be loaded
+#create the datasets to be loaded
 train_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='train')
 val_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='validate')
 test_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='test')
 
-#create the sampler
+#create the samplers
 samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
 samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
@@ -75,25 +91,24 @@ print(f'train data size: [{DATA_LEN, d_input, d_channel}]')
 print(f'mytest data size: [{train_dataset.test_len, d_input, d_channel}]')
 print(f'Number of classes: {d_output}')
 
+# [End Dataset Init]
+
+
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
+
+# [Initialize Training and Testing Procedures]
+
 # Create a Transformer model
-net = Transformer(d_model=hp.d_model, d_timestep=d_input, d_channel=d_channel, d_output=d_output, d_hidden=hp.d_hidden,
-                  q=hp.q, v=hp.v, h=hp.h, N=hp.N, dropout=hp.dropout, pe=hp.pe, mask=hp.mask, device=DEVICE).to(DEVICE)
+net = Transformer()
 
-
-print(net)
-
-# [Beginning creating and visualizing computation graph]
-
-#from torchviz import make_dot
-#traind, label = next(iter(train_dataloader))
-#y, _, _, _, _, _, _ = net(traind, 'train')
-#make_dot(y.mean(), show_attrs=True, show_saved=True,  params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
-
-#[End of creating and visualizing computation graph]
+# [Place computational graph code here if desired]
 
 # Create a loss function here using cross entropy loss
 loss_function = Myloss()
 
+#Select optimizer in an un-optimized way
 if hp.optimizer_name == 'Adam':
     optimizer = optim.Adam(net.parameters(), lr=hp.LR)
 
@@ -104,6 +119,13 @@ correct_on_test = []
 loss_list = []
 time_cost = 0
 
+# [End Training and Test Init]
+
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
+
+
+# [Begin Training and Testing]
 
 # training function
 def train():
@@ -145,7 +167,16 @@ def test(dataloader, flag = str):
         if flag == 'test':
             wandb.log({"Test acc": accuracy})
 
+# [End Training and Testing]
 
+'''-----------------------------------------------------------------------------------------------------'''
+'''====================================================================================================='''
 
+# [Save Model]
+
+# [End Save Model]
+
+# [Run the model]
 if __name__ == '__main__':
     train()
+# [End experiment]

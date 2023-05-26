@@ -6,7 +6,7 @@ class HyperParameters:
     WINDOW_SIZE = 120
     LR = .0003
     d_model = 512
-    d_hidden = 1024
+    d_hidden = 2048
     q = 8 # Queries
     v = 8 # Values
     h = 8 # Heads

@@ -8,6 +8,10 @@ import numpy as np
 import random
 from module.hyperparameters import HyperParameters as hp
 
+from module.embedding import Embedding
+from module.encoder import Encoder
+from module.gate import Gating
+
 seed = 10
 np.random.seed(seed)
 random.seed(seed)
@@ -20,5 +24,8 @@ class Transformer(Module):
     def __init__(self):
         super(Transformer, self).__init__()
 
-    def forward(self):
+    def forward(self, x):
+        x = Embedding(x)
+        x = Encoder(x)
+        x = Gating(x)
         return
