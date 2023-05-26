@@ -103,7 +103,7 @@ print(f'Number of classes: {d_output}')
 # Create a Transformer model
 net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_channel,
                   heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
-                  device=DEVICE,inner_size=hp.d_hidden,class_num=d_output)
+                  device=DEVICE,inner_size=hp.d_hidden,class_num=d_output).to(DEVICE)
 
 # [Place computational graph code here if desired]
 
@@ -162,8 +162,6 @@ def test(dataloader, flag = str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-            if i % 500 == 0:
-                print(net.fgate)
         if flag == 'train':
             wandb.log({"Train acc": accuracy})
         if flag == 'test':
