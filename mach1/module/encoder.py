@@ -5,8 +5,8 @@ import numpy as np
 import random
 
 
-from multiHeadAttention import MultiHeadAttention
-from feedForward import FeedForward
+from module.multiHeadAttention import MultiHeadAttention
+from module.feedForward import FeedForward
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 #print(f'use device: {DEVICE}')

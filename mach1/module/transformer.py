@@ -1,6 +1,5 @@
 from torch.nn import Module
 from torch.nn import ModuleList
-from encoder import Encoder
 
 
 import torch
@@ -9,8 +8,8 @@ import torch.nn.functional as F
 import numpy as np
 import random
 
-from embedding import Embedding
-from encoder import Encoder
+from module.embedding import Embedding
+from module.encoder import Encoder
 
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU

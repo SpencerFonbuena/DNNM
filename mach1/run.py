@@ -39,7 +39,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 wandb.init(
-    project='mach test',
+    project='mach transformer',
     name='test'
 )
 
@@ -101,7 +101,9 @@ print(f'Number of classes: {d_output}')
 # [Initialize Training and Testing Procedures]
 
 # Create a Transformer model
-net = Transformer()
+net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_channel,
+                  heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
+                  device=DEVICE,inner_size=hp.d_hidden,class_num=d_output)
 
 # [Place computational graph code here if desired]
 
