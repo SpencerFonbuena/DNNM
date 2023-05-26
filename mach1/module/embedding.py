@@ -4,7 +4,9 @@ from torch.nn import Module
 import numpy as np
 import random
 
-
+# Make us of GPU
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
+print(f'use device: {DEVICE}')
 
 # [Initialize stat-tracking]
 seed = 10
@@ -49,7 +51,7 @@ class Embedding(Module):
             x = x.transpose(-1,-2)
             x = self.ffchannelembedding(x) #(16,9,512)
         if self.tower == 'timestep':
-            pe = positional_encoding(max_position=self.window_size, d_model=self.d_model)
+            pe = positional_encoding(max_position=self.window_size, d_model=self.d_model).to(DEVICE)
             x = self.fftimestepembedding(x) # (16,120,512)
             x = pe + x #(16,120,512)
         return x
