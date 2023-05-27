@@ -114,8 +114,8 @@ class Transformer(Module):
 
     def forward(self, x, stage):
         #Embed channel and timestep
-        x_channel = self.channel_embedding(x).to(torch.float32) # (16,120,512)
-        x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,9,512)
+        x_channel = self.channel_embedding(x).to(torch.float32) # (16,9,512)
+        x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,120,512)
 
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
@@ -140,7 +140,7 @@ class Transformer(Module):
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1) #(16,61440)
         x_channel = x_channel.reshape(x_channel.shape[0], -1)# (16,4608)
         
-
+        testgate = self.gate(torch.cat([x_timestep, x_channel], dim=-1))
         gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
         out = self.linear_out(gate_out)
