@@ -2,7 +2,7 @@ class HyperParameters:
 
     # hyperparameter settings
     EPOCH = 1500
-    BATCH_SIZE = 32
+    BATCH_SIZE = 16
     WINDOW_SIZE = 120
     LR = .0003
     d_model = 512
@@ -14,3 +14,4 @@ class HyperParameters:
     dropout = 0.0
     split = .85
     optimizer_name = 'Adam'
+    clip = .9

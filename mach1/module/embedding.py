@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.nn import Module
 import numpy as np
 import random
+import math
 
 # Make us of GPU
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
@@ -51,28 +52,24 @@ class Embedding(Module):
             x = x.transpose(-1,-2)
             x = self.ffchannelembedding(x) #(16,9,512)
         if self.tower == 'timestep':
-            pe = positional_encoding(max_position=self.window_size, d_model=self.d_model).to(DEVICE)
             x = self.fftimestepembedding(x) # (16,120,512)
-            x = pe + x #(16,120,512)
+            x = positional_encoding(x)
         return x
     
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
 
-def positional_encoding(max_position, d_model, min_freq=1e-4):
-    '''max_position: window size
-        d_model: out_size from the embedding class'''
-    position = np.arange(max_position)
-    freqs = min_freq**(2*(np.arange(d_model)//2)/d_model)
-    pos_enc = position.reshape(-1,1)*freqs.reshape(1,-1)
-    pos_enc[:, ::2] = np.cos(pos_enc[:, ::2])
-    pos_enc[:, 1::2] = np.sin(pos_enc[:, 1::2])
-    
-    '''Possible Error: Not sure what the memory is doing just casting this numpy array to a torch tensor'''
-    pos_enc = torch.tensor(pos_enc)
-    '''End Possible Error'''
-    return pos_enc
+def positional_encoding(x):
 
+    pe = torch.ones_like(x[0])
+    position = torch.arange(0, x.shape[1]).unsqueeze(-1)
+    temp = torch.Tensor(range(0, x.shape[-1], 2))
+    temp = temp * -(math.log(10000) / x.shape[-1])
+    temp = torch.exp(temp).unsqueeze(0)
+    temp = torch.matmul(position.float(), temp)  # shape:[input, d_model/2]
+    pe[:, 0::2] = torch.sin(temp)
+    pe[:, 1::2] = torch.cos(temp)
+    return x + pe
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
 
