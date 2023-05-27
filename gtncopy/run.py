@@ -9,6 +9,7 @@ import torch.optim as optim
 from time import time
 from tqdm import tqdm
 import os
+import wandb
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -27,6 +28,14 @@ if torch.cuda.is_available():
 else:
     path = 'models/fcn/datasets/AAPL_1hour_expand.txt'
 # [End Initialization]
+
+wandb.init(
+    project='mach fcn',
+    name='bigger batch and window'
+)
+# [End Initialization]
+
+
 
 test_interval = 5  # 测试间隔 单位：epoch
 draw_key = 1  # 大于等于draw_key才会保存图像
@@ -111,10 +120,14 @@ def test(dataloader, flag='test_set'):
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
+            accuratelog = (100 * correct / total)
+            wandb.log({"Train acc": accuratelog})
         if flag == 'test_set':
             correct_on_test.append(round((100 * correct / total), 2))
+            wandb.log({"Test acc": accuratelog})
         elif flag == 'train_set':
             correct_on_train.append(round((100 * correct / total), 2))
+            wandb.log({"Train acc": accuratelog})
         print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
 
         return round((100 * correct / total), 2)
@@ -123,17 +136,20 @@ def test(dataloader, flag='test_set'):
 # 训练函数
 def train():
     net.train()
+    wandb.watch(net, log='all')
     max_accuracy = 0
     pbar = tqdm(total=EPOCH)
     begin = time()
     for index in range(EPOCH):
+        wandb.log({'index': index})
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
 
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
 
             loss = loss_function(y_pre, y.to(DEVICE))
-
+            wandb.log({'loss': loss})
+            
             print(f'Epoch:{index + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
 
@@ -146,9 +162,9 @@ def train():
             test(train_dataloader, 'train_set')
             print(f'当前最大准确率\t测试集:{max(correct_on_test)}%\t 训练集:{max(correct_on_train)}%')
 
-            if current_accuracy > max_accuracy:
-                max_accuracy = current_accuracy
-                torch.save(net, f'saved_model/{file_name} batch={BATCH_SIZE}.pkl')
+            #if current_accuracy > max_accuracy:
+                #max_accuracy = current_accuracy
+                #torch.save(net, f'saved_model/{file_name} batch={BATCH_SIZE}.pkl')
 
         pbar.update()
 
