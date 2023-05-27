@@ -82,7 +82,6 @@ class MultiHeadAttention(Module):
         out = self.output_layer(weight_V) #(16,120,512)
         # [End calculations]
 
-        print('MHA',self.output_layer.weight.grad)
         return out
     
 
