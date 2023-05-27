@@ -52,7 +52,6 @@ class MultiHeadAttention(Module):
 
 
     def forward(self, x, stage):
-
         # [Begin Query, Key, and Value pair creation]
         queries = torch.cat(self.query_weight(x).chunk(self.heads, dim=-1), dim=0) # (128,120,8)
         keys = torch.cat(self.key_weight(x).chunk(self.heads, dim=-1), dim=0) # (128,120,8)

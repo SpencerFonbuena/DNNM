@@ -134,7 +134,7 @@ time_cost = 0
 # training function
 def train():
     net.train()
-    #wandb.watch(net, log='all')
+    wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
