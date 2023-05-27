@@ -30,7 +30,7 @@ else:
 # [End Initialization]
 
 wandb.init(
-    project='mach fcn',
+    project='mach gtncopy',
     name='bigger batch and window'
 )
 # [End Initialization]
@@ -150,7 +150,7 @@ def train():
             loss = loss_function(y_pre, y.to(DEVICE))
             wandb.log({'loss': loss})
             
-            print(f'Epoch:{index + 1}:\t\tloss:{loss.item()}')
+            #print(f'Epoch:{index + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
 
             loss.backward()
