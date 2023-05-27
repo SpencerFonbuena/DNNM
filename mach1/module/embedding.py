@@ -38,8 +38,8 @@ class Embedding(Module):
         '''====================================================================================================='''
 
         # [Init layers]
-        self.ffchannelembedding = nn.Linear(timestep_in, d_model)
-        self.fftimestepembedding = nn.Linear(channel_in, d_model)
+        self.ffchannelembedding = nn.Linear(channel_in, d_model)
+        self.fftimestepembedding = nn.Linear(timestep_in, d_model)
         # positional encoding of some sort
         # [End Init]
     
@@ -49,9 +49,10 @@ class Embedding(Module):
     def forward(self, x):
 
         if self.tower == 'channel':
-            x = x.transpose(-1,-2)
+            
             x = self.ffchannelembedding(x) #(16,9,512)
         if self.tower == 'timestep':
+            x = x.transpose(-1,-2)
             x = self.fftimestepembedding(x) # (16,120,512)
             x = positional_encoding(x)
         return x

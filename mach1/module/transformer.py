@@ -113,7 +113,7 @@ class Transformer(Module):
         # [Gate & Out Init]
 
             # [convolutions for channel]
-        self.conv1 = nn.Conv1d(channel_in, layers[1], kss[2], 1, 3)
+        self.conv1 = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 3)
         self.conv2 = nn.Conv1d(layers[1], layers[1], kss[2], 1, 1)
         self.conv3 = nn.Conv1d(layers[1], layers[1], kss[2], 1, 1)
 
@@ -126,7 +126,7 @@ class Transformer(Module):
             # [end convolutions for channel]
 
             # [convolutions for timestep]
-        self.conv4 = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 3)
+        self.conv4 = nn.Conv1d(channel_in, layers[1], kss[2], 1, 3)
         self.conv5 = nn.Conv1d(layers[1], layers[1], kss[2], 1, 1)
         self.conv6 = nn.Conv1d(layers[1], layers[1], kss[2], 1, 1)
 
