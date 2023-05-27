@@ -24,15 +24,15 @@ reslut_figure_path = 'result_figure'  # 结果图像保存路径
 
 # [Initialize functions for dataset]
 if torch.cuda.is_available():
-    path = '/root/GTN/gtncopy/datasets/AAPL_1hour_expand.txt'
+    path = '/root/GTN/gtncopy/datasets/walkrun.csv'
 else:
-    path = 'models/fcn/datasets/AAPL_1hour_expand.txt'
+    path = 'models/fcn/datasets/walkrun.csv'
 # [End Initialization]
 
-wandb.init(
-    project='mach gtncopy',
-    name='bigger batch and window'
-)
+#wandb.init(
+    #project='mach gtncopy',
+    #name='bigger batch and window'
+#)
 # [End Initialization]
 
 
@@ -121,13 +121,13 @@ def test(dataloader, flag='test_set'):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuratelog = (100 * correct / total)
-            wandb.log({"Train acc": accuratelog})
+            #wandb.log({"Train acc": accuratelog})
         if flag == 'test_set':
             correct_on_test.append(round((100 * correct / total), 2))
-            wandb.log({"Test acc": accuratelog})
+            #wandb.log({"Test acc": accuratelog})
         elif flag == 'train_set':
             correct_on_train.append(round((100 * correct / total), 2))
-            wandb.log({"Train acc": accuratelog})
+            #wandb.log({"Train acc": accuratelog})
         print(f'Accuracy on {flag}: %.2f %%' % (100 * correct / total))
 
         return round((100 * correct / total), 2)
@@ -136,20 +136,24 @@ def test(dataloader, flag='test_set'):
 # 训练函数
 def train():
     net.train()
-    wandb.watch(net, log='all')
+    #wandb.watch(net, log='all')
     max_accuracy = 0
     pbar = tqdm(total=EPOCH)
     begin = time()
     for index in range(EPOCH):
-        wandb.log({'index': index})
+        #wandb.log({'index': index})
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
 
             y_pre, _, _, _, _, _, _ = net(x.to(DEVICE), 'train')
 
             loss = loss_function(y_pre, y.to(DEVICE))
-            wandb.log({'loss': loss})
-            
+            #wandb.log({'loss': loss})
+            print(net.gate.weight.grad)
+            print(net.output_linear.weight.grad)
+            print(net.embedding_channel.weight.grad)
+            print(net.embedding_input.weight.grad)
+
             #print(f'Epoch:{index + 1}:\t\tloss:{loss.item()}')
             loss_list.append(loss.item())
 

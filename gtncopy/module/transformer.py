@@ -91,6 +91,8 @@ class Transformer(Module):
 
         # gate
         gate = F.softmax(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)), dim=-1)
+        print(self.gate(torch.cat([encoding_1, encoding_2], dim=-1)))
+        print(gate)
         encoding = torch.cat([encoding_1 * gate[:, 0:1], encoding_2 * gate[:, 1:2]], dim=-1)
 
         # 输出
