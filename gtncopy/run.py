@@ -21,7 +21,12 @@ from torch.utils.data import WeightedRandomSampler as wrs
 setup_seed(30)  # 设置随机数种子
 reslut_figure_path = 'result_figure'  # 结果图像保存路径
 
-path = 'models/Gated Transformer 论文IJCAI版/datasets/AAPL_1hour_expand.txt'
+# [Initialize functions for dataset]
+if torch.cuda.is_available():
+    path = '/root/GTN/gtncopy/datasets/AAPL_1hour_expand.txt'
+else:
+    path = 'models/fcn/datasets/AAPL_1hour_expand.txt'
+# [End Initialization]
 
 test_interval = 5  # 测试间隔 单位：epoch
 draw_key = 1  # 大于等于draw_key才会保存图像
