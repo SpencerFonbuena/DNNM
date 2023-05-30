@@ -37,10 +37,30 @@ torch.manual_seed(seed)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
+config = {
+    'EPOCH': 1500,
+    'BATCH_SIZE': 64,
+    'WINDOW_SIZE': 120,
+    'LR': .0003,
+    'd_model': 512,
+    'd_hidden': 2048,
+    'queries': 8, # Queries,
+    'values': 8, # Values,
+    'heads': 8, # Heads,
+    'N': 1, # multi head attention layers,
+    'dropout': 0.0,
+    'split': .85,
+    'optimizer_name': 'Adam',
+    'clip': .9,
+    'Conv Layers': 3,
+    'Linear-Out Layers': 2
+}
+
 # Log on Weights and Biases
 wandb.init(
     project='mach2 transformer',
-    name='changed validation set'
+    name='changed validation set',
+    config=config
 )
 
 #switch datasets depending on local or virtual run
