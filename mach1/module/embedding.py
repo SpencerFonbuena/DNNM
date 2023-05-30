@@ -49,7 +49,6 @@ class Embedding(Module):
     def forward(self, x):
 
         if self.tower == 'channel':
-            
             x = self.ffchannelembedding(x) #(16,9,512)
         if self.tower == 'timestep':
             x = x.transpose(-1,-2)

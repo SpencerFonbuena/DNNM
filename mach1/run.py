@@ -38,10 +38,10 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
-wandb.init(
+'''wandb.init(
     project='mach transformer',
     name='test'
-)
+)'''
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -105,7 +105,7 @@ net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_
                   heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
                   device=DEVICE,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N).to(DEVICE)
 
-print(net)
+#print(net)
 
 # [Place computational graph code here if desired]
 
@@ -134,7 +134,7 @@ time_cost = 0
 # training function
 def train():
     net.train()
-    wandb.watch(net, log='all')
+    #wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
@@ -143,8 +143,8 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
-            wandb.log({'loss': loss})
-            wandb.log({'index': index})
+            #wandb.log({'loss': loss})
+            #wandb.log({'index': index})
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
@@ -164,10 +164,10 @@ def test(dataloader, flag = str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-        if flag == 'train':
+        '''if flag == 'train':
             wandb.log({"Train acc": accuracy})
         if flag == 'test':
-            wandb.log({"Test acc": accuracy})
+            wandb.log({"Test acc": accuracy})'''
 
 # [End Training and Testing]
 

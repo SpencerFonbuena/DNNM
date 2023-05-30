@@ -171,6 +171,9 @@ class Transformer(Module):
         identity = x_channel
 
         x_channel = F.relu(self.bn2(self.conv2(x_channel)))
+        x_channel = x_channel + identity
+        identity = x_channel
+
         x_channel = F.relu(self.bn3(self.conv3(x_channel)))
         x_channel = x_channel + identity
         
@@ -184,6 +187,9 @@ class Transformer(Module):
         identity = x_timestep
 
         x_timestep = F.relu(self.bn5(self.conv5(x_timestep)))
+        x_timestep = x_timestep + identity
+        identity = x_timestep
+
         x_timestep = F.relu(self.bn6(self.conv6(x_timestep)))
         x_timestep = x_timestep + identity
         
@@ -191,8 +197,9 @@ class Transformer(Module):
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
         x_timestep = self.fcchannel(x_timestep)
         
+        print(x_channel, x_timestep)
         out = self.finalout(torch.cat([x_channel,x_timestep], dim=-1))
-
+        print(F.softmax(out, dim=-1))
         # [End tower combination]
         return out
 
