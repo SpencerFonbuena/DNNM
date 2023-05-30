@@ -147,6 +147,10 @@ class Transformer(Module):
         '''====================================================================================================='''
 
         # [Combine tower features]
+
+        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+        x_channel = x_channel.reshape(x_channel.shape[0], -1)
+
         gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
 
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
