@@ -114,6 +114,7 @@ class Transformer(Module):
         # [Gate & Out Init]
 
         self.fcn = FCNLayer(channel_in=channel_in,timestep_in=timestep_in,layers=layers, kss=kss, class_num=class_num)
+        self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
         self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
                                           out_features=class_num)
 
@@ -151,7 +152,7 @@ class Transformer(Module):
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
         out = self.linear_out(gate_out)
-        
+
         return out
 
 
