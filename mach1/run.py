@@ -105,7 +105,7 @@ net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_
                   heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
                   device=DEVICE,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, layers=[128, 256, 512], kss=[7, 5, 3]).to(DEVICE)
 
-#print(net)
+print(net)
 
 # [Place computational graph code here if desired]
 
