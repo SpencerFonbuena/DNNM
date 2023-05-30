@@ -114,7 +114,8 @@ class Transformer(Module):
         # [Gate & Out Init]
 
         self.fcn = FCNLayer(channel_in=channel_in,timestep_in=timestep_in,layers=layers, kss=kss, class_num=class_num)
-        self.finalout = nn.Linear(8,4)
+        self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
+                                          out_features=class_num)
 
         # [End Gate & Out]
 
@@ -145,9 +146,12 @@ class Transformer(Module):
         '''====================================================================================================='''
 
         # [Combine tower features]
-        channel, timestep = self.fcn(x_channel=x_channel, x_timestep=x_timestep)
-        out = channel + timestep
-        # [End tower combination]
+        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
+
+        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
+
+        out = self.linear_out(gate_out)
+        
         return out
 
 
