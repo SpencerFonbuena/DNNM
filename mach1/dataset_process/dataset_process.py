@@ -102,10 +102,10 @@ class Create_Dataset(Dataset):
         #[beginning of creating trainvalidation data and labels]
 
         #create the trainvalidation data and labels
-        self.trainvaldata = torch.tensor(trainingdata[:10_000]).to(torch.float32)
-        self.trainvallabels = torch.tensor(labeldata[:10_000]).to(torch.float32)
+        self.trainvaldata = torch.tensor(trainingdata[30_000:50_000]).to(torch.float32)
+        self.trainvallabels = torch.tensor(labeldata[30_000:50_000]).to(torch.float32)
         #can't call the iterate through a torch, so this is to create all of the weights
-        self.normtrainvallabels = labeldata[:10_000]
+        self.normtrainvallabels = labeldata[30_000:50_000]
 
         #Find the distributions of each label in the test set
         self.trainvalsampleweights = [self.distlabel[i] for i in self.normtrainvallabels]
