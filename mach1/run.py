@@ -38,22 +38,30 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 config = {
+    # [training hp]
     'EPOCH': 1500,
     'BATCH_SIZE': 64,
-    'WINDOW_SIZE': 120,
+    'WINDOW_SIZE': 240,
     'LR': .0003,
+
+    # [architecture hp]
     'd_model': 512,
     'd_hidden': 2048,
     'queries': 8, # Queries,
     'values': 8, # Values,
     'heads': 8, # Heads,
     'N': 1, # multi head attention layers,
-    'dropout': 0.0,
+    'Conv Layers': 3,
+    'Linear-Out Layers': 2,
+
+    # [General]
     'split': .85,
     'optimizer_name': 'Adam',
+
+    # [Regularizers]
+    'dropout': 0.0,
     'clip': .9,
-    'Conv Layers': 3,
-    'Linear-Out Layers': 2
+
 }
 
 # Log on Weights and Biases
