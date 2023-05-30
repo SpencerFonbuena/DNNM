@@ -40,7 +40,7 @@ print(f'use device: {DEVICE}')
 # Log on Weights and Biases
 wandb.init(
     project='mach2 transformer',
-    name='naive gating'
+    name='changed validation set'
 )
 
 #switch datasets depending on local or virtual run
