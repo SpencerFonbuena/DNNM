@@ -149,7 +149,7 @@ class Transformer(Module):
         # [Combine tower features]
 
         x_timestep, x_channel = self.fcn(x_timestep=x_timestep, x_channel=x_channel)
-        preout = self.pre_out(torch.cat(x_timestep, x_channel))
+        preout = self.pre_out(torch.cat([x_timestep, x_channel], dim=-1))
         out = self.out(preout)
         return out
 
