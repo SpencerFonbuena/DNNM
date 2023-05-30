@@ -196,10 +196,8 @@ class Transformer(Module):
         x_timestep = self.gapchannel(x_timestep)
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
         x_timestep = self.fcchannel(x_timestep)
-        
-        print(x_channel, x_timestep)
+
         out = self.finalout(torch.cat([x_channel,x_timestep], dim=-1))
-        print(F.softmax(out, dim=-1))
         # [End tower combination]
         return out
 
