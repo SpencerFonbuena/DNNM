@@ -80,7 +80,7 @@ config = {
 
 # Log on Weights and Biases
 wandb.init(
-    project='mach-5-GTN_FCN',
+    project='mach-6-fcgtn-baseline',
     name='changed validation set',
     #config=config
 )
