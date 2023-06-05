@@ -79,6 +79,7 @@ class FCNLayer(Module):
         identity = x_timestep
 
         x_timestep = F.relu(self.bn6(self.conv6(x_timestep)))
+        print(x_timestep.mean())
         x_timestep = x_timestep + identity
         
         x_timestep = self.gapchannel(x_timestep)
