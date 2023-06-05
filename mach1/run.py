@@ -186,7 +186,7 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
-            print(list(net.parameters()))
+            #print(list(net.parameters()))
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
