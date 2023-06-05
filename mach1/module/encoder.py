@@ -58,7 +58,7 @@ class Encoder(Module):
         x = self.layernorm(recurrence + x) #(16,120,512)
 
         x = self.ffn_func(x) #(16,120,512)
-        x = torchvision.ops.stochastic_depth(x,.5, 'train')
+        x = torchvision.ops.stochastic_depth(x,.5, 'batch')
 
         return x
 
