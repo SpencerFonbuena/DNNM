@@ -27,7 +27,8 @@ class Create_Dataset(Dataset):
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
         #normalize the data inputs
-        prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=['Labels', 'OBV']).to_numpy()))
+        #prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=['Labels', 'OBV']).to_numpy()))
+        prerawtrain = torch.tensor(df.drop(columns=['Labels', 'OBV']).to_numpy())
         #recasting data as pandas dataframe. I couldn't find a way to normalize with pandas, so I cast it first to torch, then back to pandas.
         rawtrainingdata = pd.DataFrame(prerawtrain).to_numpy()
         

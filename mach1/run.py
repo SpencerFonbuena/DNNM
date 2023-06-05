@@ -14,6 +14,7 @@ import os
 import numpy as np
 import wandb
 import random
+import pandas as pd
 
 
 
@@ -185,6 +186,7 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
+            print(list(net.parameters()))
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
