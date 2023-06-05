@@ -56,14 +56,14 @@ class FCNLayer(Module):
     def forward(self, x_channel, x_timestep):
             # [combine channel features]
         x_channel = F.relu(self.bn1(self.conv1(x_channel)))
-        identity = x_channel
+        '''identity = x_channel
 
         x_channel = F.relu(self.bn2(self.conv2(x_channel)))
         x_channel = x_channel + identity
         identity = x_channel
 
         x_channel = F.relu(self.bn3(self.conv3(x_channel)))
-        x_channel = x_channel + identity
+        x_channel = x_channel + identity'''
         
         x_channel = self.gapchannel(x_channel)
         x_channel = x_channel.reshape(x_channel.shape[0], -1)
@@ -72,7 +72,7 @@ class FCNLayer(Module):
 
             # (combine timestep features)
         x_timestep = F.relu(self.bn4(self.conv4(x_timestep)))
-        identity = x_timestep
+        '''identity = x_timestep
 
         x_timestep = F.relu(self.bn5(self.conv5(x_timestep)))
         
@@ -80,7 +80,7 @@ class FCNLayer(Module):
         identity = x_timestep
 
         x_timestep = F.relu(self.bn6(self.conv6(x_timestep)))
-        x_timestep = x_timestep + identity
+        x_timestep = x_timestep + identity'''
         
         x_timestep = self.gapchannel(x_timestep)
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
