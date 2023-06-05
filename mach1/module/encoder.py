@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch
 import numpy as np
 import random
+import torchvision
 
 
 from module.multiHeadAttention import MultiHeadAttention
@@ -57,6 +58,7 @@ class Encoder(Module):
         x = self.layernorm(recurrence + x) #(16,120,512)
 
         x = self.ffn_func(x) #(16,120,512)
+        x = torchvision.ops.stochastic_depth(x,.5)
 
         return x
 

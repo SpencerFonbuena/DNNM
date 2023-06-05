@@ -37,38 +37,52 @@ torch.manual_seed(seed)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
+# [Create WandB sweeps]
+
 config = {
     # [training hp]
-    'EPOCH': 1500,
-    'BATCH_SIZE': 64,
-    'WINDOW_SIZE': 240,
-    'LR': .0003,
+    'EPOCH': hp.EPOCH,
+    'BATCH_SIZE': hp.BATCH_SIZE,
+    'WINDOW_SIZE': hp.WINDOW_SIZE,
+    'LR': hp.LR,
 
     # [architecture hp]
-    'd_model': 512,
-    'd_hidden': 2048,
-    'queries': 8, # Queries,
-    'values': 8, # Values,
-    'heads': 8, # Heads,
-    'N': 1, # multi head attention layers,
+    'd_model': hp.d_model,
+    'd_hidden': hp.d_hidden,
+    'queries': hp.queries, # Queries,
+    'values': hp.values, # Values,
+    'heads': hp.heads, # Heads,
+    'N': hp.N, # multi head attention layers,
     'Conv Layers': 3,
     'Linear-Out Layers': 2,
 
     # [General]
-    'split': .85,
-    'optimizer_name': 'Adam',
+    'split': hp.split,
+    'optimizer_name': hp.optimizer_name,
 
     # [Regularizers]
-    'dropout': 0.0,
-    'clip': .9,
+    'dropout': hp.dropout,
+    'clip': hp.clip,
 
 }
+
+'''sweep_config = {
+    'method': 'random',
+    'name': 'sweep',
+    'metric': {
+        'goal': 'maximize',
+        'name': 
+    }
+
+}'''
+
+# [End Sweeps]
 
 # Log on Weights and Biases
 wandb.init(
     project='mach2 transformer',
     name='changed validation set',
-    config=config
+    #config=config
 )
 
 #switch datasets depending on local or virtual run
