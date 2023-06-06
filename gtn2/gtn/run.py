@@ -51,7 +51,7 @@ d_hidden = 1024
 q = 8
 v = 8
 h = 8
-N = 24
+N = 1
 dropout = 0.2
 pe = True  # # 设置的是双塔中 score=pe score=channel默认没有pe
 mask = True  # 设置的是双塔中 score=input的mask score=channel默认没有mask

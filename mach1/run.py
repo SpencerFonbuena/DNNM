@@ -178,6 +178,9 @@ time_cost = 0
 def train():
     net.train()
     wandb.watch(net, log='all')
+    list_even = []
+    list_odd = []
+    list_dif = []
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
@@ -186,20 +189,20 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
-            list_even = list
-            list_odd = list
-            list_dif = list
             if i % 2 == 0 :
                 for i in range(44):
-                    if i % 2 == 0:
-                        list_even = np.append(list_even, list(net.parameters())[i].mean())
+                    if i % 2 == 0 :
+                        list_even = np.append(list_even, torch.tensor(list(net.parameters())[i]).detach().mean())
             else:
                 for i in range(44):
-                    if i % 2 == 0:
-                        print(f'{i}:',list(net.parameters())[i].mean())
-                        list_odd = list(net.parameters())[i].mean()
-            for i in range(44):
-                list_dif.append(list_even[i]-list_odd[i])
+                    if i % 2 == 0 :
+                        list_odd = np.append(list_odd, torch.tensor(list(net.parameters())[i]).detach().mean())
+                print(list_even, list_odd)
+                for i in range(22):
+                    print(f'{i}', list_odd[i].item()-list_even[i].item())
+                list_even = []
+                list_odd = []
+                list_dif = []
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
