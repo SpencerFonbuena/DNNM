@@ -6,6 +6,7 @@ import torch
 import math
 import random
 import torch.nn.functional as F
+import torchvision.ops.stochastic_depth as std
 import numpy as np
 import torch.nn as nn
 
@@ -57,7 +58,7 @@ class Transformer(Module):
                  fcnstack = int
                  ):
         super(Transformer, self).__init__()
-        
+        self.p = p
         # [Initialize Embedding]
 
         #Channel embedding Init
@@ -170,13 +171,17 @@ class Transformer(Module):
 
         # Channel tower
         for encoder in self.channel_tower:
+            identity = x_channel
+            x_channel = std(x_channel, self.p, 'batch')
             y_channel = encoder(x=x_channel, stage=stage)
-            x_channel = y_channel
+            x_channel = y_channel + identity
         
         #Timestep tower
         for encoder in self.timestep_tower:
+            identity = x_timestep
+            x_timestep = std(x_timestep, self.p, 'batch')
             y_timestep = encoder(x = x_timestep, stage=stage)
-            x_timestep = y_timestep
+            x_timestep = y_timestep + identity
 
         # [End loop]
 
