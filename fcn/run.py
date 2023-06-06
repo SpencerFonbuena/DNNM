@@ -3,7 +3,7 @@ from modules.hyperparameters import HyperParameters as hp
 from torch.utils.data import WeightedRandomSampler as wrs
 from torch.utils.data import DataLoader
 from modules.loss import Myloss
-from modules.fcn import FCN
+from modules.fcn import FN
 
 import torch
 import torch.optim as optim
@@ -59,7 +59,7 @@ test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shu
 
 # [Initialize functions for training]
 loss_function = Myloss()
-model = FCN(data_in=9, data_out=4, layers=[128,256,512], kss=[7,5,3], stack=40,p=.5).to(DEVICE)
+model = FN(data_in=9, data_out=4, layers=[128,256,512], kss=[7,5,3], stack=40,p=.5).to(DEVICE)
 
 #Choose Optimizer
 if hp.optimizer_name == 'Adam':

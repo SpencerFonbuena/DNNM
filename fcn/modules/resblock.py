@@ -23,7 +23,7 @@ torch.manual_seed(seed)
 
 class ResBlock(Module):
     def __init__(self, layers = list, kss = list, p = float):
-        
+        super(ResBlock, self).__init__()
         self.p = p
 
         self.conv1 = nn.Conv1d(layers[1], layers[1], kss[2], 1, 1)

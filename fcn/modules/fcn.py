@@ -7,13 +7,13 @@ from modules.resblock import ResBlock
 from torch.nn import ModuleList
 
 
-class FCN(nn.Module):
+class FN(nn.Module):
     def __init__(self, data_in, data_out, layers=list, kss=list, p = float, stack = int):
         super().__init__()
 
         self.convin = nn.Conv1d(data_in, layers[1], kss[2], 1, 3)
 
-        self.FCN = ModuleList([
+        self.FN = ModuleList([
             ResBlock(
                  layers=layers,
                  kss = kss,
@@ -31,7 +31,7 @@ class FCN(nn.Module):
         x = x.transpose(-1,-2)
         x = F.relu(self.bn1(self.conv1(x)))
         
-        for resnet in self.FCN:
+        for resnet in self.FN:
             x = resnet(x)
 
         x = self.gap(x)
