@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import torchvision.ops.stochastic_depth as std
 
 
 class FCN(nn.Module):
@@ -63,41 +64,49 @@ class FCN(nn.Module):
         x = x + identity
         identity = x
 
+        x = std(x, .1, 'batch')
         x = F.relu(self.bn4(self.conv4(x)))
         x = F.relu(self.bn5(self.conv5(x)))
         x = x + identity
         identity = x
 
+        x = std(x, .3, 'batch')
         x = F.relu(self.bn6(self.conv6(x)))
         x = F.relu(self.bn7(self.conv7(x)))
         x = x + identity
         identity = x
 
+        x = std(x, .3, 'batch')
         x = F.relu(self.bn8(self.conv8(x)))
         x = F.relu(self.bn9(self.conv9(x)))
         x = x + identity
         identity = x
-
+        
+        x = std(x, .5, 'batch')
         x = F.relu(self.bn10(self.conv10(x)))
         x = F.relu(self.bn11(self.conv11(x)))
         x = x + identity
         identity = x
 
+        x = std(x, .5, 'batch')
         x = F.relu(self.bn12(self.conv12(x)))
         x = F.relu(self.bn13(self.conv13(x)))
         x = x + identity
         identity = x
 
+        x = std(x, .5, 'batch')
         x = F.relu(self.bn14(self.conv14(x)))
         x = F.relu(self.bn15(self.conv15(x)))
         x = x + identity
         identity = x
         
+        x = std(x, .5, 'batch')
         x = F.relu(self.bn16(self.conv16(x)))
         x = F.relu(self.bn17(self.conv17(x)))
         x = x + identity
         identity = x
         
+
         x = F.relu(self.bnout(self.convout(x)))
         x = self.gap(x)
         x = x.reshape(x.shape[0], -1)
