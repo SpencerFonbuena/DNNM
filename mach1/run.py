@@ -186,7 +186,20 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
-            #print(list(net.parameters()))
+            list_even = list
+            list_odd = list
+            list_dif = list
+            if i % 2 == 0 :
+                for i in range(44):
+                    if i % 2 == 0:
+                        list_even = np.append(list_even, list(net.parameters())[i].mean())
+            else:
+                for i in range(44):
+                    if i % 2 == 0:
+                        print(f'{i}:',list(net.parameters())[i].mean())
+                        list_odd = list(net.parameters())[i].mean()
+            for i in range(44):
+                list_dif.append(list_even[i]-list_odd[i])
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
