@@ -137,6 +137,7 @@ def train():
     pbar = tqdm(total=EPOCH)
     begin = time()
     for index in range(EPOCH):
+        wandb.log({'Index': index})
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
 
