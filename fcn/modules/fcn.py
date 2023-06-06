@@ -8,7 +8,7 @@ from torch.nn import ModuleList
 
 
 class FCN(nn.Module):
-    def __init__(self, data_in, data_out, layers=list, kss=list, device = str, p = float, stack = int):
+    def __init__(self, data_in, data_out, layers=list, kss=list, p = float, stack = int):
         super().__init__()
 
         self.convin = nn.Conv1d(data_in, layers[1], kss[2], 1, 3)
@@ -18,7 +18,6 @@ class FCN(nn.Module):
                  layers=layers,
                  kss = kss,
                  p = p,
-                 device = device,
                  
             ) for _ in range(stack)
         ])
