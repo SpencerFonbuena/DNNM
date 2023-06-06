@@ -59,7 +59,7 @@ test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shu
 
 # [Initialize functions for training]
 loss_function = Myloss()
-model = FN(data_in=9, data_out=4, layers=[128,256,512], kss=[7,5,3], stack=124,p=.5).to(DEVICE)
+model = FN(data_in=9, data_out=4, layers=[128,256,512], kss=[7,5,3],  stack=124,p=.5).to(DEVICE)
 
 print(model)
 #Choose Optimizer
