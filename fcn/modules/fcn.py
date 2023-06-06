@@ -12,7 +12,7 @@ class FN(nn.Module):
         super().__init__()
 
         self.convin = nn.Conv1d(data_in, layers[1], kss[2], 1, 3)
-
+        self.bnin = nn.BatchNorm1d(layers[1])
         self.FN = ModuleList([
             ResBlock(
                  layers=layers,
@@ -29,7 +29,7 @@ class FN(nn.Module):
         
     def forward(self, x):
         x = x.transpose(-1,-2)
-        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bnin(self.convin(x)))
         
         for resnet in self.FN:
             x = resnet(x)
