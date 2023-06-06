@@ -210,7 +210,6 @@ class Transformer(Module):
 
         preout = self.pre_out(torch.cat([x_timestep, x_channel], dim=-1))
         out = self.out(preout)
-        print(out.shape)
         # [End FCN]
 
         # [Gates]
