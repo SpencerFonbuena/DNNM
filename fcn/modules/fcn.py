@@ -53,9 +53,7 @@ class FCN(nn.Module):
 
         
     def forward(self, x):
-        print(x.shape)
         x = x.transpose(-1,-2)
-        print(x.shape)
         x = F.relu(self.bn1(self.conv1(x)))
         identity = x
 
