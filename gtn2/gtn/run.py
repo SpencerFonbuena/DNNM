@@ -149,16 +149,11 @@ def train():
 
             loss.backward()
 
-            optimizer.step()
+            optimizer.step()        
+        test(test_dataloader)
+        test(validate_dataloader, 'train_set')
+        print(f'当前最大准确率\t测试集:{max(correct_on_test)}%\t 训练集:{max(correct_on_train)}%')
 
-        if ((index + 1) % test_interval) == 0:
-            current_accuracy = test(test_dataloader)
-            test(train_dataloader, 'train_set')
-            print(f'当前最大准确率\t测试集:{max(correct_on_test)}%\t 训练集:{max(correct_on_train)}%')
-
-            if current_accuracy > max_accuracy:
-                max_accuracy = current_accuracy
-                torch.save(net, f'saved_model/{file_name} batch={BATCH_SIZE}.pkl')
 
         pbar.update()
 
