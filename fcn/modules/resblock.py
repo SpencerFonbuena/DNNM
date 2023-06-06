@@ -4,7 +4,7 @@ import torch
 import numpy as np
 import random
 import torchvision.ops.stochastic_depth as std
-import torch.functional as F
+import torch.nn.functional as F
 
 
 
