@@ -41,7 +41,7 @@ file_name = path.split('\\')[-1][0:path.split('\\')[-1].index('.')]  # 获得文
 
 # 超参数设置
 EPOCH = 100
-BATCH_SIZE = 3
+BATCH_SIZE = 36
 LR = 1e-4
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # 选择设备 CPU or GPU
 print(f'use device: {DEVICE}')
@@ -87,6 +87,8 @@ print(f'Number of classes: {d_output}')
 # 创建Transformer模型
 net = Transformer(d_model=d_model, d_input=d_input, d_channel=d_channel, d_output=d_output, d_hidden=d_hidden,
                   q=q, v=v, h=h, N=N, dropout=dropout, pe=pe, mask=mask, device=DEVICE).to(DEVICE)
+
+print(net)
 # 创建loss函数 此处使用 交叉熵损失
 loss_function = Myloss()
 if optimizer_name == 'Adagrad':
