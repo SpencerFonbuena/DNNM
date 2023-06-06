@@ -3,7 +3,7 @@ class HyperParameters:
     # hyperparameter settings
     EPOCH = 1500
     BATCH_SIZE = 9
-    WINDOW_SIZE = 5
+    WINDOW_SIZE = 120
     LR = .0003
     d_model = 512
     d_hidden = 2048
@@ -15,3 +15,5 @@ class HyperParameters:
     split = .85
     optimizer_name = 'Adam'
     clip = .9
+    p = .5
+    fcnstack = 4

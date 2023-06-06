@@ -146,7 +146,7 @@ print(f'Number of classes: {d_output}')
 # Create a Transformer model
 net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_channel,
                   heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
-                  device=DEVICE,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, layers=[128, 256, 512], kss=[7, 5, 3]).to(DEVICE)
+                  device=DEVICE,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, layers=[128, 256, 512], kss=[7, 5, 3], p=hp.p, fcnstack=hp.fcnstack).to(DEVICE)
 
 print(net)
 
@@ -178,9 +178,6 @@ time_cost = 0
 def train():
     net.train()
     wandb.watch(net, log='all')
-    list_even = []
-    list_odd = []
-    list_dif = []
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
@@ -189,20 +186,6 @@ def train():
             loss_list.append(loss.item())
             loss.backward()
             optimizer.step()
-            if i % 2 == 0 :
-                for i in range(44):
-                    if i % 2 == 0 :
-                        list_even = np.append(list_even, torch.tensor(list(net.parameters())[i]).detach().mean())
-            else:
-                for i in range(44):
-                    if i % 2 == 0 :
-                        list_odd = np.append(list_odd, torch.tensor(list(net.parameters())[i]).detach().mean())
-                print(list_even, list_odd)
-                for i in range(22):
-                    print(f'{i}', list_odd[i].item()-list_even[i].item())
-                list_even = []
-                list_odd = []
-                list_dif = []
             wandb.log({'loss': loss})
             wandb.log({'index': index})
         #validate training accuracy and test accuracy
