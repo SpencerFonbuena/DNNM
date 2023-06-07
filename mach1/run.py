@@ -184,8 +184,8 @@ def train():
             y_pre = net(x.to(DEVICE), 'train')
             loss = loss_function(y_pre, y.to(DEVICE))
             loss_list.append(loss.item())
-            for i in range(len(list(net.parameters()))):
-                print(list(net.parameters())[i])
+            '''for i in range(len(list(net.parameters()))):
+                print(list(net.parameters())[i])'''
             loss.backward()
             optimizer.step()
             wandb.log({'Loss': loss})
