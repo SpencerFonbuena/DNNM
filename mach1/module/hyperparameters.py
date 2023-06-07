@@ -4,7 +4,7 @@ class HyperParameters:
     EPOCH = 1500
     BATCH_SIZE = 32
     WINDOW_SIZE = 120
-    LR = .06
+    LR = .0003
     d_model = 512
     d_hidden = 2048
     queries = 8 # Queries
