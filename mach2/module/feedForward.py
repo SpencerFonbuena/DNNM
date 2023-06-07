@@ -30,12 +30,29 @@ class FeedForward(Module):
     '''====================================================================================================='''
     
     def forward(self, x):
-        residual = x
+        #fig, axs = plt.subplots(2,3, figsize=(10,4))
+        #axs[0,0].hist(x.view(-1).tolist(), 80)
+        #axs[0,0].set_title('input')
 
+        residual = x
+        #axs[0,1].hist(residual.view(-1).tolist(), 80)
+        #axs[0,1].set_title('residual')
+        
         x = self.in_layer(x) #(16,120,2048)
+        #axs[0,2].hist(x.view(-1).tolist(), 80)
+        #axs[0,2].set_title('ffn layer in')
+
         x = F.relu(x) #(16,120,2048)
+        #axs[1,0].hist(x.view(-1).tolist(), 80)
+        #axs[1,0].set_title('ffn relu')
+
         x = self.out_layer(x) #(16,120,512)
+        #axs[1,1].hist(x.view(-1).tolist(), 80)
+        #axs[1,1].set_title('ffn layer out')
+
         x = self.layernorm(x + residual)
+        #axs[1,2].hist(x.view(-1).tolist(), 80)
+        #axs[1,2].set_title('out with res')
         return x 
     
 

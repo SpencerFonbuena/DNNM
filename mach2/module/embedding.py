@@ -40,28 +40,42 @@ class Embedding(Module):
 
         # [Init layers]
         self.ffchannelembedding = nn.Linear(channel_in, d_model)
-        plt.hist(self.ffchannelembedding.view(-1).tolist(), 50)
         self.fftimestepembedding = nn.Linear(timestep_in, d_model)
         # positional encoding of some sort
         # [End Init]
     
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
-    
+        
     def forward(self, x):
 
-        if self.tower == 'channel':
-            #plt.hist(x.view(-1).tolist(), 50)
-            x = F.tanh(self.ffchannelembedding(x)) #(16,120,512)
-            #plt.hist(x.view(-1).tolist(), 50)
-        if self.tower == 'timestep':
-            x = x.transpose(-1,-2)
-            x = F.tanh(self.fftimestepembedding(x)) # (16,9,512)
-            #plt.hist(x.view(-1).tolist(), 50)
-            x = positional_encoding(x)
-            #plt.hist(x.view(-1).tolist(), 50)
-            #plt.show()
-        return x
+          if self.tower == 'channel':
+               #fig, axs = plt.subplots(1,3, figsize=(10,4))
+               #axs[0].hist(x.view(-1).tolist(), 80)
+               #axs[0].set_title('input')
+
+               x = self.ffchannelembedding(x) #(16,120,512)
+               #axs[1].hist(x.view(-1).tolist(), 80)
+               #axs[1].set_title('Linear channel activations')
+
+               x = F.tanh(x)
+               #axs[2].hist(x.view(-1).tolist(), 80)
+               #axs[2].set_title('non-linear channel activations')
+          if self.tower == 'timestep':
+               #fig, axs = plt.subplots(1,3, figsize=(10,4))
+               x = x.transpose(-1,-2)
+               x = self.fftimestepembedding(x) # (16,9,512)
+               #axs[0].hist(x.view(-1).tolist(), 80)
+               #axs[0].set_title('Linear timestep activations')
+
+               x = F.tanh(x)
+               #axs[1].hist(x.view(-1).tolist(), 80)
+               #axs[1].set_title('nonlinear timestep activation')
+
+               x = positional_encoding(x)
+               #axs[2].hist(x.view(-1).tolist(), 80)
+               #axs[2].set_title('timestep non-linear positional')
+          return x
     
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''

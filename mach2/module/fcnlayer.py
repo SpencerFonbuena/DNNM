@@ -32,7 +32,7 @@ class ResBlock(Module):
     def forward(self, x):
         identity = x
 
-        x = std(x, self.p, 'batch')
+        #x = std(x, self.p, 'batch')
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = x + identity

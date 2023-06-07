@@ -80,11 +80,11 @@ config = {
 # [End Sweeps]
 
 # Log on Weights and Biases
-wandb.init(
+'''wandb.init(
     project='garbage',
     name='changed validation set',
     #config=config
-)
+)'''
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -177,7 +177,7 @@ time_cost = 0
 # training function
 def train():
     net.train()
-    wandb.watch(net, log='all')
+    #wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
@@ -188,8 +188,8 @@ def train():
                 print(list(net.parameters())[i])'''
             loss.backward()
             optimizer.step()
-            wandb.log({'Loss': loss})
-            wandb.log({'index': index})
+            #wandb.log({'Loss': loss})
+            #wandb.log({'index': index})
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
@@ -209,10 +209,10 @@ def test(dataloader, flag = str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-        if flag == 'train':
+        '''if flag == 'train':
             wandb.log({"Train acc": accuracy})
         if flag == 'test':
-            wandb.log({"Test acc": accuracy})
+            wandb.log({"Test acc": accuracy})'''
 
 # [End Training and Testing]
 

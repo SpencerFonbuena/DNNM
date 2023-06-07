@@ -4,7 +4,7 @@ import torch
 import numpy as np
 import random
 import torchvision
-
+import matplotlib.pyplot as plt
 
 from module.multiHeadAttention import MultiHeadAttention
 from module.feedForward import FeedForward
@@ -52,12 +52,26 @@ class Encoder(Module):
         '''====================================================================================================='''
 
     def forward(self, x, stage):
+        #fig, axs = plt.subplots(2,3, figsize=(10,4))
+        #axs[0,0].hist(x.view(-1).tolist(), 80)
+        #axs[0,0].set_title('MHA input')
+
         recurrence = x #(16,120,512)
+        #axs[0,1].hist(recurrence.view(-1).tolist(), 80)
+        #axs[0,1].set_title('MHA recurrence')
 
         x = self.multi_head_func(x, stage) #(16,120,512)
+        #axs[0,2].hist(x.view(-1).tolist(), 80)
+        #axs[0,2].set_title('MHA output')
+        
         x = self.layernorm(recurrence + x) #(16,120,512)
+        #axs[1,0].hist(x.view(-1).tolist(), 80)
+        #axs[1,0].set_title('encoder layernorm')
 
         x = self.ffn_func(x) #(16,120,512)
+        #axs[1,1].hist(x.view(-1).tolist(), 80)
+        #axs[1,1].set_title('encoder output')
+
 
         return x
 
