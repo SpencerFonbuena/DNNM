@@ -126,7 +126,7 @@ class Transformer(Module):
 
 
             # [ResBlock Loop]
-        self.fcnchannel = ModuleList([
+        '''self.fcnchannel = ModuleList([
             ResBlock(
                  layers= layers,
                  kss = kss,
@@ -150,10 +150,10 @@ class Transformer(Module):
         self.fctimestep = nn.Linear(layers[1], class_num)
 
         self.pre_out = torch.nn.Linear(8,16)
-        self.out = nn.Linear(16,4)
-        '''self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
+        self.out = nn.Linear(16,4)'''
+        self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
         self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
-                                          out_features=class_num)'''
+                                          out_features=class_num)
 
         # [End Gate & Out]
 
@@ -192,7 +192,7 @@ class Transformer(Module):
         # [Combine tower features]
 
         # [FCN]
-        #embed channels and timesteps into convolution
+        '''#embed channels and timesteps into convolution
         x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
         x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
 
@@ -215,18 +215,18 @@ class Transformer(Module):
         x_timestep = self.fctimestep(x_timestep)
 
         preout = self.pre_out(torch.cat([x_timestep, x_channel], dim=-1))
-        out = self.out(preout)
+        out = self.out(preout)'''
         # [End FCN]
 
         # [Gates]
-        '''x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
         x_channel = x_channel.reshape(x_channel.shape[0], -1)
 
         gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
 
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
-        out = self.linear_out(gate_out)'''
+        out = self.linear_out(gate_out)
 
         # [End Gates]
         return out
