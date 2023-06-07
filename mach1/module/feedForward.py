@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 import numpy as np
 import random
-
+import matplotlib.pyplot as plt
 seed = 10
 np.random.seed(seed)
 random.seed(seed)
@@ -33,9 +33,8 @@ class FeedForward(Module):
         residual = x
 
         x = self.in_layer(x) #(16,120,2048)
-        x = F.relu(x) #(16,120,2048)
+        x = F.gelu(x) #(16,120,2048)
         x = self.out_layer(x) #(16,120,512)
-
         x = self.layernorm(x + residual)
         return x 
     
