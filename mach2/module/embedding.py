@@ -50,31 +50,31 @@ class Embedding(Module):
     def forward(self, x):
 
           if self.tower == 'channel':
-               #fig, axs = plt.subplots(1,3, figsize=(10,4))
-               #axs[0].hist(x.view(-1).tolist(), 80)
-               #axs[0].set_title('input')
+               fig, axs = plt.subplots(1,3, figsize=(10,4))
+               axs[0].hist(x.view(-1).tolist(), 80)
+               axs[0].set_title('input')
 
                x = self.ffchannelembedding(x) #(16,120,512)
-               #axs[1].hist(x.view(-1).tolist(), 80)
-               #axs[1].set_title('Linear channel activations')
+               axs[1].hist(x.view(-1).tolist(), 80)
+               axs[1].set_title('Linear channel activations')
 
                x = F.tanh(x)
-               #axs[2].hist(x.view(-1).tolist(), 80)
-               #axs[2].set_title('non-linear channel activations')
+               axs[2].hist(x.view(-1).tolist(), 80)
+               axs[2].set_title('non-linear channel activations')
           if self.tower == 'timestep':
-               #fig, axs = plt.subplots(1,3, figsize=(10,4))
+               fig, axs = plt.subplots(1,3, figsize=(10,4))
                x = x.transpose(-1,-2)
                x = self.fftimestepembedding(x) # (16,9,512)
-               #axs[0].hist(x.view(-1).tolist(), 80)
-               #axs[0].set_title('Linear timestep activations')
+               axs[0].hist(x.view(-1).tolist(), 80)
+               axs[0].set_title('Linear timestep activations')
 
                x = F.tanh(x)
-               #axs[1].hist(x.view(-1).tolist(), 80)
-               #axs[1].set_title('nonlinear timestep activation')
+               axs[1].hist(x.view(-1).tolist(), 80)
+               axs[1].set_title('nonlinear timestep activation')
 
                x = positional_encoding(x)
-               #axs[2].hist(x.view(-1).tolist(), 80)
-               #axs[2].set_title('timestep non-linear positional')
+               axs[2].hist(x.view(-1).tolist(), 80)
+               axs[2].set_title('timestep non-linear positional')
           return x
     
 '''-----------------------------------------------------------------------------------------------------'''

@@ -8,7 +8,6 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import random
-import matplotlib.pyplot as plt
 
 seed = 10
 np.random.seed(seed)
@@ -28,11 +27,7 @@ class Create_Dataset(Dataset):
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
         #normalize the data inputs
-        prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=['Labels', 'OBV']).to_numpy()), dim=1)
-        #axs[0,0].set_title('queries')
-        #prerawtrain = torch.tensor(df.drop(columns=['Labels', 'OBV']).to_numpy())
-        print(len(prerawtrain.reshape(-1).tolist()))
-        plt.scatter(x=range(len(prerawtrain.reshape(-1).tolist())),y=prerawtrain.reshape(-1).tolist())
+        prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=['Labels', 'Date']).to_numpy()))
         #recasting data as pandas dataframe. I couldn't find a way to normalize with pandas, so I cast it first to torch, then back to pandas.
         rawtrainingdata = pd.DataFrame(prerawtrain).to_numpy()
         

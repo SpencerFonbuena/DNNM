@@ -117,11 +117,11 @@ class Transformer(Module):
 
         # [Gate & Out Init]
             # [FCN Init]
-        self.convchannel = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 1)
+        '''self.convchannel = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 1)
         self.convtimestep = nn.Conv1d(channel_in, layers[1], kss[2], 1, 1)
 
         self.bnchannel = nn.BatchNorm1d(layers[1])
-        self.bntimestep = nn.BatchNorm1d(layers[1])
+        self.bntimestep = nn.BatchNorm1d(layers[1])'''
             # [End Init]
 
 
