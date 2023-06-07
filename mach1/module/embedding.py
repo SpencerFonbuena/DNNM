@@ -1,10 +1,11 @@
 import torch
 import torch.nn as nn
 from torch.nn import Module
+from torch.nn import functional as F
 import numpy as np
 import random
 import math
-
+import matplotlib.pyplot as plt
 # Make us of GPU
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
@@ -49,11 +50,15 @@ class Embedding(Module):
     def forward(self, x):
 
         if self.tower == 'channel':
-            x = self.ffchannelembedding(x) #(16,120,512)
+            #plt.hist(x.view(-1).tolist(), 50)
+            x = F.tanh(self.ffchannelembedding(x)) #(16,120,512)
+            #plt.hist(x.view(-1).tolist(), 50)
         if self.tower == 'timestep':
             x = x.transpose(-1,-2)
             x = self.fftimestepembedding(x) # (16,9,512)
             x = positional_encoding(x)
+            #plt.hist(x.view(-1).tolist(), 50)
+            #plt.show()
         return x
     
 '''-----------------------------------------------------------------------------------------------------'''

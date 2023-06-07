@@ -7,6 +7,7 @@ import math
 import random
 import torch.nn.functional as F
 import torchvision.ops.stochastic_depth as std
+import matplotlib.pyplot as plt
 import numpy as np
 import torch.nn as nn
 
