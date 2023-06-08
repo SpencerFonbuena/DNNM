@@ -188,11 +188,13 @@ def train():
                 print(list(net.parameters())[i])'''
             loss.backward()
             optimizer.step()
+            
+        if index % hp.logs == 0:
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
-        #validate training accuracy and test accuracy
-        test(validate_dataloader, 'train')
-        test(test_dataloader, 'test')
+            #validate training accuracy and test accuracy
+            test(validate_dataloader, 'train')
+            test(test_dataloader, 'test')
 
 
 # test function
@@ -205,6 +207,7 @@ def test(dataloader, flag = str):
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, 'test')
+            loss = loss_function(y_pre, y.to(DEVICE))
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
@@ -213,6 +216,7 @@ def test(dataloader, flag = str):
             wandb.log({"Train acc": accuracy})
         if flag == 'test':
             wandb.log({"Test acc": accuracy})
+            wandb.log({"Test Loss": loss})
 
 # [End Training and Testing]
 

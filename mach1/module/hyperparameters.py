@@ -17,3 +17,4 @@ class HyperParameters:
     clip = .9
     p = .5
     fcnstack = 2
+    logs = 5
