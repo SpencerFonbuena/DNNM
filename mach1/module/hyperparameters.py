@@ -16,4 +16,4 @@ class HyperParameters:
     optimizer_name = 'Adam'
     clip = .9
     p = .5
-    fcnstack = 1
+    fcnstack = 2
