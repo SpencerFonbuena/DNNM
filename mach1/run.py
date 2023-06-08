@@ -88,9 +88,9 @@ wandb.init(
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/GTN/mach1/datasets/AAPL_1hour_corrected.txt'
+    path = '/root/GTN/mach1/datasets/AAPL_1hour.txt'
 else:
-    path = 'models/mach1/datasets/AAPL_1hour_corrected.txt'
+    path = 'models/mach1/datasets/AAPL_1hour.txt'
 
 
 # Use this sleeper function if you want to look at the computational graph
