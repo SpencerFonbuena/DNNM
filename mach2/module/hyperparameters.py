@@ -2,8 +2,8 @@ class HyperParameters:
 
     # hyperparameter settings
     EPOCH = 1500
-    BATCH_SIZE = 120
-    WINDOW_SIZE = 120
+    BATCH_SIZE = 16
+    WINDOW_SIZE = 200
     LR = .0003
     d_model = 512
     d_hidden = 2048

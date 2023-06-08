@@ -53,9 +53,12 @@ class MultiHeadAttention(Module):
 
 
     def forward(self, x, stage):
-        print(x.shape)
-        # [Begin Query, Key, and Value pair creation]
         fig, axs = plt.subplots(3,3, figsize=(10,4))
+
+        axs[2,2].hist(x.view(-1).tolist(), 80)
+        axs[2,2].set_title('mha input')
+        # [Begin Query, Key, and Value pair creation]
+        
         queries = torch.cat(self.query_weight(x).chunk(self.heads, dim=-1), dim=0) # (128,120,8)
         axs[0,0].hist(queries.view(-1).tolist(), 80)
         axs[0,0].set_title('queries')
@@ -79,7 +82,7 @@ class MultiHeadAttention(Module):
         #Create pairwise connections between Queries and Keys
         score = torch.matmul(queries, keys.transpose(-1,-2)) #(128,120,120)
         axs[1,0].hist(score.view(-1).tolist(), 80)
-        axs[1,0].set_title('score')
+        axs[1,0].set_title('qkpair')
 
         #mask future for realistic training
         if stage == 'train':
@@ -98,6 +101,7 @@ class MultiHeadAttention(Module):
         weight_V = torch.cat(torch.matmul(score, values).chunk(self.heads, dim=0), dim=-1) #(16,120,64)
         axs[2,0].hist(weight_V.view(-1).tolist(), 80)
         axs[2,0].set_title('weight_V')
+
         #Combine all features from  MHA through an FFN
         out = self.output_layer(weight_V) #(16,120,512)
         axs[2,1].hist(out.view(-1).tolist(), 80)
