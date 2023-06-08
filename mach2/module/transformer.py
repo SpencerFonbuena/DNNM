@@ -222,7 +222,7 @@ class Transformer(Module):
 
         # [Gates]
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
-        #axs[0,0].hist(x_timestep.view(-1).tolist(), 80)
+        #raxs[0,0].hist(x_timestep.view(-1).tolist(), 80)
         #axs[0,0].set_title('timestep input transformer')
 
         x_channel = x_channel.reshape(x_channel.shape[0], -1)
