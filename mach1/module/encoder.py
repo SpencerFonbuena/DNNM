@@ -30,7 +30,8 @@ class Encoder(Module):
                  value_count = int,
                  device = str,
                  
-                 inner_size = int):
+                 inner_size = int,
+                 dropout = float):
         super(Encoder, self).__init__()
 
         self.multi_head_func = MultiHeadAttention(
@@ -44,7 +45,8 @@ class Encoder(Module):
                 d_model = d_model,
                 inner_size= inner_size,
         )
-
+        
+        self.dropout = nn.Dropout(p=dropout)
         self.layernorm = nn.LayerNorm(d_model)
 
 
@@ -55,6 +57,7 @@ class Encoder(Module):
         recurrence = x #(16,120,512)
 
         x = self.multi_head_func(x, stage) #(16,120,512)
+        x = self.dropout(x)
         x = self.layernorm(recurrence + x) #(16,120,512)
 
         x = self.ffn_func(x) #(16,120,512)

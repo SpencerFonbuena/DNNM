@@ -47,6 +47,7 @@ class Transformer(Module):
                  value_count = int,
                  device = str,
                  stack = int,
+                 dropout = float,
                  
                  #FFN Variables
                  inner_size = int,
@@ -94,7 +95,8 @@ class Transformer(Module):
                  value_count = value_count,
                  device = device,
                  
-                 inner_size = inner_size
+                 inner_size = inner_size,
+                 dropout=dropout
             ) for _ in range(stack)
         ])
 
@@ -107,7 +109,8 @@ class Transformer(Module):
                  value_count = value_count,
                  device = device,
                  
-                 inner_size = inner_size
+                 inner_size = inner_size,
+                 dropout = dropout
             ) for _ in range(stack)
         ])
         # [End Init]

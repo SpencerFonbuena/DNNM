@@ -11,7 +11,7 @@ class HyperParameters:
     values = 8 # Values
     heads = 8 # Heads
     N = 32 # multi head attention layers
-    dropout = 0.0
+    dropout = 0.3
     split = .85
     optimizer_name = 'Adam'
     clip = .9
