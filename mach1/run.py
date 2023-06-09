@@ -206,6 +206,8 @@ def test(dataloader, flag = str):
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, 'test')
+            if i % 1000 == 0:
+                print(torch.cat([y_pre,y.expand(1,hp.BATCH_SIZE).reshape(16,1)], dim=-1))
             loss = loss_function(y_pre, y.to(DEVICE))
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]

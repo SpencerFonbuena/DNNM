@@ -182,6 +182,9 @@ def train():
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
             y_pre = net(x.to(DEVICE), 'train')
+            print(y_pre.shape)
+            print(y.expand(1,hp.BATCH_SIZE).reshape(16,1).shape)
+            print(torch.cat([y_pre,y.expand(1,hp.BATCH_SIZE).reshape(16,1)], dim=-1))
             loss = loss_function(y_pre, y.to(DEVICE))
             loss_list.append(loss.item())
             '''for i in range(len(list(net.parameters()))):
