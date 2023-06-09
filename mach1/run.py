@@ -81,8 +81,8 @@ config = {
 
 # Log on Weights and Biases
 wandb.init(
-    project='garbage',
-    name='changed validation set',
+    project='regularize',
+    name='lower dropout',
     #config=config
 )
 
@@ -158,7 +158,7 @@ loss_function = Myloss()
 
 #Select optimizer in an un-optimized way
 if hp.optimizer_name == 'AdamW':
-    optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
+    optimizer = optim.AdamW(net.parameters(), lr=hp.LR) #
 
 # Used to record the accuracy rate change
 correct_on_train = []
