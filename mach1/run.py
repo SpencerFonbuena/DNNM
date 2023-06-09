@@ -157,8 +157,8 @@ print(net)
 loss_function = Myloss()
 
 #Select optimizer in an un-optimized way
-if hp.optimizer_name == 'Adam':
-    optimizer = optim.Adam(net.parameters(), lr=hp.LR)
+if hp.optimizer_name == 'AdamW':
+    optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
 
 # Used to record the accuracy rate change
 correct_on_train = []
