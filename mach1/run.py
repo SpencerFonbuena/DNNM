@@ -188,13 +188,11 @@ def train():
                 print(list(net.parameters())[i])'''
             loss.backward()
             optimizer.step()
-            
-        if index % hp.logs == 0:
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
-            #validate training accuracy and test accuracy
-            test(validate_dataloader, 'train')
-            test(test_dataloader, 'test')
+        #validate training accuracy and test accuracy
+        test(validate_dataloader, 'train')
+        test(test_dataloader, 'test')
 
 
 # test function
