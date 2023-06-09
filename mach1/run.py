@@ -81,7 +81,7 @@ config = {
 
 # Log on Weights and Biases
 wandb.init(
-    project='garbage',
+    project='regularization',
     name='lower dropout',
     #config=config
 )
