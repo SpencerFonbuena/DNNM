@@ -208,7 +208,7 @@ def test(dataloader, flag = str):
             y_pre = net(x, 'test')
             if i % 1000 == 0:
                 max_indices = torch.argmax(y_pre, dim=-1)
-                print(torch.cat([max_indices,y.expand(1,hp.BATCH_SIZE).reshape(hp.BATCH_SIZE,1)], dim=-1))
+                print(torch.cat([max_indices, y]))
             loss = loss_function(y_pre, y.to(DEVICE))
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
