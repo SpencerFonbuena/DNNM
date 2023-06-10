@@ -51,11 +51,11 @@ class Embedding(Module):
 
         if self.tower == 'channel':
             #plt.hist(x.view(-1).tolist(), 50)
-            x = F.tanh(self.ffchannelembedding(x)) #(16,120,512)
+            x = self.ffchannelembedding(x)#(16,120,512)
             #plt.hist(x.view(-1).tolist(), 50)
         if self.tower == 'timestep':
             x = x.transpose(-1,-2)
-            x = F.tanh(self.fftimestepembedding(x)) # (16,9,512)
+            x = self.fftimestepembedding(x) # (16,9,512)
             #plt.hist(x.view(-1).tolist(), 50)
             x = positional_encoding(x)
             #plt.hist(x.view(-1).tolist(), 50)
