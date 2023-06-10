@@ -206,7 +206,7 @@ def test(dataloader, flag = str):
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, 'test')
-            if i % 1000 == 0:
+            if i % 100 == 0:
                 if flag == 'train':
                     max_indices = torch.argmax(y_pre, dim=-1)
                     print('Train',torch.cat([max_indices, y]))
