@@ -207,8 +207,12 @@ def test(dataloader, flag = str):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, 'test')
             if i % 1000 == 0:
-                max_indices = torch.argmax(y_pre, dim=-1)
-                print(torch.cat([max_indices, y]))
+                if flag == 'train':
+                    max_indices = torch.argmax(y_pre, dim=-1)
+                    print('Train',torch.cat([max_indices, y]))
+                if flag == 'test':
+                    max_indices = torch.argmax(y_pre, dim=-1)
+                    print('test',torch.cat([max_indices, y]))
             loss = loss_function(y_pre, y.to(DEVICE))
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
