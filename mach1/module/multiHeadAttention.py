@@ -65,7 +65,7 @@ class MultiHeadAttention(Module):
 
         # [Calculation of Multi-Head Attention]
         #Create pairwise connections between Queries and Keys
-        score = torch.matmul(queries, keys.transpose(-1,-2)) #(128,120,120)
+        score = torch.matmul(queries, keys.transpose(-1,-2)) / math.sqrt(self.qkpair) #(128,120,120)
 
         #mask future for realistic training
         if stage == 'train':
