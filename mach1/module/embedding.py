@@ -51,10 +51,12 @@ class Embedding(Module):
 
         if self.tower == 'channel':
             #plt.hist(x.view(-1).tolist(), 50)
+            x = torch.nn.functional.normalize(x)
             x = self.ffchannelembedding(x)#(16,120,512)
             #plt.hist(x.view(-1).tolist(), 50)
         if self.tower == 'timestep':
             x = x.transpose(-1,-2)
+            x = torch.nn.functional.normalize(x)
             x = self.fftimestepembedding(x) # (16,9,512)
             #plt.hist(x.view(-1).tolist(), 50)
             x = positional_encoding(x)
