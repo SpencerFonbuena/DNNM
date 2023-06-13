@@ -15,6 +15,9 @@ import numpy as np
 import wandb
 import random
 import pandas as pd
+import torcheval
+from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
+
 
 
 
@@ -149,6 +152,9 @@ net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_
                   device=DEVICE,dropout=hp.dropout ,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, 
                   layers=[128, 256, 512], kss=[7, 5, 3], p=hp.p, fcnstack=hp.fcnstack).to(DEVICE)
 
+print (
+    sum(param.numel() for param in net.parameters())
+)
 print(net)
 
 # [Place computational graph code here if desired]
@@ -218,11 +224,22 @@ def test(dataloader, flag = str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
+            metricAUPRC = MulticlassAUPRC(num_classes=4)
+            metricrecall = MulticlassRecall(num_classes=4) 
+            metricAUPRC.update(y_pre, y)  # Add predictions and targets
+            auprc = metricAUPRC.compute()  # Get the computed Multiclass AUPRC
+
+            metricrecall.update(y_pre, y)
+            recall = metricrecall.compute()
         if flag == 'train':
             wandb.log({"Train acc": accuracy})
+            wandb.log({"Train precision": auprc})
+            wandb.log({"Train recall": recall})
         if flag == 'test':
             wandb.log({"Test acc": accuracy})
             wandb.log({"Test Loss": loss})
+            wandb.log({"Test precision": auprc})
+            wandb.log({"Test recall": recall})
 
 # [End Training and Testing]
 
