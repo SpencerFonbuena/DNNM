@@ -224,17 +224,18 @@ def test(dataloader, flag = str):
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
-            metricAUPRC = MulticlassAUPRC(num_classes=4)
-            metricrecall = MulticlassRecall(num_classes=4) 
-            metricAUPRC.update(y_pre, y)  # Add predictions and targets
-            auprc = metricAUPRC.compute()  # Get the computed Multiclass AUPRC
+            metricAUPRC = MulticlassAUPRC(num_classes=4).to(DEVICE)
+            metricrecall = MulticlassRecall(num_classes=4).to(DEVICE)
+            metricAUPRC.update(y_pre, y).to(DEVICE)  # Add predictions and targets
+            auprc = metricAUPRC.compute().to(DEVICE)  # Get the computed Multiclass AUPRC
 
-            metricrecall.update(y_pre, y)
-            recall = metricrecall.compute()
+            metricrecall.update(y_pre, y).to(DEVICE)
+            recall = metricrecall.compute().to(DEVICE)
         if flag == 'train':
             wandb.log({"Train acc": accuracy})
             wandb.log({"Train precision": auprc})
             wandb.log({"Train recall": recall})
+
         if flag == 'test':
             wandb.log({"Test acc": accuracy})
             wandb.log({"Test Loss": loss})
