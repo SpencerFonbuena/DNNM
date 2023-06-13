@@ -11,10 +11,10 @@ class HyperParameters:
     values = 16 # Values
     heads = 32 # Heads
     N = 24 # multi head attention layers
-    dropout = 0.0
+    dropout = 0.2
     split = .85
     optimizer_name = 'AdamW'
     clip = .9
-    p = .01
+    p = .5
     fcnstack = 2
     logs = 5
