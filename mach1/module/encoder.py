@@ -55,12 +55,12 @@ class Encoder(Module):
 
     def forward(self, x, stage):
         recurrence = x #(16,120,512)
-
+        
+        x = self.layernorm(x) #(16,120,512)
         x = self.multi_head_func(x, stage) #(16,120,512)
         x = self.dropout(x)
-        x = self.layernorm(recurrence + x) #(16,120,512)
-
         x = self.ffn_func(x) #(16,120,512)
+        x = x + recurrence
 
         return x
 
