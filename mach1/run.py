@@ -3,7 +3,6 @@
 # @FileName: run.py
 
 import torch
-import torchmetrics as tm
 from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
 from torch.utils.data import WeightedRandomSampler as wrs
