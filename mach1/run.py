@@ -83,7 +83,7 @@ config = {
 
 # Log on Weights and Biases
 wandb.init(
-    project='+modelsize',
+    project='trash',
     name='8',
     #config=config
 )
