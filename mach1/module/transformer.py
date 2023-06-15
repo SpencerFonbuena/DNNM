@@ -14,7 +14,6 @@ import torch.nn as nn
 from module.embedding import Embedding
 from module.encoder import Encoder
 from module.fcnlayer import ResBlock
-from module.hyperparameters import HyperParameters as hp
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 #print(f'use device: {DEVICE}')
@@ -59,6 +58,7 @@ class Transformer(Module):
                  ):
         super(Transformer, self).__init__()
         self.p = p
+        self.stack = stack
         # [Initialize Embedding]
 
         #Channel embedding Init
@@ -172,14 +172,14 @@ class Transformer(Module):
         # Channel tower
         for i, encoder in enumerate(self.channel_tower):
             identity = x_channel
-            x_channel = std(x_channel, (1/hp.N) * self.p, 'batch')
+            x_channel = std(x_channel, (1/self.stack) * self.p, 'batch')
             y_channel = encoder(x=x_channel, stage=stage)
             x_channel = y_channel + identity
         
         #Timestep tower
         for i, encoder in enumerate(self.timestep_tower):
             identity = x_timestep
-            x_timestep = std(x_timestep, (1/hp.N) * self.p, 'batch')
+            x_timestep = std(x_timestep, (1/self.stack) * self.p, 'batch')
             y_timestep = encoder(x = x_timestep, stage=stage)
             x_timestep = y_timestep + identity
 

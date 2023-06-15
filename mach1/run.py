@@ -115,9 +115,9 @@ def pipeline(batch_size, window_size):
     samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=24, pin_memory=True ,sampler=samplertrain)
-    validate_dataloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertrainval)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertest)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, pin_memory=True ,sampler=samplertrain)
+    validate_dataloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True,sampler=samplertrainval)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True,sampler=samplertest)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
