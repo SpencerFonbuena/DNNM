@@ -53,44 +53,26 @@ config = {
     },
     'parameters': {
     # [training hp]
-    'EPOCH':{
-        'values': hp.EPOCH},
+    'LR': {
+        'values': hp.LR},
     'BATCH_SIZE':{
         'values': hp.BATCH_SIZE},
     'WINDOW_SIZE':{
         'values': hp.WINDOW_SIZE},
-    'LR':{
-        'values': hp.LR},
 
     # [architecture hp]
     'd_model':{
         'values': hp.d_model},
     'd_hidden':{
         'values': hp.d_hidden},
-    'queries':{
-        'values': hp.queries}, # Queries
-    'values':{
-        'values': hp.values}, # Values
     'heads':{
         'values': hp.heads}, # Heads
     'N':{
         'values': hp.N}, # multi head attention layers
-    'Conv Layers':{
-        'values': 3},
-    'Linear-Out Layers':{
-        'values': 2},
-
-    # [General]
-    'split':{
-        'values': hp.split},
-    'optimizer_name':{
-        'values': hp.optimizer_name},
 
     # [Regularizers]
     'dropout':{
         'values': hp.dropout},
-    'clip':{
-        'values': hp.clip},
     }
 }
 
@@ -102,7 +84,7 @@ config.update({
     }
 })
 
-sweep_id = wandb.sweep(config, project='trash')
+
 # [End Sweeps]
 
 # Log on Weights and Biases
@@ -111,7 +93,7 @@ wandb.init(
     name='big',
     config=config
 )
-
+sweep_id = wandb.sweep(config, project='trash')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -171,10 +153,18 @@ print(f'Number of classes: {d_output}')
 # [Initialize Training and Testing Procedures]
 
 # Create a Transformer model
-net = Transformer(window_size=wandb.config['WINDOW_SIZE'], timestep_in=d_input, channel_in=d_channel,
-                  heads=wandb.config['heads'],d_model=wandb.config['d_model'],device=DEVICE,dropout=wandb.config['dropout'] ,
-                  inner_size=wandb.config['d_hidden'],class_num=d_output, stack=wandb.config['N'], 
-                  layers=[128, 256, 512], kss=[7, 5, 3], p=wandb.config['p'], fcnstack=wandb.config['fcnstack']).to(DEVICE)
+net = Transformer(window_size=wandb.config['WINDOW_SIZE'], 
+                  timestep_in=d_input, channel_in=d_channel,
+                  heads=wandb.config['heads'],
+                  d_model=wandb.config['d_model'],
+                  device=DEVICE,dropout=wandb.config['dropout'],
+                  inner_size=wandb.config['d_hidden'],
+                  class_num=d_output, 
+                  stack=wandb.config['N'], 
+                  layers=[128, 256, 512], 
+                  kss=[7, 5, 3], 
+                  p=wandb.config['p'], 
+                  fcnstack=wandb.config['fcnstack']).to(DEVICE)
 
 
 # [Printing summaries]
