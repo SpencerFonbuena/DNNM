@@ -51,10 +51,10 @@ class MultiHeadAttention(Module):
 
         attn = (q * self.scale) @ k.transpose(-2, -1)
         
-        if stage == 'train':
+        '''if stage == 'train':
             mask = torch.ones_like(attn[0])
             mask = mask.tril(diagonal=0)
-            attn = torch.where(mask > 0, attn, (torch.ones_like(mask) * self.inf)).to(self.device)
+            attn = torch.where(mask > 0, attn, (torch.ones_like(mask) * self.inf)).to(self.device)'''
 
         attn = attn.softmax(dim=-1)
 
