@@ -33,7 +33,7 @@ class FeedForward(Module):
         residual = x
         x = self.layernorm(x)
         x = self.in_layer(x) #(16,120,2048)
-        x = F.relu(x) #(16,120,2048)
+        x = F.gelu(x) #(16,120,2048)
         x = self.out_layer(x) #(16,120,512)
         x = x + residual
         return x 

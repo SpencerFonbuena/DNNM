@@ -23,65 +23,44 @@ torch.manual_seed(seed)
 
 class MultiHeadAttention(Module):
     def __init__(self,
-                 heads = int,
-                 d_model = int,
-                 qkpair = int,
-                 value_count = int,
+                 d_model: int,
+                 num_heads: int,
+                 qkv_bias: bool = True,
                  device = str):
         super(MultiHeadAttention, self).__init__()
         # [Making init variables class-wide available]
-        self.qkpair = qkpair
-        self.heads = heads
-        self.inf = -2**32+1
-        self.device= device
-        # [End availability]
-
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
-
-        # [Create Layers]
-        self.query_weight = nn.Linear(d_model, qkpair * heads) 
-        self.key_weight = nn.Linear(d_model, qkpair * heads)
-        self.value_weight = nn.Linear(d_model, value_count * heads)
-        self.output_layer = nn.Linear(value_count * heads, d_model)
-        # [End creation]
         
+        self.num_heads = num_heads
+        head_dim = d_model // num_heads
+        self.scale = head_dim**-0.5
 
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
+        self.qkv = nn.Linear(d_model, d_model * 3, bias=qkv_bias)
+        self.proj = nn.Linear(d_model, d_model)
+        
+        self.device= device
 
 
     def forward(self, x, stage):
-        # [Begin Query, Key, and Value pair creation]
-        queries = torch.cat(self.query_weight(x).chunk(self.heads, dim=-1), dim=0) # (128,120,8)
-        keys = torch.cat(self.key_weight(x).chunk(self.heads, dim=-1), dim=0) # (128,120,8)
-        values = torch.cat(self.value_weight(x).chunk(self.heads, dim=-1), dim=0) # (128, 120 ,8)
-        # [End pair creation]
+        
+        B, T, F = x.shape
+        # qkv with shape (3, B, nHead, H * W, C)
+        qkv = self.qkv(x).reshape(B,T, 3, self.num_heads, -1).permute(2, 0, 3, 1, 4)
+        # q, k, v with shape (B * nHead, H * W, C)
+        q, k, v = qkv.reshape(3, B * self.num_heads,T, -1).unbind(0)
 
-
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
-
-
-        # [Calculation of Multi-Head Attention]
-        #Create pairwise connections between Queries and Keys
-        score = torch.matmul((queries *(self.qkpair**-.5)), keys.transpose(-1,-2))  #(128,120,120)
-
-        #mask future for realistic training
+        attn = (q * self.scale) @ k.transpose(-2, -1)
+        
         if stage == 'train':
-            mask = torch.ones_like(score[0])
+            mask = torch.ones_like(attn[0])
             mask = mask.tril(diagonal=0)
-            score = torch.where(mask > 0, score, (torch.ones_like(mask) * self.inf).to(self.device))
+            attn = torch.where(mask > 0, attn, (torch.ones_like(mask) * self.inf).to(self.device))
 
-        #Raw attention scores
-        score = F.softmax(score, dim=-1) #(128,120,120)
-        #Multiply attention by the values, and concatenate the heads to prepare for FFN
-        weight_V = torch.cat(torch.matmul(score, values).chunk(self.heads, dim=0), dim=-1) #(16,120,64)
-        #Combine all features from  MHA through an FFN
-        out = self.output_layer(weight_V) #(16,120,512)
-        # [End calculations]
+        attn = attn.softmax(dim=-1)
 
-        return out
+        x = (attn @ v).view(B, self.num_heads, T, -1).permute(0, 2, 1, 3).reshape(B, T, -1)
+        x = self.proj(x)
+
+        return x
     
 
 

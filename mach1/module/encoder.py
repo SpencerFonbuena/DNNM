@@ -35,11 +35,9 @@ class Encoder(Module):
         super(Encoder, self).__init__()
 
         self.multi_head_func = MultiHeadAttention(
-                heads = heads,
-                d_model = d_model,
-                qkpair = qkpair,
-                value_count = value_count,
-                device = device
+                 d_model = d_model,
+                 num_heads = heads,
+                 device = str
         )
         self.ffn_func = FeedForward( 
                 d_model = d_model,

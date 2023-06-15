@@ -43,8 +43,6 @@ class Transformer(Module):
                  #MHA Variables
                  heads = int,
                  d_model = int,
-                 qkpair = int,
-                 value_count = int,
                  device = str,
                  stack = int,
                  dropout = float,
@@ -91,8 +89,6 @@ class Transformer(Module):
             Encoder(
                  heads = heads,
                  d_model = d_model,
-                 qkpair = qkpair,
-                 value_count = value_count,
                  device = device,
                  
                  inner_size = inner_size,
@@ -105,8 +101,6 @@ class Transformer(Module):
             Encoder(
                  heads = heads,
                  d_model = d_model,
-                 qkpair = qkpair,
-                 value_count = value_count,
                  device = device,
                  
                  inner_size = inner_size,

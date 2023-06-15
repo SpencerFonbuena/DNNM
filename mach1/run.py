@@ -16,6 +16,7 @@ import random
 import pandas as pd
 import torcheval
 from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
+import deepspeed
 
 
 
@@ -39,6 +40,8 @@ torch.manual_seed(seed)
 # Make us of GPU
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
+
+
 
 # [Create WandB sweeps]
 
@@ -151,10 +154,13 @@ net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_
                   device=DEVICE,dropout=hp.dropout ,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, 
                   layers=[128, 256, 512], kss=[7, 5, 3], p=hp.p, fcnstack=hp.fcnstack).to(DEVICE)
 
+
+# [Printing summaries]
 print (
     sum(param.numel() for param in net.parameters())
 )
 print(net)
+# [End Summaries]
 
 # [Place computational graph code here if desired]
 
@@ -183,7 +189,7 @@ time_cost = 0
 # training function
 def train():
     net.train()
-    wandb.watch(net, log='all')
+    wandb.watch(net, log='all', log_freq=10)
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             optimizer.zero_grad()
@@ -194,8 +200,9 @@ def train():
                 print(list(net.parameters())[i])'''
             loss.backward()
             optimizer.step()
-            wandb.log({'Loss': loss})
-            wandb.log({'index': index})
+            if i % 500 == 0:
+                wandb.log({'Loss': loss})
+        wandb.log({'index': index})
         #validate training accuracy and test accuracy
         test(validate_dataloader, 'train')
         test(test_dataloader, 'test')
