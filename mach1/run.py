@@ -150,7 +150,7 @@ print(f'Number of classes: {d_output}')
 
 # Create a Transformer model
 net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_channel,
-                  heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
+                  heads=hp.heads,d_model=hp.d_model,
                   device=DEVICE,dropout=hp.dropout ,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, 
                   layers=[128, 256, 512], kss=[7, 5, 3], p=hp.p, fcnstack=hp.fcnstack).to(DEVICE)
 
