@@ -76,13 +76,6 @@ config = {
     }
 }
 
-config.update({
-    'LR': {
-        'distribution': 'log_normal',
-        'min': .00001,
-        'max': 0.1
-    }
-})
 
 
 # [End Sweeps]
@@ -118,9 +111,9 @@ else:
 #[Create and load the dataset]
 
 #create the datasets to be loaded
-train_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='train')
-val_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='validate')
-test_dataset = Create_Dataset(datafile=path, window_size=hp.WINDOW_SIZE, split=hp.split, mode='test')
+train_dataset = Create_Dataset(datafile=path, window_size=wandb.config['WINDOW_SIZE'], split=hp.split, mode='train')
+val_dataset = Create_Dataset(datafile=path, window_size=wandb.config['WINDOW_SIZE'], split=hp.split, mode='validate')
+test_dataset = Create_Dataset(datafile=path, window_size=wandb.config['WINDOW_SIZE'], split=hp.split, mode='test')
 
 #create the samplers
 samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
@@ -128,9 +121,9 @@ samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_d
 samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
 #Load the data
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=24, pin_memory=True ,sampler=samplertrain)
-validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertrainval)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertest)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=wandb.config['BATCH_SIZE'], shuffle=False, num_workers=24, pin_memory=True ,sampler=samplertrain)
+validate_dataloader = DataLoader(dataset=val_dataset, batch_size=wandb.config['BATCH_SIZE'], shuffle=False, num_workers=24, pin_memory=True,sampler=samplertrainval)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=wandb.config['BATCH_SIZE'], shuffle=False, num_workers=24, pin_memory=True,sampler=samplertest)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
 d_input = train_dataset.input_len # number of time parts
@@ -181,7 +174,7 @@ loss_function = Myloss()
 
 #Select optimizer in an un-optimized way
 if hp.optimizer_name == 'AdamW':
-    optimizer = optim.AdamW(net.parameters(), lr=hp.LR) #
+    optimizer = optim.AdamW(net.parameters(), lr=wandb.config['LR']) #
 
 # Used to record the accuracy rate change
 correct_on_train = []
