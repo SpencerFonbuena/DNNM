@@ -54,28 +54,44 @@ config = {
     },
     'parameters': {
     # [training hp]
-    'EPOCH': hp.EPOCH,
-    'BATCH_SIZE': hp.BATCH_SIZE,
-    'WINDOW_SIZE': hp.WINDOW_SIZE,
-    'LR': hp.LR,
+    'EPOCH':{
+        'values': hp.EPOCH},
+    'BATCH_SIZE':{
+        'values': hp.BATCH_SIZE},
+    'WINDOW_SIZE':{
+        'values': hp.WINDOW_SIZE},
+    'LR':{
+        'values': hp.LR},
 
     # [architecture hp]
-    'd_model': hp.d_model,
-    'd_hidden': hp.d_hidden,
-    'queries': hp.queries, # Queries,
-    'values': hp.values, # Values,
-    'heads': hp.heads, # Heads,
-    'N': hp.N, # multi head attention layers,
-    'Conv Layers': 3,
-    'Linear-Out Layers': 2,
+    'd_model':{
+        'values': hp.d_model},
+    'd_hidden':{
+        'values': hp.d_hidden},
+    'queries':{
+        'values': hp.queries}, # Queries
+    'values':{
+        'values': hp.values}, # Values
+    'heads':{
+        'values': hp.heads}, # Heads
+    'N':{
+        'values': hp.N}, # multi head attention layers
+    'Conv Layers':{
+        'values': 3},
+    'Linear-Out Layers':{
+        'values': 2},
 
     # [General]
-    'split': hp.split,
-    'optimizer_name': hp.optimizer_name,
+    'split':{
+        'values': hp.split},
+    'optimizer_name':{
+        'values': hp.optimizer_name},
 
     # [Regularizers]
-    'dropout': hp.dropout,
-    'clip': hp.clip,
+    'dropout':{
+        'values': hp.dropout},
+    'clip':{
+        'values': hp.clip},
     }
 }
 
@@ -87,7 +103,7 @@ config.update({
     }
 })
 
-
+sweep_id = wandb.sweep(config, project='trash')
 # [End Sweeps]
 
 # Log on Weights and Biases
@@ -97,7 +113,6 @@ wandb.init(
     config=config
 )
 
-sweep_id = wandb.sweep(config, project='trash')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
