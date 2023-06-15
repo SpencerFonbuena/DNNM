@@ -46,7 +46,6 @@ print(f'use device: {DEVICE}')
 # [Create WandB sweeps]
 
 sweep_config = {
-    'project': 'mach8 sweep',
     'method': 'random',
 
 
@@ -89,7 +88,7 @@ sweep_config = {
 
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='trash')
+sweep_id = wandb.sweep(sweep_config, project='mach8 sweep')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
