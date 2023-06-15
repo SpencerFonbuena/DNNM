@@ -264,5 +264,5 @@ def test(dataloader, net, loss_function, flag = str):
 
 # [Run the model]
 if __name__ == '__main__':
-    wandb.agent(sweep_id, train, count=20)
+    wandb.agent(sweep_id, train, count=200)
 # [End experiment]
