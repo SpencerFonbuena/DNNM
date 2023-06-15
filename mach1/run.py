@@ -88,7 +88,7 @@ sweep_config = {
 
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='mach8 sweep')
+sweep_id = wandb.sweep(sweep_config, project='mach9 sweep')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
