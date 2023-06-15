@@ -45,19 +45,24 @@ print(f'use device: {DEVICE}')
 
 # [Create WandB sweeps]
 
-config = {
+sweep_config = {
+    'project': 'mach8 sweep',
     'method': 'random',
+
+
     'metric': {
         'goal': 'minimize',
         'name': 'test_loss'
     },
+
+
     'parameters': {
     # [training hp]
-    'LR': {
+    'learning_rate': {
         'values': hp.LR},
-    'BATCH_SIZE':{
+    'batch_size':{
         'values': hp.BATCH_SIZE},
-    'WINDOW_SIZE':{
+    'window_size':{
         'values': hp.WINDOW_SIZE},
 
     # [architecture hp]
@@ -67,7 +72,7 @@ config = {
         'values': hp.d_hidden},
     'heads':{
         'values': hp.heads}, # Heads
-    'N':{
+    'stack':{
         'values': hp.N}, # multi head attention layers
 
     # [Regularizers]
@@ -76,31 +81,17 @@ config = {
     }
 }
 
-
-
 # [End Sweeps]
 
 # Log on Weights and Biases
-wandb.init(
-    project='trash',
-    name='big',
-    config=config
-)
-sweep_id = wandb.sweep(config, project='trash')
+
+sweep_id = wandb.sweep(sweep_config, project='trash')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
     path = '/root/DNNM/mach1/datasets/SPY_30mins.txt'
 else:
     path = 'models/mach1/datasets/SPY_30mins.txt'
-
-
-# Use this sleeper function if you want to look at the computational graph
-#print(net)
-#from torchviz import make_dot
-#traind, label = next(iter(train_dataloader))
-#y, _, _, _, _, _, _ = net(traind, 'train')
-#make_dot(y.mean(), show_attrs=True, show_saved=True,  params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
 
 # [End General Init]
 
@@ -109,112 +100,118 @@ else:
 
 
 #[Create and load the dataset]
+def pipeline(batch_size, window_size):
+    #create the datasets to be loaded
+    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train')
+    val_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='validate')
+    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test')
 
-#create the datasets to be loaded
-train_dataset = Create_Dataset(datafile=path, window_size=wandb.config['WINDOW_SIZE'], split=hp.split, mode='train')
-val_dataset = Create_Dataset(datafile=path, window_size=wandb.config['WINDOW_SIZE'], split=hp.split, mode='validate')
-test_dataset = Create_Dataset(datafile=path, window_size=wandb.config['WINDOW_SIZE'], split=hp.split, mode='test')
+    #create the samplers
+    samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
+    samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
+    samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
-#create the samplers
-samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
-samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
-samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
+    #Load the data
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=24, pin_memory=True ,sampler=samplertrain)
+    validate_dataloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertrainval)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertest)
 
-#Load the data
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=wandb.config['BATCH_SIZE'], shuffle=False, num_workers=24, pin_memory=True ,sampler=samplertrain)
-validate_dataloader = DataLoader(dataset=val_dataset, batch_size=wandb.config['BATCH_SIZE'], shuffle=False, num_workers=24, pin_memory=True,sampler=samplertrainval)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=wandb.config['BATCH_SIZE'], shuffle=False, num_workers=24, pin_memory=True,sampler=samplertest)
+    DATA_LEN = train_dataset.training_len # Number of samples in the training set
+    d_input = train_dataset.input_len # number of time parts
+    d_channel = train_dataset.channel_len # feature dimension
+    d_output = train_dataset.output_len # classification category
 
-DATA_LEN = train_dataset.training_len # Number of samples in the training set
-d_input = train_dataset.input_len # number of time parts
-d_channel = train_dataset.channel_len # feature dimension
-d_output = train_dataset.output_len # classification category
+    # Dimension display
+    print('data structure: [lines, timesteps, features]')
+    print(f'train data size: [{DATA_LEN, d_input, d_channel}]')
+    print(f'mytest data size: [{train_dataset.test_len, d_input, d_channel}]')
+    print(f'Number of classes: {d_output}')
 
-# Dimension display
-print('data structure: [lines, timesteps, features]')
-print(f'train data size: [{DATA_LEN, d_input, d_channel}]')
-print(f'mytest data size: [{train_dataset.test_len, d_input, d_channel}]')
-print(f'Number of classes: {d_output}')
+    # [End Dataset Init]
 
-# [End Dataset Init]
+    return train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output
 
 
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
 
 
-# [Initialize Training and Testing Procedures]
+def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, stack, p, fcnstack, d_hidden):
+    net = Transformer(window_size=window_size, 
+                    timestep_in=d_input, channel_in=d_channel,
+                    heads=heads,
+                    d_model=d_model,
+                    device=DEVICE,
+                    dropout = dropout,
+                    inner_size=d_hidden,
+                    class_num=d_output, 
+                    stack=stack, 
+                    layers=[128, 256, 512], 
+                    kss=[7, 5, 3], 
+                    p=p, 
+                    fcnstack=fcnstack).to(DEVICE)
 
-# Create a Transformer model
-net = Transformer(window_size=wandb.config['WINDOW_SIZE'], 
-                  timestep_in=d_input, channel_in=d_channel,
-                  heads=wandb.config['heads'],
-                  d_model=wandb.config['d_model'],
-                  device=DEVICE,dropout=wandb.config['dropout'],
-                  inner_size=wandb.config['d_hidden'],
-                  class_num=d_output, 
-                  stack=wandb.config['N'], 
-                  layers=[128, 256, 512], 
-                  kss=[7, 5, 3], 
-                  p=wandb.config['p'], 
-                  fcnstack=wandb.config['fcnstack']).to(DEVICE)
+    def hiddenPrints():
+        # [Printing summaries]
+        '''print (
+            sum(param.numel() for param in net.parameters())
+        )
+        print(net)'''
+        # [End Summaries]
+        # Use this sleeper function if you want to look at the computational graph
+        #print(net)
+        #from torchviz import make_dot
+        #traind, label = next(iter(train_dataloader))
+        #y, _, _, _, _, _, _ = net(traind, 'train')
+        #make_dot(y.mean(), show_attrs=True, show_saved=True,  params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
 
-
-# [Printing summaries]
-print (
-    sum(param.numel() for param in net.parameters())
-)
-print(net)
-# [End Summaries]
-
-# [Place computational graph code here if desired]
-
-# Create a loss function here using cross entropy loss
-loss_function = Myloss()
-
-#Select optimizer in an un-optimized way
-if hp.optimizer_name == 'AdamW':
-    optimizer = optim.AdamW(net.parameters(), lr=wandb.config['LR']) #
-
-# Used to record the accuracy rate change
-correct_on_train = []
-correct_on_test = []
-# Used to record loss changes
-loss_list = float
-time_cost = 0
-
-# [End Training and Test Init]
-
-'''-----------------------------------------------------------------------------------------------------'''
-'''====================================================================================================='''
+    return net
+    # [Place computational graph code here if desired]
 
 
-# [Begin Training and Testing]
+def train(config=None):
 
-# training function
-def train():
-    net.train()
-    wandb.watch(net, log='all', log_freq=10)
-    for index in tqdm(range(hp.EPOCH)):
-        for i, (x, y) in enumerate(train_dataloader):
-            optimizer.zero_grad()
-            y_pre = net(x.to(DEVICE), 'train')
-            loss = loss_function(y_pre, y.to(DEVICE))
-            loss_list.append(loss.item())
-            '''for i in range(len(list(net.parameters()))):
-                print(list(net.parameters())[i])'''
-            loss.backward()
-            optimizer.step()
-            if i % 500 == 0:
-                wandb.log({'Loss': loss})
-        wandb.log({'index': index})
-        #validate training accuracy and test accuracy
-        test(validate_dataloader, 'train')
-        test(test_dataloader, 'test')
+    with wandb.init(config=config):
+
+        config = wandb.config
+
+        train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
+        net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
+                      dropout=config.dropout, stack=config.stack, p=config.p, fcnstack=config.fcnstack, d_hidden=config.d_hidden)
+        # Create a loss function here using cross entropy loss
+        loss_function = Myloss()
+
+        #Select optimizer in an un-optimized way
+        if hp.optimizer_name == 'AdamW':
+            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate) #
+        # [End Training and Test Init]
+
+
+        # [Begin Training and Testing]
+
+        # training function
+
+        net.train()
+        wandb.watch(net, log='all', log_freq=10)
+        for index in tqdm(range(hp.EPOCH)):
+            for i, (x, y) in enumerate(train_dataloader):
+                optimizer.zero_grad()
+                y_pre = net(x.to(DEVICE), 'train')
+                loss = loss_function(y_pre, y.to(DEVICE))
+                '''for i in range(len(list(net.parameters()))):
+                    print(list(net.parameters())[i])'''
+                loss.backward()
+                optimizer.step()
+                if i % 500 == 0:
+                    wandb.log({'Loss': loss})
+            wandb.log({'index': index})
+            #validate training accuracy and test accuracy
+            test(validate_dataloader, 'train', net, loss_function)
+            test(test_dataloader, 'test', net, loss_function)
 
 
 # test function
-def test(dataloader, flag = str):
+def test(dataloader, net, loss_function, flag = str):
     correct = 0
     total = 0
 
