@@ -46,6 +46,12 @@ print(f'use device: {DEVICE}')
 # [Create WandB sweeps]
 
 config = {
+    'method': 'random',
+    'name': 'sweep',
+    'metric': {
+        'goal': 'minimize',
+        'name': 'test_loss'
+    },
     # [training hp]
     'EPOCH': hp.EPOCH,
     'BATCH_SIZE': hp.BATCH_SIZE,
@@ -73,12 +79,7 @@ config = {
 }
 
 sweep_config = {
-    'method': 'random',
-    'name': 'sweep',
-    'metric': {
-        'goal': 'minimize',
-        'name': 'test_loss'
-    }
+    
 }
 
 config.update({
