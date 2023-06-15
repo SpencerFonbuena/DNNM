@@ -33,6 +33,7 @@ class MultiHeadAttention(Module):
         self.num_heads = num_heads
         head_dim = d_model // num_heads
         self.scale = head_dim**-0.5
+        self.inf = -2**32+1
 
         self.qkv = nn.Linear(d_model, d_model * 3, bias=qkv_bias)
         self.proj = nn.Linear(d_model, d_model)
