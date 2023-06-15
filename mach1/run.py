@@ -52,6 +52,7 @@ config = {
         'goal': 'minimize',
         'name': 'test_loss'
     },
+    'parameters': {
     # [training hp]
     'EPOCH': hp.EPOCH,
     'BATCH_SIZE': hp.BATCH_SIZE,
@@ -75,11 +76,7 @@ config = {
     # [Regularizers]
     'dropout': hp.dropout,
     'clip': hp.clip,
-
-}
-
-sweep_config = {
-    
+    }
 }
 
 config.update({
