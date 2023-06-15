@@ -47,7 +47,6 @@ print(f'use device: {DEVICE}')
 
 config = {
     'method': 'random',
-    'name': 'sweep',
     'metric': {
         'goal': 'minimize',
         'name': 'test_loss'
