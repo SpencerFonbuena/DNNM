@@ -72,15 +72,23 @@ config = {
 
 }
 
-'''sweep_config = {
+sweep_config = {
     'method': 'random',
     'name': 'sweep',
     'metric': {
-        'goal': 'maximize',
-        'name': 
+        'goal': 'minimize',
+        'name': 'test_loss'
     }
+}
 
-}'''
+config.update({
+    'LR': {
+        'distribution': 'log_normal',
+        'min': .00001,
+        'max': 0.1
+    }
+})
+
 
 # [End Sweeps]
 
@@ -88,8 +96,10 @@ config = {
 wandb.init(
     project='trash',
     name='big',
-    #config=config
+    config=config
 )
+
+sweep_id = wandb.sweep(config, project='trash')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -124,9 +134,9 @@ samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_d
 samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
 #Load the data
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=48, pin_memory=True ,sampler=samplertrain)
-validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=48, pin_memory=True,sampler=samplertrainval)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=48, pin_memory=True,sampler=samplertest)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=24, pin_memory=True ,sampler=samplertrain)
+validate_dataloader = DataLoader(dataset=val_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertrainval)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.BATCH_SIZE, shuffle=False, num_workers=24, pin_memory=True,sampler=samplertest)
 
 DATA_LEN = train_dataset.training_len # Number of samples in the training set
 d_input = train_dataset.input_len # number of time parts
@@ -149,10 +159,10 @@ print(f'Number of classes: {d_output}')
 # [Initialize Training and Testing Procedures]
 
 # Create a Transformer model
-net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_channel,
-                  heads=hp.heads,d_model=hp.d_model,
-                  device=DEVICE,dropout=hp.dropout ,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, 
-                  layers=[128, 256, 512], kss=[7, 5, 3], p=hp.p, fcnstack=hp.fcnstack).to(DEVICE)
+net = Transformer(window_size=wandb.config['WINDOW_SIZE'], timestep_in=d_input, channel_in=d_channel,
+                  heads=wandb.config['heads'],d_model=wandb.config['d_model'],device=DEVICE,dropout=wandb.config['dropout'] ,
+                  inner_size=wandb.config['d_hidden'],class_num=d_output, stack=wandb.config['N'], 
+                  layers=[128, 256, 512], kss=[7, 5, 3], p=wandb.config['p'], fcnstack=wandb.config['fcnstack']).to(DEVICE)
 
 
 # [Printing summaries]
@@ -175,7 +185,7 @@ if hp.optimizer_name == 'AdamW':
 correct_on_train = []
 correct_on_test = []
 # Used to record loss changes
-loss_list = []
+loss_list = float
 time_cost = 0
 
 # [End Training and Test Init]
@@ -225,7 +235,7 @@ def test(dataloader, flag = str):
                 if flag == 'test':
                     max_indices = torch.argmax(y_pre, dim=-1)
                     print('test',torch.cat([max_indices, y]))
-            loss = loss_function(y_pre, y.to(DEVICE))
+            test_loss = loss_function(y_pre, y.to(DEVICE))
             _, label_index = torch.max(y_pre.data, dim=-1)
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
@@ -244,7 +254,7 @@ def test(dataloader, flag = str):
 
         if flag == 'test':
             wandb.log({"Test acc": accuracy})
-            wandb.log({"Test Loss": loss})
+            wandb.log({"test_loss": test_loss})
             wandb.log({"Test precision": auprc})
             wandb.log({"Test recall": recall})
 
@@ -259,5 +269,5 @@ def test(dataloader, flag = str):
 
 # [Run the model]
 if __name__ == '__main__':
-    train()
+    wandb.agent(sweep_id, train, count=20)
 # [End experiment]

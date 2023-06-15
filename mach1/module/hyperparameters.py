@@ -1,20 +1,20 @@
 class HyperParameters:
 
     # hyperparameter settings
-    EPOCH = 1500
-    BATCH_SIZE = 36
-    WINDOW_SIZE = 120
-    LR = .0003
-    d_model = 512
-    d_hidden = 2048
+    EPOCH = 5
+    BATCH_SIZE = [16,32,64,128,256]
+    WINDOW_SIZE = [120,150,180,210,240]
+    LR = .003
+    d_model = [256, 512, 1024]
+    d_hidden = [1024,2048,4096]
     queries = 8 # Queries
     values = 8 # Values
-    heads = 8 # Heads
-    N = 8 # multi head attention layers
-    dropout = 0.2
+    heads = [8,16,32,64,96] # Heads
+    N = [8,16,32,64,96] # multi head attention layers
+    dropout = [0.2,0.3,0.4]
     split = .85
     optimizer_name = 'AdamW'
     clip = .9
-    p = .9
-    fcnstack = 2
+    p = [0.5, 0.6, 0.7, 0.8, 0.9]
+    fcnstack = [2,4,6,8]
     logs = 5
