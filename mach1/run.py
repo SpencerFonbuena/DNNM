@@ -195,7 +195,7 @@ def train(config=None):
         # training function
 
         net.train()
-        wandb.watch(net, log='all', log_freq=10)
+        wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
             for i, (x, y) in enumerate(train_dataloader):
                 optimizer.zero_grad()
@@ -207,16 +207,18 @@ def train(config=None):
                 optimizer.step()
                 if i % 500 == 0:
                     wandb.log({'Loss': loss})
-            wandb.log({'index': index})
-            #validate training accuracy and test accuracy
-            test(validate_dataloader, 'train', net, loss_function)
-            test(test_dataloader, 'test', net, loss_function)
+                wandb.log({'index': index})
+                #validate training accuracy and test accuracy
+                if (index + 1) % 2 == 0:
+                    test(validate_dataloader, 'train', net, loss_function)
+                    test(test_dataloader, 'test', net, loss_function)
 
 
 # test function
 def test(dataloader, net, loss_function, flag = str):
     correct = 0
-    total = 0
+    total = 0  
+    print('got through')
 
     net.eval()
     with torch.no_grad():
