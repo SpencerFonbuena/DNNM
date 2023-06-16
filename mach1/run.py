@@ -15,7 +15,7 @@ import pandas as pd
 import torcheval
 from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
 import deepspeed
-from colossalai import launch_from_torch
+import colossalai
 from colossalai.booster import Booster
 from colossalai.booster.plugin import GeminiPlugin
 
@@ -180,7 +180,7 @@ def train(config=None):
 
         config = wandb.config
 
-        launch_from_torch(config=config)
+        colossalai.launch_from_torch(config=config)
         plugin = GeminiPlugin()
         booster = Booster(plugin=plugin)
 
