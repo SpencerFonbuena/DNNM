@@ -207,7 +207,7 @@ def train(config=None):
                 #validate training accuracy and test accuracy
                 
             test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
-            test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
+            test(dataloader=validate_dataloader, flag='test', net=net, loss_function=loss_function)
 
 
 # test function
