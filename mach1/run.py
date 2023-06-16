@@ -221,8 +221,11 @@ def test(dataloader, net, loss_function, flag = str):
     net.eval()
     with torch.no_grad():
         for i, (x, y) in enumerate(dataloader):
+            print('1')
             x, y = x.to(DEVICE), y.to(DEVICE)
+            print('2')
             y_pre = net(x, 'test')
+            print('3')
             if i % 100 == 0:
                 if flag == 'train':
                     max_indices = torch.argmax(y_pre, dim=-1)
@@ -230,8 +233,11 @@ def test(dataloader, net, loss_function, flag = str):
                 if flag == 'test':
                     max_indices = torch.argmax(y_pre, dim=-1)
                     print('test',torch.cat([max_indices, y]))
+            print('4')
             test_loss = loss_function(y_pre, y.to(DEVICE))
+            print('5')
             _, label_index = torch.max(y_pre.data, dim=-1)
+            print('6')
             total += label_index.shape[0]
             correct += (label_index == y.long()).sum().item()
             accuracy = correct / total * 100
