@@ -14,7 +14,6 @@ import random
 import pandas as pd
 import torcheval
 from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
-import deepspeed
 import colossalai
 from colossalai.booster import Booster
 from colossalai.booster.plugin import GeminiPlugin
