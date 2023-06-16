@@ -205,9 +205,9 @@ def train(config=None):
                     wandb.log({'Loss': loss})
                 wandb.log({'index': index})
                 #validate training accuracy and test accuracy
-                if (index + 1) % 2 == 0:
-                    test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
-                    test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
+                
+            test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
+            test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
 
 
 # test function
