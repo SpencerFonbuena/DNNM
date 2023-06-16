@@ -194,7 +194,6 @@ def train(config=None):
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
             for i, (x, y) in enumerate(train_dataloader):
-                test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
                 optimizer.zero_grad()
                 y_pre = net(x.to(DEVICE), 'train')
                 loss = loss_function(y_pre, y.to(DEVICE))
@@ -206,9 +205,9 @@ def train(config=None):
                     wandb.log({'Loss': loss})
                 wandb.log({'index': index})
                 #validate training accuracy and test accuracy
-                if (index + 1) % 2 == 0:
-                    test(validate_dataloader, 'train', net, loss_function)
-                    test(test_dataloader, 'test', net, loss_function)
+                if (index) % 1 == 0:
+                    test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
+                    test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
 
 
 # test function
