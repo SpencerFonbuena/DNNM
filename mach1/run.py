@@ -40,7 +40,7 @@ print(f'use device: {DEVICE}')
 
 
 
-# [Create WandB sweeps]
+# [Create WandB sweeps ]
 
 sweep_config = {
 
