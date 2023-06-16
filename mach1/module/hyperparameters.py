@@ -2,11 +2,11 @@ class HyperParameters:
 
     # hyperparameter settings
     EPOCH = 5
-    BATCH_SIZE = [16,32,64,128,256]
+    BATCH_SIZE = [16,32,64]
     WINDOW_SIZE = [120,150,180,210,240]
     LR = [.00001,.0001,.001,.01,.1, .00003,.0003,.003,.03, .00005,.0005,.005,.05, .00007,.0007,.007,.07, .00009,.0009,.009,.09]
-    d_model = [256, 512, 1024]
-    d_hidden = [1024,2048,4096]
+    d_model = [512]
+    d_hidden = [2048]
     queries = 8 # Queries
     values = 8 # Values
     heads = [8,16,32,64,96] # Heads

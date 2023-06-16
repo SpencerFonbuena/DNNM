@@ -50,8 +50,8 @@ sweep_config = {
 
 
     'metric': {
-        'goal': 'minimize',
-        'name': 'test_loss'
+        'goal': 'maximize',
+        'name': 'test_acc'
     },
 
 
@@ -243,12 +243,12 @@ def test(dataloader, net, loss_function, flag = str):
             metricrecall.update(y_pre, y).to(DEVICE)
             recall = metricrecall.compute().to(DEVICE)
         if flag == 'train':
-            wandb.log({"Train acc": accuracy})
+            wandb.log({"Train_acc": accuracy})
             wandb.log({"Train precision": auprc})
             wandb.log({"Train recall": recall})
 
         if flag == 'test':
-            wandb.log({"Test acc": accuracy})
+            wandb.log({"test_acc": accuracy})
             wandb.log({"test_loss": test_loss})
             wandb.log({"Test precision": auprc})
             wandb.log({"Test recall": recall})
