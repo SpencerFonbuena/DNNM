@@ -1,9 +1,10 @@
+from torch.nn import Module
 import torch.nn as nn
 import torch
 import numpy as np
 import random
 import torchvision
-import pytorch_lightning as pl
+
 
 from module.multiHeadAttention import MultiHeadAttention
 from module.feedForward import FeedForward
@@ -21,7 +22,7 @@ torch.manual_seed(seed)
 '''====================================================================================================='''
 
 
-class Encoder(pl.LightningModule):
+class Encoder(Module):
     def __init__(self,
                  heads = int,
                  d_model = int,

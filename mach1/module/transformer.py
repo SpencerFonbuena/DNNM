@@ -1,4 +1,4 @@
-import pytorch_lightning as pl
+from torch.nn import Module
 from torch.nn import ModuleList
 
 
@@ -31,7 +31,7 @@ torch.manual_seed(seed)
 '''====================================================================================================='''
 
 
-class Transformer(pl.LightningModule):
+class Transformer(Module):
     def __init__(self,
                  
                  #Embedding Variables

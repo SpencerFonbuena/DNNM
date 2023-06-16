@@ -1,4 +1,4 @@
-import pytorch_lightning as pl
+from torch.nn import Module
 import torch
 from torch.nn import CrossEntropyLoss
 import numpy as np
@@ -12,7 +12,7 @@ torch.manual_seed(seed)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 #print(f'use device: {DEVICE}')
 
-class Myloss(pl.LightningModule):
+class Myloss(Module):
     def __init__(self):
         super(Myloss, self).__init__()
         self.loss_function = CrossEntropyLoss()

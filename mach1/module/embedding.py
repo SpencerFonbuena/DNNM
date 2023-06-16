@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch.nn import Module
 from torch.nn import functional as F
 import numpy as np
 import random
@@ -20,7 +21,7 @@ torch.manual_seed(seed)
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
 
-class Embedding(pl.LightningModule):
+class Embedding(Module):
     def __init__(self,
                  channel_in = str,
                  timestep_in = str,

@@ -1,4 +1,4 @@
-import pytorch_lightning as pl
+from torch.nn import Module
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
@@ -15,7 +15,7 @@ torch.manual_seed(seed)
 '''====================================================================================================='''
 
 
-class FeedForward(pl.LightningModule):
+class FeedForward(Module):
     def __init__(self,
                  d_model: int,
                  inner_size: int):
