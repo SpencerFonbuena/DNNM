@@ -15,9 +15,9 @@ import pandas as pd
 import torcheval
 from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
 import deepspeed
-
-
-
+import colossalai
+from colossalai.booster import Booster
+from colossalai.booster.plugin import GeminiPlugin
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -44,6 +44,10 @@ print(f'use device: {DEVICE}')
 # [Create WandB sweeps]
 
 sweep_config = {
+
+    # [Colossal AI]
+
+
     'method': 'random',
 
 
@@ -171,10 +175,15 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
 
 
 def train(config=None):
+    colossalai.launch()
 
     with wandb.init(config=config):
 
         config = wandb.config
+
+        colossalai.launch_from_torch(config=config)
+        plugin = GeminiPlugin()
+        booster = Booster(plugin=plugin)
 
         train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
@@ -192,6 +201,7 @@ def train(config=None):
 
         # training function
 
+        net, optimizer, loss_function = booster.boost(net, optimizer, loss_function)
         net.train()
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
@@ -201,7 +211,7 @@ def train(config=None):
                 loss = loss_function(y_pre, y.to(DEVICE))
                 '''for i in range(len(list(net.parameters()))):
                     print(list(net.parameters())[i])'''
-                loss.backward()
+                booster.backward()
                 optimizer.step()
                 if i % 500 == 0:
                     wandb.log({'Loss': loss})
