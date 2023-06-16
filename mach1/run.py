@@ -1,7 +1,3 @@
-# @Time    : 2021/01/22 25:16
-# @Author  : SY.M
-# @FileName: run.py
-
 import torch
 from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
@@ -88,7 +84,7 @@ sweep_config = {
 
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='mach9 sweep')
+sweep_id = wandb.sweep(sweep_config, project='mach9 garbage')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -198,6 +194,7 @@ def train(config=None):
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
             for i, (x, y) in enumerate(train_dataloader):
+                test(validate_dataloader, 'train', net, loss_function)
                 optimizer.zero_grad()
                 y_pre = net(x.to(DEVICE), 'train')
                 loss = loss_function(y_pre, y.to(DEVICE))
@@ -216,6 +213,7 @@ def train(config=None):
 
 # test function
 def test(dataloader, net, loss_function, flag = str):
+    
     correct = 0
     total = 0  
     print('got through')

@@ -1,4 +1,4 @@
-from torch.nn import Module
+import pytorch_lightning as pl
 import torch.nn as nn
 import torch
 import math
@@ -21,7 +21,7 @@ torch.manual_seed(seed)
 '''====================================================================================================='''
 
 
-class MultiHeadAttention(Module):
+class MultiHeadAttention(pl.LightningModule):
     def __init__(self,
                  d_model: int,
                  num_heads: int,

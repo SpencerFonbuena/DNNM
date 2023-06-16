@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
-from torch.nn import Module
 from torch.nn import functional as F
 import numpy as np
 import random
 import math
 import matplotlib.pyplot as plt
+import pytorch_lightning as pl
 # Make us of GPU
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
@@ -20,7 +20,7 @@ torch.manual_seed(seed)
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
 
-class Embedding(Module):
+class Embedding(pl.LightningModule):
     def __init__(self,
                  channel_in = str,
                  timestep_in = str,
