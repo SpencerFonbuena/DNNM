@@ -1,4 +1,4 @@
-from torch.nn import Module
+import pytorch_lightning as pl
 import torch.nn as nn
 import torch
 import numpy as np
@@ -9,8 +9,6 @@ import matplotlib.pyplot as plt
 from module.multiHeadAttention import MultiHeadAttention
 from module.feedForward import FeedForward
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
-#print(f'use device: {DEVICE}')
 
 seed = 10
 np.random.seed(seed)
@@ -22,13 +20,12 @@ torch.manual_seed(seed)
 '''====================================================================================================='''
 
 
-class Encoder(Module):
+class Encoder(pl.LightningModule):
     def __init__(self,
                  heads = int,
                  d_model = int,
                  qkpair = int,
                  value_count = int,
-                 device = str,
                  
                  inner_size = int):
         super(Encoder, self).__init__()
@@ -38,7 +35,6 @@ class Encoder(Module):
                 d_model = d_model,
                 qkpair = qkpair,
                 value_count = value_count,
-                device = device
         )
         self.ffn_func = FeedForward( 
                 d_model = d_model,

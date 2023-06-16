@@ -1,4 +1,4 @@
-from torch.nn import Module
+import pytorch_lightning as pl
 import torch.nn as nn
 import torch
 import math
@@ -7,8 +7,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
-#print(f'use device: {DEVICE}')
+
 
 # [Initialize stat-tracking]
 seed = 10
@@ -22,19 +21,18 @@ torch.manual_seed(seed)
 '''====================================================================================================='''
 
 
-class MultiHeadAttention(Module):
+class MultiHeadAttention(pl.LightningModule):
     def __init__(self,
                  heads = int,
                  d_model = int,
                  qkpair = int,
                  value_count = int,
-                 device = str):
+                 ):
         super(MultiHeadAttention, self).__init__()
         # [Making init variables class-wide available]
         self.qkpair = qkpair
         self.heads = heads
         self.inf = -2**32+1
-        self.device= device
         # [End availability]
 
         '''-----------------------------------------------------------------------------------------------------'''

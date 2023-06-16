@@ -2,6 +2,8 @@ import torch
 from torch.utils.data import DataLoader
 from dataset_process.dataset_process import Create_Dataset
 from torch.utils.data import WeightedRandomSampler as wrs
+
+
 import torch.optim as optim
 from time import time
 from tqdm.auto import tqdm
@@ -13,7 +15,7 @@ import pandas as pd
 import torcheval
 from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
 import deepspeed
-
+import colossalai
 
 
 
@@ -205,9 +207,8 @@ def train(config=None):
                     wandb.log({'Loss': loss})
                 wandb.log({'index': index})
                 #validate training accuracy and test accuracy
-                
             test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
-            test(dataloader=validate_dataloader, flag='test', net=net, loss_function=loss_function)
+            test(dataloader=test_dataloader, flag='test', net=net, loss_function=loss_function)
 
 
 # test function

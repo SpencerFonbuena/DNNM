@@ -1,4 +1,4 @@
-from torch.nn import Module
+import pytorch_lightning as pl
 from torch.nn import ModuleList
 
 
@@ -17,8 +17,6 @@ from module.encoder import Encoder
 from module.fcnlayer import ResBlock
 
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
-#print(f'use device: {DEVICE}')
 
 # [Maintain random seed]
 seed = 10
@@ -32,7 +30,7 @@ torch.manual_seed(seed)
 '''====================================================================================================='''
 
 
-class Transformer(Module):
+class Transformer(pl.LightningModule):
     def __init__(self,
                  
                  #Embedding Variables
@@ -45,7 +43,6 @@ class Transformer(Module):
                  d_model = int,
                  qkpair = int,
                  value_count = int,
-                 device = str,
                  stack = int,
                  
                  #FFN Variables
@@ -92,7 +89,6 @@ class Transformer(Module):
                  d_model = d_model,
                  qkpair = qkpair,
                  value_count = value_count,
-                 device = device,
                  
                  inner_size = inner_size
             ) for _ in range(stack)
@@ -105,7 +101,6 @@ class Transformer(Module):
                  d_model = d_model,
                  qkpair = qkpair,
                  value_count = value_count,
-                 device = device,
                  
                  inner_size = inner_size
             ) for _ in range(stack)
@@ -236,7 +231,7 @@ class Transformer(Module):
         gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
         #axs[1,0].hist(pregate.view(-1).tolist(), 80)
         #axs[1,0].set_title('softmax gate transformer')
-        print(gate[0])
+        #print(gate[0])
 
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
         #axs[1,1].hist(pregate.view(-1).tolist(), 80)

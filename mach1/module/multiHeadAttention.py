@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import numpy as np
 import random
 
+
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 #print(f'use device: {DEVICE}')
 

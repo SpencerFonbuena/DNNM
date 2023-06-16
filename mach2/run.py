@@ -2,6 +2,8 @@
 # @Author  : SY.M
 # @FileName: run.py
 
+from typing import Any, Optional
+from pytorch_lightning.utilities.types import EVAL_DATALOADERS, STEP_OUTPUT, TRAIN_DATALOADERS
 import torch
 import torchmetrics as tm
 from torch.utils.data import DataLoader
@@ -15,7 +17,8 @@ import numpy as np
 import wandb
 import random
 import pandas as pd
-
+import pytorch_lightning as pl
+from torcheval.metrics import MulticlassAccuracy, MulticlassPrecision, MulticlassRecall
 
 
 from module.transformer import Transformer
@@ -35,9 +38,6 @@ random.seed(seed)
 torch.manual_seed(seed)
 
 # Make us of GPU
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
-print(f'use device: {DEVICE}')
-
 # [Create WandB sweeps]
 
 config = {
@@ -105,6 +105,13 @@ else:
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
 
+class DataModule(pl.LightningDataModule):
+    def setup(self, stage: str):
+        return super().setup(stage)
+    def train_dataloader(self) -> TRAIN_DATALOADERS:
+        return super().train_dataloader()
+    def test_dataloader(self) -> EVAL_DATALOADERS:
+        return super().test_dataloader()
 
 #[Create and load the dataset]
 
@@ -143,90 +150,82 @@ print(f'Number of classes: {d_output}')
 
 # [Initialize Training and Testing Procedures]
 
-# Create a Transformer model
-net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_channel,
-                  heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
-                  device=DEVICE,inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, layers=[128, 256, 512], kss=[7, 5, 3], p=hp.p, fcnstack=hp.fcnstack).to(DEVICE)
+class PlClassifier(pl.LightningModule):
 
-print(net)
+    def __init__(self) -> None:
+        super().__init__()
 
-# [Place computational graph code here if desired]
+        self.net = Transformer(window_size=hp.WINDOW_SIZE, timestep_in=d_input, channel_in=d_channel,
+                heads=hp.heads,d_model=hp.d_model,qkpair=hp.queries,value_count=hp.values,
+                inner_size=hp.d_hidden,class_num=d_output, stack=hp.N, layers=[128, 256, 512], kss=[7, 5, 3], p=hp.p, fcnstack=hp.fcnstack)
+        
+    def forward(self, x, stage):
+        fcgtn = self.net(x, stage)
+        return fcgtn
+    
+    
 
-# Create a loss function here using cross entropy loss
-loss_function = Myloss()
+    def loss(self, logits, y):
+        pre_loss_func = torch.nn.CrossEntropyLoss()
+        y = y.type(torch.LongTensor)
+        loss_func = pre_loss_func(logits, y)
+        return loss_func
 
-#Select optimizer in an un-optimized way
-if hp.optimizer_name == 'Adam':
-    optimizer = optim.Adam(net.parameters(), lr=hp.LR)
+    
+    def training_step(self, train_batch, batch_idx):
+        x, y = train_batch
+        logits = self.forward(x, 'train')
+        loss = self.loss(logits, y)
 
-# Used to record the accuracy rate change
-correct_on_train = []
-correct_on_test = []
-# Used to record loss changes
-loss_list = []
-time_cost = 0
+        if batch_idx % 100 == 0:
+            accuracy = MulticlassAccuracy()
+            precision = MulticlassPrecision()
+            recall = MulticlassRecall()
 
-# [End Training and Test Init]
+            accuracy.update(logits, y)
+            precision.update(logits, y)
+            recall.update(logits, y)
 
-'''-----------------------------------------------------------------------------------------------------'''
-'''====================================================================================================='''
+            accuracy.compute
+            precision.compute
+            recall.compute 
+
+        return loss
+        
+    
+    def validation_step(self, trainval_batch, trainval_idx):
+        x, y = trainval_batch
+        logits = self.forward(x, 'test')
+        loss = self.loss(logits, y)
+
+        accuracy = MulticlassAccuracy()
+        precision = MulticlassPrecision()
+        recall = MulticlassRecall()
+
+        accuracy.update(logits, y)
+        precision.update(logits, y)
+        recall.update(logits, y)
+
+        accuracy.compute
+        precision.compute
+        recall.compute 
+        
+        return loss, accuracy, precision, recall
+        
+    
+    
+    def configure_optimizers(self) -> Any:
+        optimizer = optim.Adam(self.net.parameters(), lr=hp.LR)
+
+        return optimizer
 
 
-# [Begin Training and Testing]
+model = PlClassifier()
+trainer = pl.Trainer()
 
-# training function
-def train():
-    net.train()
-    #wandb.watch(net, log='all')
-    for index in tqdm(range(hp.EPOCH)):
-        for i, (x, y) in enumerate(train_dataloader):
-            optimizer.zero_grad()
-            y_pre = net(x.to(DEVICE), 'train')
-            print(y_pre.shape)
-            print(y.expand(1,hp.BATCH_SIZE).reshape(16,1).shape)
-            print(torch.cat([y_pre,y.expand(1,hp.BATCH_SIZE).reshape(16,1)], dim=-1))
-            loss = loss_function(y_pre, y.to(DEVICE))
-            loss_list.append(loss.item())
-            '''for i in range(len(list(net.parameters()))):
-                print(list(net.parameters())[i])'''
-            loss.backward()
-            optimizer.step()
-            #wandb.log({'Loss': loss})
-            #wandb.log({'index': index})
-        #validate training accuracy and test accuracy
-        test(validate_dataloader, 'train')
-        test(test_dataloader, 'test')
-
-
-# test function
-def test(dataloader, flag = str):
-    correct = 0
-    total = 0
-
-    net.eval()
-    with torch.no_grad():
-        for i, (x, y) in enumerate(dataloader):
-            x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x, 'test')
-            _, label_index = torch.max(y_pre.data, dim=-1)
-            total += label_index.shape[0]
-            correct += (label_index == y.long()).sum().item()
-            accuracy = correct / total * 100
-        '''if flag == 'train':
-            wandb.log({"Train acc": accuracy})
-        if flag == 'test':
-            wandb.log({"Test acc": accuracy})'''
-
-# [End Training and Testing]
-
-'''-----------------------------------------------------------------------------------------------------'''
-'''====================================================================================================='''
-
-# [Save Model]
-
-# [End Save Model]
+trainer.fit(model, train_dataloader, test_dataloader)
 
 # [Run the model]
 if __name__ == '__main__':
-    train()
+    pass
 # [End experiment]
