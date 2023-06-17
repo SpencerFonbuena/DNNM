@@ -182,7 +182,7 @@ def train(config=None):
         caiconfig = dict(
         batch_size=config.batch_size
         )
-        colossalai.launch(config = caiconfig, rank=0, host='vultr.guest', world_size=1, port=53)
+        colossalai.launch(config = caiconfig, rank=0, host='vultr.guest', world_size=1, port=68)
         plugin = GeminiPlugin()
         booster = Booster(plugin=plugin)
 
