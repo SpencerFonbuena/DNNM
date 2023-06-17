@@ -187,9 +187,10 @@ def train(config=None):
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
             for i, (x, y) in enumerate(train_dataloader):
+                x, y = x.to(DEVICE), y.to(DEVICE)
                 optimizer.zero_grad()
-                y_pre = net(x.to(DEVICE))
-                loss = loss_function(y_pre, y.to(DEVICE))
+                y_pre = net(x)
+                loss = loss_function(y_pre, y)
                 loss.backward()
                 optimizer.step()
                 if i % 1000 == 0:
@@ -229,7 +230,7 @@ def test(dataloader, net, loss_function):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
-            test_loss = loss_function(y_pre, y.to(DEVICE))
+            test_loss = loss_function(y_pre, y)
             
             accuracy = MulticlassAccuracy().to(DEVICE)
             specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
