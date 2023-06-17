@@ -182,7 +182,10 @@ def train(config=None):
             optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate)
 
         # training function
-
+        trainmetricaccuracy = MulticlassAccuracy().to(DEVICE)
+        #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
+        trainmetricprecision = MulticlassPrecision().to(DEVICE)
+        trainmetricrecall = MulticlassRecall().to(DEVICE)
         net.train()
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
@@ -193,35 +196,35 @@ def train(config=None):
                 loss = loss_function(y_pre, y)
                 loss.backward()
                 optimizer.step()
-                if i % 1000 == 0:
-                    metricaccuracy = MulticlassAccuracy().to(DEVICE)
-                    #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
-                    metricprecision = MulticlassPrecision().to(DEVICE)
-                    metricrecall = MulticlassRecall().to(DEVICE)
 
-                    metricaccuracy.update(y_pre, y)
-                    metricprecision.update(y_pre, y)
-                    metricrecall.update(y_pre, y)
-                    #specacc.update(y_pre, y)
+                    
 
-                    accuracy = metricaccuracy.compute()
-                    precision = metricprecision.compute()
-                    recall = metricrecall.compute()
-                    #specacc.compute()
+                trainmetricaccuracy.update(y_pre, y)
+                trainmetricprecision.update(y_pre, y)
+                trainmetricrecall.update(y_pre, y)
+                #specacc.update(y_pre, y)
 
-                    wandb.log({"train_acc": accuracy})
-                    wandb.log({"Test precision": precision})
-                    wandb.log({"Test recall": recall})
-                    wandb.log({'Loss': loss})
-                    wandb.log({'index': index})
+                wandb.log({'Loss': loss})
+                wandb.log({'index': index})
                     #print(specacc.specacc())
                 #validate training accuracy and test accuracy
+            trainaccuracy = trainmetricaccuracy.compute()
+            trainprecision = trainmetricprecision.compute()
+            trainrecall = trainmetricrecall.compute()
+            #specacc.compute()
+
+            wandb.log({"train_acc": trainaccuracy})
+            wandb.log({"Test precision": trainprecision})
+            wandb.log({"Test recall": trainrecall})
             test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
 
 # test function
 def test(dataloader, net, loss_function):
-    
+    metricaccuracy = MulticlassAccuracy().to(DEVICE)
+    #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
+    metricprecision = MulticlassPrecision().to(DEVICE)
+    metricrecall = MulticlassRecall().to(DEVICE)
 
     net.eval()
     with torch.no_grad():
@@ -230,26 +233,23 @@ def test(dataloader, net, loss_function):
             y_pre = net(x)
             test_loss = loss_function(y_pre, y)
             
-            metricaccuracy = MulticlassAccuracy().to(DEVICE)
-            #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
-            metricprecision = MulticlassPrecision().to(DEVICE)
-            metricrecall = MulticlassRecall().to(DEVICE)
+            
 
             metricaccuracy.update(y_pre, y)
             metricprecision.update(y_pre, y)
             metricrecall.update(y_pre, y)
             #specacc.update(y_pre, y)
 
-            accuracy = metricaccuracy.compute()
-            precision = metricprecision.compute()
-            recall = metricrecall.compute()
-            #specacc.compute()
+        accuracy = metricaccuracy.compute()
+        precision = metricprecision.compute()
+        recall = metricrecall.compute()
+        #specacc.compute()
 
-            wandb.log({"test_acc": accuracy})
-            wandb.log({"test_loss": test_loss})
-            wandb.log({"Test precision": precision})
-            wandb.log({"Test recall": recall})
-            #print(specacc.specacc())
+        wandb.log({"test_acc": accuracy})
+        wandb.log({"test_loss": test_loss})
+        wandb.log({"Test precision": precision})
+        wandb.log({"Test recall": recall})
+        #print(specacc.specacc())
 
 # [End Training and Testing]
 
