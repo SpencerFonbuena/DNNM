@@ -173,7 +173,7 @@ def train(config=None):
 
         train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
-                      dropout=config.dropout, stack=config.stack, p=config.stoch_p, fcnstack=config.fcnstack, d_hidden=config.d_hidden).to(DEVICE)
+                      dropout=config.dropout, stack=config.stack, p=config.stoch_p, fcnstack=config.fcnstack, d_hidden=config.d_hidden)
         # Create a loss function here using cross entropy loss
         loss_function = Myloss()
 
@@ -229,7 +229,7 @@ def test(dataloader, net, loss_function):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
-            test_loss = loss_function(y_pre, y)
+            test_loss = loss_function(y_pre, y.to(DEVICE))
             
             accuracy = MulticlassAccuracy().to(DEVICE)
             specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
