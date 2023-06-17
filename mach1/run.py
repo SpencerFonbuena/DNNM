@@ -179,7 +179,7 @@ def train(config=None):
 
         config = wandb.config
 
-        colossalai.launch_from_torch(config=config)
+        colossalai.launch(config=config, rank=0, host='vultr.guest', port=22)
         plugin = GeminiPlugin()
         booster = Booster(plugin=plugin)
 
