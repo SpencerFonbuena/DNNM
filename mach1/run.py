@@ -179,7 +179,7 @@ def train(config=None):
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate).to(DEVICE)
+            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate)
 
         # training function
 
