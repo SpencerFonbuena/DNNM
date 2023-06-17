@@ -12,11 +12,8 @@ import numpy as np
 import torch.nn as nn
 
 from module.embedding import Embedding
-from module.encoder import Encoder
+from torch.nn import TransformerEncoderLayer
 from module.fcnlayer import ResBlock
-
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
-#print(f'use device: {DEVICE}')
 
 # [Maintain random seed]
 seed = 10
@@ -56,18 +53,16 @@ class Transformer(Module):
                  p = float,
                  fcnstack = int
                  ):
+        
         super(Transformer, self).__init__()
-        self.p = p
-        self.stack = stack
-        # [Initialize Embedding]
 
-        #Channel embedding Init
+
         self.channel_embedding = Embedding(
-                 channel_in = channel_in,
-                 timestep_in = timestep_in,
-                 d_model = d_model,
-                 window_size = window_size,
-                 tower='channel')
+                        channel_in = channel_in,
+                        timestep_in = timestep_in,
+                        d_model = d_model,
+                        window_size = window_size,
+                        tower='channel')
         
         #Timestep embedding Init
         self.timestep_embedding = Embedding(
@@ -77,37 +72,37 @@ class Transformer(Module):
                  window_size = window_size,
                  tower='timestep')
         
-        # [End Embedding]
 
-
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
 
         # [Initialize Towers]
         #Channel Init
         self.channel_tower = ModuleList([
-            Encoder(
-                 heads = heads,
-                 d_model = d_model,
-                 device = device,
-                 
-                 inner_size = inner_size,
-                 dropout=dropout
+            TransformerEncoderLayer(
+                 d_model=d_model,
+                 nhead=heads,
+                 dim_feedforward=inner_size,
+                 dropout=dropout,
+                 activation=F.gelu,
+                 batch_first=True,
+                 norm_first=True,
+                 device=device
             ) for _ in range(stack)
         ])
 
         #Timestep Init
         self.timestep_tower = ModuleList([
-            Encoder(
-                 heads = heads,
-                 d_model = d_model,
-                 device = device,
-                 
-                 inner_size = inner_size,
-                 dropout = dropout
+            TransformerEncoderLayer(
+                 d_model=d_model,
+                 nhead=heads,
+                 dim_feedforward=inner_size,
+                 dropout=dropout,
+                 activation=F.gelu,
+                 batch_first=True,
+                 norm_first=True,
+                 device=device
             ) for _ in range(stack)
         ])
-        # [End Init]
+        # [End Towers]
 
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''

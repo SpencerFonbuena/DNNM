@@ -12,7 +12,7 @@ import numpy as np
 import wandb
 import random
 import pandas as pd
-from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
+from torcheval.metrics import MulticlassPrecision, MulticlassRecall, MulticlassAccuracy
 
 
 
@@ -102,17 +102,14 @@ else:
 def pipeline(batch_size, window_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train')
-    val_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='validate')
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test')
 
     #create the samplers
     samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
     samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
-    samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
 
     #Load the data
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True ,sampler=samplertrain)
-    validate_dataloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True,sampler=samplertrainval)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True,sampler=samplertest)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
@@ -128,7 +125,7 @@ def pipeline(batch_size, window_size):
 
     # [End Dataset Init]
 
-    return train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output
+    return train_dataloader, test_dataloader, d_input, d_channel, d_output
 
 
 '''-----------------------------------------------------------------------------------------------------'''
@@ -137,7 +134,8 @@ def pipeline(batch_size, window_size):
 
 def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, stack, p, fcnstack, d_hidden):
     net = Transformer(window_size=window_size, 
-                    timestep_in=d_input, channel_in=d_channel,
+                    timestep_in=d_input, 
+                    channel_in=d_channel,
                     heads=heads,
                     d_model=d_model,
                     device=DEVICE,
@@ -182,11 +180,7 @@ def train(config=None):
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate) #
-        # [End Training and Test Init]
-
-
-        # [Begin Training and Testing]
+            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate)
 
         # training function
 
@@ -197,20 +191,35 @@ def train(config=None):
                 optimizer.zero_grad()
                 y_pre = net(x.to(DEVICE), 'train')
                 loss = loss_function(y_pre, y.to(DEVICE))
-                '''for i in range(len(list(net.parameters()))):
-                    print(list(net.parameters())[i])'''
                 loss.backward()
                 optimizer.step()
-                if i % 500 == 0:
+                if i % 1000 == 0:
+                    accuracy = MulticlassAccuracy()
+                    specacc = MulticlassAccuracy(average=None, num_classes=4)
+                    precision = MulticlassPrecision()
+                    recall = MulticlassRecall()
+
+                    accuracy.update(y_pre, y)
+                    precision.update(y_pre, y)
+                    recall.update(y_pre, y)
+
+                    accuracy.compute
+                    precision.compute
+                    recall.compute
+
+
+                    wandb.log({"test_acc": accuracy})
+                    wandb.log({"Test precision": precision})
+                    wandb.log({"Test recall": recall})
                     wandb.log({'Loss': loss})
-                wandb.log({'index': index})
+                    wandb.log({'index': index})
+                    print(specacc)
                 #validate training accuracy and test accuracy
-            test(dataloader=validate_dataloader, flag='train', net=net, loss_function=loss_function)
-            test(dataloader=test_dataloader, flag='test', net=net, loss_function=loss_function)
+            test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
 
 # test function
-def test(dataloader, net, loss_function, flag = str):
+def test(dataloader, net, loss_function):
     
     correct = 0
     total = 0  
@@ -218,38 +227,30 @@ def test(dataloader, net, loss_function, flag = str):
 
     net.eval()
     with torch.no_grad():
-        for i, (x, y) in enumerate(dataloader):
+        for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, 'test')
-            if i % 100 == 0:
-                if flag == 'train':
-                    max_indices = torch.argmax(y_pre, dim=-1)
-                    print('Train',torch.cat([max_indices, y]))
-                if flag == 'test':
-                    max_indices = torch.argmax(y_pre, dim=-1)
-                    print('test',torch.cat([max_indices, y]))
             test_loss = loss_function(y_pre, y.to(DEVICE))
-            _, label_index = torch.max(y_pre.data, dim=-1)
-            total += label_index.shape[0]
-            correct += (label_index == y.long()).sum().item()
-            accuracy = correct / total * 100
-            metricAUPRC = MulticlassAUPRC(num_classes=4).to(DEVICE)
-            metricrecall = MulticlassRecall(num_classes=4).to(DEVICE)
-            metricAUPRC.update(y_pre, y).to(DEVICE)  # Add predictions and targets
-            auprc = metricAUPRC.compute().to(DEVICE)  # Get the computed Multiclass AUPRC
+            
+            accuracy = MulticlassAccuracy()
+            specacc = MulticlassAccuracy(average=None, num_classes=4)
+            precision = MulticlassPrecision()
+            recall = MulticlassRecall()
 
-            metricrecall.update(y_pre, y).to(DEVICE)
-            recall = metricrecall.compute().to(DEVICE)
-        if flag == 'train':
-            wandb.log({"Train_acc": accuracy})
-            wandb.log({"Train precision": auprc})
-            wandb.log({"Train recall": recall})
+            accuracy.update(y_pre, y)
+            precision.update(y_pre, y)
+            recall.update(y_pre, y)
 
-        if flag == 'test':
+            accuracy.compute
+            precision.compute
+            recall.compute 
+
+
             wandb.log({"test_acc": accuracy})
             wandb.log({"test_loss": test_loss})
-            wandb.log({"Test precision": auprc})
+            wandb.log({"Test precision": precision})
             wandb.log({"Test recall": recall})
+            print(specacc)
 
 # [End Training and Testing]
 

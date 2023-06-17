@@ -97,24 +97,7 @@ class Create_Dataset(Dataset):
 
         #[end of creating validation data and labels]
         
-
-
-
-        #[beginning of creating trainvalidation data and labels]
-
-        #create the trainvalidation data and labels
-        self.trainvaldata = torch.tensor(trainingdata[30_000:50_000]).to(torch.float32)
-        self.trainvallabels = torch.tensor(labeldata[30_000:50_000]).to(torch.float32)
-        #can't call the iterate through a torch, so this is to create all of the weights
-        self.normtrainvallabels = labeldata[30_000:50_000]
-
-        #Find the distributions of each label in the test set
-        self.trainvalsampleweights = [self.distlabel[i] for i in self.normtrainvallabels]
-
-         #[end of creating trainvalidation data and labels]
         
-
-
 
         # [Creating dimension variables for easy computing on other sheets]
         
@@ -133,16 +116,14 @@ class Create_Dataset(Dataset):
             return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
-        elif self.mode == 'validate':
-            return self.trainvaldata[index], self.trainvallabels[index]
+
     
     def __len__(self):
         if self.mode == 'train':
             return len(self.trainingdata)
         if self.mode == 'test':
             return len(self.vallabels)
-        if self.mode == 'validate':
-            return len(self.trainvallabels)
+
         
         
 
