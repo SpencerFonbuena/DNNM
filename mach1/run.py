@@ -195,26 +195,26 @@ def train(config=None):
                 optimizer.step()
                 if i % 1000 == 0:
                     accuracy = MulticlassAccuracy().to(DEVICE)
-                    specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
+                    #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
                     precision = MulticlassPrecision().to(DEVICE)
                     recall = MulticlassRecall().to(DEVICE)
 
                     accuracy.update(y_pre, y)
                     precision.update(y_pre, y)
                     recall.update(y_pre, y)
-                    specacc.update(y_pre, y)
+                    #specacc.update(y_pre, y)
 
                     accuracy.compute()
                     precision.compute()
                     recall.compute()
-                    specacc.compute()
+                    #specacc.compute()
 
                     wandb.log({"test_acc": accuracy.accuracy()})
                     wandb.log({"Test precision": precision.precision()})
                     wandb.log({"Test recall": recall.recall()})
                     wandb.log({'Loss': loss})
                     wandb.log({'index': index})
-                    print(specacc.specacc())
+                    #print(specacc.specacc())
                 #validate training accuracy and test accuracy
             test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
@@ -234,25 +234,25 @@ def test(dataloader, net, loss_function):
             test_loss = loss_function(y_pre, y)
             
             accuracy = MulticlassAccuracy().to(DEVICE)
-            specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
+            #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
             precision = MulticlassPrecision().to(DEVICE)
             recall = MulticlassRecall().to(DEVICE)
 
             accuracy.update(y_pre, y)
             precision.update(y_pre, y)
             recall.update(y_pre, y)
-            specacc.update(y_pre, y)
+            #specacc.update(y_pre, y)
 
             accuracy.compute()
             precision.compute()
             recall.compute()
-            specacc.compute()
+            #specacc.compute()
 
             wandb.log({"test_acc": accuracy.accuracy()})
             wandb.log({"test_loss": test_loss})
             wandb.log({"Test precision": precision.precision()})
             wandb.log({"Test recall": recall.recall()})
-            print(specacc.specacc())
+            #print(specacc.specacc())
 
 # [End Training and Testing]
 
