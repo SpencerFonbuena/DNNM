@@ -54,6 +54,8 @@ class Transformer(Module):
         
         super(Transformer, self).__init__()
 
+        self.p = p
+        self.stack = stack
 
         self.channel_embedding = Embedding(
                         channel_in = channel_in,
@@ -152,7 +154,7 @@ class Transformer(Module):
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
 
-    def forward(self, x, stage):
+    def forward(self, x):
         #Embed channel and timestep
         x_channel = self.channel_embedding(x).to(torch.float32) # (16,9,512)
         x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,120,512)
@@ -166,14 +168,14 @@ class Transformer(Module):
         for i, encoder in enumerate(self.channel_tower):
             identity = x_channel
             x_channel = std(x_channel, (1/self.stack) * self.p, 'batch')
-            y_channel = encoder(x=x_channel, stage=stage)
+            y_channel = encoder(x_channel)
             x_channel = y_channel + identity
         
         #Timestep tower
         for i, encoder in enumerate(self.timestep_tower):
             identity = x_timestep
             x_timestep = std(x_timestep, (1/self.stack) * self.p, 'batch')
-            y_timestep = encoder(x = x_timestep, stage=stage)
+            y_timestep = encoder(x_timestep)
             x_timestep = y_timestep + identity
 
         # [End loop]

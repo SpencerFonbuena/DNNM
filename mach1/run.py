@@ -109,8 +109,8 @@ def pipeline(batch_size, window_size):
     samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True ,sampler=samplertrain)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True,sampler=samplertest)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True ,sampler=samplertrain)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,sampler=samplertest)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -188,7 +188,7 @@ def train(config=None):
         for index in tqdm(range(hp.EPOCH)):
             for i, (x, y) in enumerate(train_dataloader):
                 optimizer.zero_grad()
-                y_pre = net(x.to(DEVICE), 'train')
+                y_pre = net(x.to(DEVICE))
                 loss = loss_function(y_pre, y.to(DEVICE))
                 loss.backward()
                 optimizer.step()
@@ -228,7 +228,7 @@ def test(dataloader, net, loss_function):
     with torch.no_grad():
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x, 'test')
+            y_pre = net(x)
             test_loss = loss_function(y_pre, y.to(DEVICE))
             
             accuracy = MulticlassAccuracy()
