@@ -17,6 +17,7 @@ from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
 import colossalai
 from colossalai.booster import Booster
 from colossalai.booster.plugin import GeminiPlugin
+from colossalai.nn.optimizer import HybridAdam
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -194,7 +195,7 @@ def train(config=None):
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate) #
+            optimizer = HybridAdam(net.parameters(), lr=config.learning_rate) #
         # [End Training and Test Init]
 
 
