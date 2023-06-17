@@ -140,7 +140,6 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
                     d_model=d_model,
                     device=DEVICE,
                     dropout = dropout,
-                    inner_size=d_hidden,
                     class_num=d_output, 
                     stack=stack, 
                     layers=[128, 256, 512], 
@@ -172,7 +171,7 @@ def train(config=None):
 
         config = wandb.config
 
-        train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
+        train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
                       dropout=config.dropout, stack=config.stack, p=config.stoch_p, fcnstack=config.fcnstack, d_hidden=config.d_hidden)
         # Create a loss function here using cross entropy loss

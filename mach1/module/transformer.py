@@ -43,8 +43,6 @@ class Transformer(Module):
                  stack = int,
                  dropout = float,
                  
-                 #FFN Variables
-                 inner_size = int,
                  
                  #FCN Variables
                  layers=list, 
@@ -80,7 +78,7 @@ class Transformer(Module):
             TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
-                 dim_feedforward=inner_size,
+                 dim_feedforward=4 * d_model,
                  dropout=dropout,
                  activation=F.gelu,
                  batch_first=True,
@@ -94,7 +92,7 @@ class Transformer(Module):
             TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
-                 dim_feedforward=inner_size,
+                 dim_feedforward=4 * d_model,
                  dropout=dropout,
                  activation=F.gelu,
                  batch_first=True,

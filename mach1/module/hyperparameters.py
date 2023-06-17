@@ -5,7 +5,7 @@ class HyperParameters:
     BATCH_SIZE = [16,32,64]
     WINDOW_SIZE = [120,150,180,210,240]
     LR = [.00001,.0001,.001,.01,.1, .00003,.0003,.003,.03, .00005,.0005,.005,.05, .00007,.0007,.007,.07, .00009,.0009,.009,.09]
-    d_model = [512]
+    d_model = [512, 1024]
     d_hidden = [2048]
     queries = 8 # Queries
     values = 8 # Values
