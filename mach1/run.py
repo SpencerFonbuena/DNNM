@@ -101,16 +101,16 @@ else:
 #[Create and load the dataset]
 def pipeline(batch_size, window_size):
     #create the datasets to be loaded
-    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train')
-    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test')
+    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train').to(DEVICE)
+    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test').to(DEVICE)
 
     #create the samplers
-    samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
-    samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
+    samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True).to(DEVICE)
+    samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True).to(DEVICE)
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True ,sampler=samplertrain)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,sampler=samplertest)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True ,sampler=samplertrain).to(DEVICE)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,sampler=samplertest).to(DEVICE)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -179,7 +179,7 @@ def train(config=None):
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate)
+            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate).to(DEVICE)
 
         # training function
 
@@ -193,18 +193,18 @@ def train(config=None):
                 loss.backward()
                 optimizer.step()
                 if i % 1000 == 0:
-                    accuracy = MulticlassAccuracy()
-                    specacc = MulticlassAccuracy(average=None, num_classes=4)
-                    precision = MulticlassPrecision()
-                    recall = MulticlassRecall()
+                    accuracy = MulticlassAccuracy().to(DEVICE)
+                    specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
+                    precision = MulticlassPrecision().to(DEVICE)
+                    recall = MulticlassRecall().to(DEVICE)
 
                     accuracy.update(y_pre, y)
                     precision.update(y_pre, y)
                     recall.update(y_pre, y)
 
-                    accuracy.compute
-                    precision.compute
-                    recall.compute
+                    accuracy.compute()
+                    precision.compute()
+                    recall.compute()
 
 
                     wandb.log({"test_acc": accuracy})
@@ -231,18 +231,18 @@ def test(dataloader, net, loss_function):
             y_pre = net(x)
             test_loss = loss_function(y_pre, y)
             
-            accuracy = MulticlassAccuracy()
-            specacc = MulticlassAccuracy(average=None, num_classes=4)
-            precision = MulticlassPrecision()
-            recall = MulticlassRecall()
+            accuracy = MulticlassAccuracy().to(DEVICE)
+            specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
+            precision = MulticlassPrecision().to(DEVICE)
+            recall = MulticlassRecall().to(DEVICE)
 
             accuracy.update(y_pre, y)
             precision.update(y_pre, y)
             recall.update(y_pre, y)
 
-            accuracy.compute
-            precision.compute
-            recall.compute 
+            accuracy.compute()
+            precision.compute()
+            recall.compute()
 
 
             wandb.log({"test_acc": accuracy})
