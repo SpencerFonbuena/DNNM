@@ -14,10 +14,10 @@ import random
 import pandas as pd
 import torcheval
 from torcheval.metrics import MulticlassAUPRC, MulticlassRecall
-import colossalai
-from colossalai.booster import Booster
-from colossalai.booster.plugin import GeminiPlugin
-from colossalai.nn.optimizer import HybridAdam
+import deepspeed
+
+
+
 
 from module.transformer import Transformer
 from module.loss import Myloss
@@ -41,13 +41,9 @@ print(f'use device: {DEVICE}')
 
 
 
-# [Create WandB sweeps ]
+# [Create WandB sweeps]
 
 sweep_config = {
-
-    # [Colossal AI]
-
-
     'method': 'random',
 
 
@@ -175,17 +171,10 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
 
 
 def train(config=None):
-    
+
     with wandb.init(config=config):
 
         config = wandb.config
-
-        caiconfig = dict(
-        batch_size=config.batch_size
-        )
-        colossalai.launch(config = caiconfig, rank=0, host='vultr.guest', world_size=1, port=68)
-        plugin = GeminiPlugin()
-        booster = Booster()
 
         train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
@@ -195,7 +184,7 @@ def train(config=None):
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
-            optimizer = HybridAdam(net.parameters(), lr=config.learning_rate) #
+            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate) #
         # [End Training and Test Init]
 
 
@@ -203,7 +192,6 @@ def train(config=None):
 
         # training function
 
-        net, optimizer, loss_function = booster.boost(net, optimizer, loss_function)
         net.train()
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
@@ -213,7 +201,7 @@ def train(config=None):
                 loss = loss_function(y_pre, y.to(DEVICE))
                 '''for i in range(len(list(net.parameters()))):
                     print(list(net.parameters())[i])'''
-                booster.backward()
+                loss.backward()
                 optimizer.step()
                 if i % 500 == 0:
                     wandb.log({'Loss': loss})
