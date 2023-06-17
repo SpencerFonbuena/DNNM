@@ -174,14 +174,14 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
 
 
 def train(config=None):
-
+    colossalai.launch(rank=0, host='vultr.guest', port=22, world_size=1)
+    plugin = GeminiPlugin()
+    booster = Booster(plugin=plugin)
     with wandb.init(config=config):
 
         config = wandb.config
 
-        colossalai.launch(config=config, rank=0, host='vultr.guest', port=22, world_size=1)
-        plugin = GeminiPlugin()
-        booster = Booster(plugin=plugin)
+        
 
         train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
