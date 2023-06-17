@@ -209,7 +209,7 @@ def train(config=None):
                     recall = metricrecall.compute()
                     #specacc.compute()
 
-                    wandb.log({"test_acc": accuracy})
+                    wandb.log({"train_acc": accuracy})
                     wandb.log({"Test precision": precision})
                     wandb.log({"Test recall": recall})
                     wandb.log({'Loss': loss})
