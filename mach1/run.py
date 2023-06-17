@@ -185,7 +185,7 @@ def train(config=None):
         )
         colossalai.launch(config = caiconfig, rank=0, host='vultr.guest', world_size=1, port=68)
         plugin = GeminiPlugin()
-        booster = Booster(plugin=plugin)
+        booster = Booster()
 
         train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
