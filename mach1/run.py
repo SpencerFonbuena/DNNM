@@ -101,16 +101,16 @@ else:
 #[Create and load the dataset]
 def pipeline(batch_size, window_size):
     #create the datasets to be loaded
-    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train').to(DEVICE)
-    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test').to(DEVICE)
+    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train')
+    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test')
 
     #create the samplers
-    samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True).to(DEVICE)
-    samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True).to(DEVICE)
+    samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
+    samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True ,sampler=samplertrain).to(DEVICE)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,sampler=samplertest).to(DEVICE)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True ,sampler=samplertrain)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,sampler=samplertest)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
