@@ -194,24 +194,24 @@ def train(config=None):
                 loss.backward()
                 optimizer.step()
                 if i % 1000 == 0:
-                    accuracy = MulticlassAccuracy().to(DEVICE)
+                    metricaccuracy = MulticlassAccuracy().to(DEVICE)
                     #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
-                    precision = MulticlassPrecision().to(DEVICE)
-                    recall = MulticlassRecall().to(DEVICE)
+                    metricprecision = MulticlassPrecision().to(DEVICE)
+                    metricrecall = MulticlassRecall().to(DEVICE)
 
-                    accuracy.update(y_pre, y)
-                    precision.update(y_pre, y)
-                    recall.update(y_pre, y)
+                    metricaccuracy.update(y_pre, y)
+                    metricprecision.update(y_pre, y)
+                    metricrecall.update(y_pre, y)
                     #specacc.update(y_pre, y)
 
-                    accuracy.compute()
-                    precision.compute()
-                    recall.compute()
+                    accuracy = metricaccuracy.compute()
+                    precision = metricprecision.compute()
+                    recall = metricrecall.compute()
                     #specacc.compute()
 
-                    wandb.log({"test_acc": accuracy.accuracy()})
-                    wandb.log({"Test precision": precision.precision()})
-                    wandb.log({"Test recall": recall.recall()})
+                    wandb.log({"test_acc": accuracy})
+                    wandb.log({"Test precision": precision})
+                    wandb.log({"Test recall": recall})
                     wandb.log({'Loss': loss})
                     wandb.log({'index': index})
                     #print(specacc.specacc())
@@ -222,9 +222,6 @@ def train(config=None):
 # test function
 def test(dataloader, net, loss_function):
     
-    correct = 0
-    total = 0  
-    print('got through')
 
     net.eval()
     with torch.no_grad():
@@ -233,25 +230,25 @@ def test(dataloader, net, loss_function):
             y_pre = net(x)
             test_loss = loss_function(y_pre, y)
             
-            accuracy = MulticlassAccuracy().to(DEVICE)
+            metricaccuracy = MulticlassAccuracy().to(DEVICE)
             #specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
-            precision = MulticlassPrecision().to(DEVICE)
-            recall = MulticlassRecall().to(DEVICE)
+            metricprecision = MulticlassPrecision().to(DEVICE)
+            metricrecall = MulticlassRecall().to(DEVICE)
 
-            accuracy.update(y_pre, y)
-            precision.update(y_pre, y)
-            recall.update(y_pre, y)
+            metricaccuracy.update(y_pre, y)
+            metricprecision.update(y_pre, y)
+            metricrecall.update(y_pre, y)
             #specacc.update(y_pre, y)
 
-            accuracy.compute()
-            precision.compute()
-            recall.compute()
+            accuracy = metricaccuracy.compute()
+            precision = metricprecision.compute()
+            recall = metricrecall.compute()
             #specacc.compute()
 
-            wandb.log({"test_acc": accuracy.accuracy()})
+            wandb.log({"test_acc": accuracy})
             wandb.log({"test_loss": test_loss})
-            wandb.log({"Test precision": precision.precision()})
-            wandb.log({"Test recall": recall.recall()})
+            wandb.log({"Test precision": precision})
+            wandb.log({"Test recall": recall})
             #print(specacc.specacc())
 
 # [End Training and Testing]
