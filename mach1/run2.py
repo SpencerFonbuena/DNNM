@@ -178,7 +178,7 @@ def train(config=None):
 
         config = wandb.config
 
-        train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
+        train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
                       dropout=config.dropout, stack=config.stack, p=config.stoch_p, fcnstack=config.fcnstack, d_hidden=config.d_hidden)
         # Create a loss function here using cross entropy loss
@@ -199,7 +199,7 @@ def train(config=None):
         for index in tqdm(range(hp.EPOCH)):
             for i, (x, y) in enumerate(train_dataloader):
                 optimizer.zero_grad()
-                y_pre = net(x.to(DEVICE), 'train')
+                y_pre = net(x.to(DEVICE))
                 loss = loss_function(y_pre, y.to(DEVICE))
                 '''for i in range(len(list(net.parameters()))):
                     print(list(net.parameters())[i])'''
@@ -209,7 +209,6 @@ def train(config=None):
                     wandb.log({'Loss': loss})
             wandb.log({'index': index})
             #validate training accuracy and test accuracy
-            test(validate_dataloader, 'train', net, loss_function)
             test(test_dataloader, 'test', net, loss_function)
 
 
@@ -222,7 +221,7 @@ def test(dataloader, net, loss_function, flag = str):
     with torch.no_grad():
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x, 'test')
+            y_pre = net(x)
             if i % 100 == 0:
                 if flag == 'train':
                     max_indices = torch.argmax(y_pre, dim=-1)
