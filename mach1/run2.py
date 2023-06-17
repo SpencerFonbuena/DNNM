@@ -106,17 +106,17 @@ else:
 def pipeline(batch_size, window_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train')
-    val_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='validate')
+
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test')
 
     #create the samplers
     samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
     samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
-    samplertrainval = wrs(weights=val_dataset.trainvalsampleweights, num_samples=len(val_dataset), replacement=True)
+
 
     #Load the data
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True ,sampler=samplertrain)
-    validate_dataloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True,sampler=samplertrainval)
+
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True,sampler=samplertest)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
@@ -132,7 +132,7 @@ def pipeline(batch_size, window_size):
 
     # [End Dataset Init]
 
-    return train_dataloader, validate_dataloader, test_dataloader, d_input, d_channel, d_output
+    return train_dataloader, test_dataloader, d_input, d_channel, d_output
 
 
 '''-----------------------------------------------------------------------------------------------------'''
