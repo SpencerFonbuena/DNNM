@@ -13,6 +13,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from module.hyperparameters import HyperParameters as hp
+from module.gate import Gate
 from module.embedding import Embedding
 from torch.nn import TransformerEncoderLayer
 from tsai.models.FCN import FCN
@@ -103,15 +104,14 @@ class Transformer(Module):
         ])
         # [End Towers]
 
-        
-
+        self.gate = Gate(16)
 
         # [Gate & Out Init]
 
-        self.fcnchannel = FCN(timestep_in,class_num)
+        '''self.fcnchannel = FCN(timestep_in,class_num)
         self.fcntimestep = FCN(channel_in, class_num)
 
-        self.out = nn.Linear(8,class_num)
+        self.out = nn.Linear(8,class_num)'''
 
         '''self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
         self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
@@ -194,12 +194,7 @@ class Transformer(Module):
 
             # [End Gates]
         
-        #out = self.fcnchannel(x_channel)
-
-        channelout = self.fcnchannel(x_channel)
-        timestepout = self.fcntimestep(x_timestep)
-        out = self.out(torch.cat([channelout,timestepout], dim=-1))
-
+        out = self.gate(x_channel)
 
         return out
 
