@@ -110,7 +110,7 @@ class Transformer(Module):
 
         # [Gate & Out Init]
             # [FCN Init]
-        self.convchannel = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 1)
+        '''self.convchannel = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 1)
         self.convtimestep = nn.Conv1d(channel_in, layers[1], kss[2], 1, 1)
 
         self.bnchannel = nn.BatchNorm1d(layers[1])
@@ -140,16 +140,11 @@ class Transformer(Module):
         self.fcchannel = nn.Linear(layers[1], class_num)
         
         self.gaptimestep = nn.AdaptiveAvgPool1d(1)
-        self.fctimestep = nn.Linear(layers[1], class_num)
-
-        self.channelout = nn.Linear(120*512 ,4)
-        self.timestepout = nn.Linear(8 * 512,4)
-
+        self.fctimestep = nn.Linear(layers[1], class_num)'''
         
-        
-        '''self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
+        self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
         self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
-                                          out_features=class_num)'''
+                                          out_features=class_num)
 
         # [End Gate & Out]
 
@@ -167,7 +162,7 @@ class Transformer(Module):
         # [Loop through towers]
 
         # Channel tower
-        for i, encoder in enumerate(self.channel_tower):
+        '''for i, encoder in enumerate(self.channel_tower):
             identity = x_channel
             x_channel = std(x_channel, (i/self.stack) * self.p, 'batch')
             y_channel = encoder(x_channel)
@@ -178,7 +173,7 @@ class Transformer(Module):
             identity = x_timestep
             x_timestep = std(x_timestep, (i/self.stack) * self.p, 'batch')
             y_timestep = encoder(x_timestep)
-            x_timestep = y_timestep + identity
+            x_timestep = y_timestep + identity'''
 
         # [End loop]
 
@@ -216,27 +211,27 @@ class Transformer(Module):
             # [End FCN]
 
             # [Gates]
-            '''x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+            x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
             x_channel = x_channel.reshape(x_channel.shape[0], -1)
 
             gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
 
             gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
-            out = self.linear_out(gate_out)'''
+            out = self.linear_out(gate_out)
 
             # [End Gates]
         
-        #x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
-        #x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
+        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+        x_channel = x_channel.reshape(x_channel.shape[0], -1)
 
-        x_channel = x_channel.reshape(16,-1)
-        x_timestep = x_timestep.reshape(16,-1)
+        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
 
-        x_channel = self.channelout(x_channel)
-        x_timestep = self.timestepout(x_timestep)
+        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
+
+        out = self.linear_out(gate_out)
         
-        return x_channel
+        return out
 
 
 # [Mock test the MHA]
