@@ -38,3 +38,6 @@ class ResBlock(Module):
         x = x + identity
 
         return x
+    
+
+    
