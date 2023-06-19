@@ -196,7 +196,7 @@ class Transformer(Module):
             # [End Gates]
         
         x_channel = x_channel.reshape(x_channel.shape[0], -1)
-        out = F.softmax(self.out(x_channel), dim=-1)
+        out = self.out(x_channel)
 
         return out
 
