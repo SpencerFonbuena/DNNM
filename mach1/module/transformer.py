@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch.nn as nn
 
+from module.hyperparameters import HyperParameters as hp
 from module.embedding import Embedding
 from torch.nn import TransformerEncoderLayer
 from module.fcnlayer import ResBlock
@@ -141,8 +142,9 @@ class Transformer(Module):
         self.gaptimestep = nn.AdaptiveAvgPool1d(1)
         self.fctimestep = nn.Linear(layers[1], class_num)
 
-        self.pre_out = torch.nn.Linear(8,16)
-        self.out = nn.Linear(16,4)
+        self.channelout = nn.Linear(hp.WINDOW_SIZE * hp.d_model ,4)
+        self.timestepout = nn.Linear(8 * hp.d_model,4)
+
         
         
         '''self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
@@ -228,9 +230,11 @@ class Transformer(Module):
         x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
         x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
 
-        x_timestep = self.gaptimestep(x_timestep)
-        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
-        x_timestep = self.fctimestep(x_timestep)
+        x_channel = x_channel.reshape(16,-1)
+        x_timestep = x_timestep.reshape(16,-1)
+
+        x_channel = self.channelout(x_channel)
+        x_timestep = self.timestepout(x_timestep)
         
         return x_timestep
 
