@@ -4,13 +4,13 @@ class HyperParameters:
     EPOCH = 8
     BATCH_SIZE = [16]
     WINDOW_SIZE = [120]
-    LR = [.00001,.0001,.001, .00003,.0003, .00005,.0005, .00007,.0007, .00009,.0009,]
+    LR = [.00001,.00003,.00005,.00007,.00009]
     d_model = [512]
     d_hidden = [2048]
     queries = 8 # Queries
     values = 8 # Values
-    heads = [32] # Heads
-    N = [16] # multi head attention layers
+    heads = [64] # Heads
+    N = [32] # multi head attention layers
     dropout = [0.0]
     split = .85
     optimizer_name = 'AdamW'
