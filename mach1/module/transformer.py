@@ -197,11 +197,11 @@ class Transformer(Module):
         #out = self.fcnchannel(x_channel)
 
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
-        x_feature = x_feature.reshape(x_feature.shape[0], -1)
+        x_channel = x_channel.reshape(x_channel.shape[0], -1)
 
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_feature], dim=-1)), dim=-1)
+        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
 
-        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_feature * gate[:, 1:2]], dim=-1)
+        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
         out = self.linear_out(gate_out)
 
