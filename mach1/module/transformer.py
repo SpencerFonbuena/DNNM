@@ -110,7 +110,7 @@ class Transformer(Module):
 
         # [Gate & Out Init]
             # [FCN Init]
-        '''self.convchannel = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 1)
+        self.convchannel = nn.Conv1d(timestep_in, layers[1], kss[2], 1, 1)
         self.convtimestep = nn.Conv1d(channel_in, layers[1], kss[2], 1, 1)
 
         self.bnchannel = nn.BatchNorm1d(layers[1])
@@ -140,11 +140,14 @@ class Transformer(Module):
         self.fcchannel = nn.Linear(layers[1], class_num)
         
         self.gaptimestep = nn.AdaptiveAvgPool1d(1)
-        self.fctimestep = nn.Linear(layers[1], class_num)'''
+        self.fctimestep = nn.Linear(layers[1], class_num)
+
+        self.pre_out = torch.nn.Linear(8,16)
+        self.out = nn.Linear(16,4)
         
-        self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
+        '''self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
         self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
-                                          out_features=class_num)
+                                          out_features=class_num)'''
 
         # [End Gate & Out]
 
@@ -222,14 +225,30 @@ class Transformer(Module):
 
             # [End Gates]
         
-        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+
+        x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
+        x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
+
+        #feed them through the resblocks
+        for module in self.fcnchannel:
+            y = module(x_channel)
+            x_channel = y
+
+        for module in self.fcntimestep:
+            y = module(x_timestep)
+            x_timestep = y
+
+        #prepare for combination
+        x_channel = self.gapchannel(x_channel)
         x_channel = x_channel.reshape(x_channel.shape[0], -1)
+        x_channel = self.fcchannel(x_channel)
 
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
+        x_timestep = self.gaptimestep(x_timestep)
+        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+        x_timestep = self.fctimestep(x_timestep)
 
-        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
-
-        out = self.linear_out(gate_out)
+        preout = self.pre_out(torch.cat([x_timestep, x_channel], dim=-1))
+        out = self.out(preout) 
         
         return out
 
