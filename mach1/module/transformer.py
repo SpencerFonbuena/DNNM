@@ -111,7 +111,7 @@ class Transformer(Module):
         self.twoout = nn.Linear(10000, 1000)
         self.oneout = nn.Linear(1000, 100)
         self.preout = nn.Linear(100, 10)
-        self.out = F.softmax(nn.Linear(10, 4), dim=-1)
+        self.out = nn.Linear(10, 4)
 
 
         # [Gate & Out Init]
@@ -203,7 +203,7 @@ class Transformer(Module):
         x = self.twoout(x)
         x = self.oneout(x)
         x = self.preout(x)
-        out = self.out(x)
+        out = F.softmax(self.out(x), dim=-1)
 
         return out
 
