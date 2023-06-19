@@ -142,8 +142,8 @@ class Transformer(Module):
         self.gaptimestep = nn.AdaptiveAvgPool1d(1)
         self.fctimestep = nn.Linear(layers[1], class_num)
 
-        self.channelout = nn.Linear(hp.WINDOW_SIZE * hp.d_model ,4)
-        self.timestepout = nn.Linear(8 * hp.d_model,4)
+        self.channelout = nn.Linear(120*512 ,4)
+        self.timestepout = nn.Linear(8 * 512,4)
 
         
         
