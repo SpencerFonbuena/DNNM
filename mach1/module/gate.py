@@ -34,6 +34,7 @@ class Gate(Module):
         self.mlp2 = nn.Linear(1000,4)
 
     def forward(self, x):
+        x = x.reshape(16,1,512,512)
         x = self.pool1(F.gelu(self.layer2(F.gelu(self.layer1(x)))))
         x = self.pool2(F.gelu(self.layer4(F.gelu(self.layer3(x)))))
         x = self.pool3(F.gelu(self.layer6(F.gelu(self.layer5(x)))))
