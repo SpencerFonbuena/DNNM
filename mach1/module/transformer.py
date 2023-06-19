@@ -184,46 +184,55 @@ class Transformer(Module):
         '''====================================================================================================='''
 
         # [Combine tower features]
+        def hiddenStates():
 
-        # [FCN]
-        #embed channels and timesteps into convolution
+            # [FCN]
+            '''#embed channels and timesteps into convolution
+            x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
+            x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
+
+            #feed them through the resblocks
+            for module in self.fcnchannel:
+                y = module(x_channel)
+                x_channel = y
+            
+            for module in self.fcntimestep:
+                y = module(x_timestep)
+                x_timestep = y
+
+            #prepare for combination
+            x_channel = self.gapchannel(x_channel)
+            x_channel = x_channel.reshape(x_channel.shape[0], -1)
+            x_channel = self.fcchannel(x_channel)
+
+            x_timestep = self.gaptimestep(x_timestep)
+            x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+            x_timestep = self.fctimestep(x_timestep)
+
+            preout = self.pre_out(torch.cat([x_timestep, x_channel], dim=-1))
+            out = self.out(preout)'''
+            # [End FCN]
+
+            # [Gates]
+            '''x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+            x_channel = x_channel.reshape(x_channel.shape[0], -1)
+
+            gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
+
+            gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
+
+            out = self.linear_out(gate_out)'''
+
+            # [End Gates]
+        
         x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
         x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
-
-        #feed them through the resblocks
-        for module in self.fcnchannel:
-            y = module(x_channel)
-            x_channel = y
-        
-        for module in self.fcntimestep:
-            y = module(x_timestep)
-            x_timestep = y
-
-        #prepare for combination
-        x_channel = self.gapchannel(x_channel)
-        x_channel = x_channel.reshape(x_channel.shape[0], -1)
-        x_channel = self.fcchannel(x_channel)
 
         x_timestep = self.gaptimestep(x_timestep)
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
         x_timestep = self.fctimestep(x_timestep)
-
-        preout = self.pre_out(torch.cat([x_timestep, x_channel], dim=-1))
-        out = self.out(preout)
-        # [End FCN]
-
-        # [Gates]
-        '''x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
-        x_channel = x_channel.reshape(x_channel.shape[0], -1)
-
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
-
-        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
-
-        out = self.linear_out(gate_out)'''
-
-        # [End Gates]
-        return out
+        
+        return x_timestep
 
 
 # [Mock test the MHA]
