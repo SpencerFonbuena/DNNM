@@ -162,7 +162,7 @@ class Transformer(Module):
         # [Loop through towers]
 
         # Channel tower
-        '''for i, encoder in enumerate(self.channel_tower):
+        for i, encoder in enumerate(self.channel_tower):
             identity = x_channel
             x_channel = std(x_channel, (i/self.stack) * self.p, 'batch')
             y_channel = encoder(x_channel)
@@ -173,7 +173,7 @@ class Transformer(Module):
             identity = x_timestep
             x_timestep = std(x_timestep, (i/self.stack) * self.p, 'batch')
             y_timestep = encoder(x_timestep)
-            x_timestep = y_timestep + identity'''
+            x_timestep = y_timestep + identity
 
         # [End loop]
 
@@ -211,14 +211,14 @@ class Transformer(Module):
             # [End FCN]
 
             # [Gates]
-            x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+            '''x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
             x_channel = x_channel.reshape(x_channel.shape[0], -1)
 
             gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
 
             gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
-            out = self.linear_out(gate_out)
+            out = self.linear_out(gate_out)'''
 
             # [End Gates]
         
