@@ -197,8 +197,10 @@ class Transformer(Module):
         #out = self.fcnchannel(x_channel)
 
         channelout = self.fcnchannel(x_channel)
+        print(channelout.shape)
         timestepout = self.fcntimestep(x_timestep)
-        out = self.out(torch.cat([channelout,timestepout]))
+        print(timestepout.shape)
+        out = self.out(torch.cat([channelout,timestepout], dim=-1))
 
 
         return out
