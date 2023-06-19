@@ -105,7 +105,8 @@ class Transformer(Module):
         ])
         # [End Towers]
 
-        self.fcnchannel = FCN(timestep_in,class_num)
+        #self.fcnchannel = FCN(timestep_in,class_num)
+        self.out = nn.Linear(120*512, class_num)
 
         # [Gate & Out Init]
             
@@ -191,7 +192,8 @@ class Transformer(Module):
 
             # [End Gates]
         
-        out = self.fcnchannel(x_channel)
+        x_channel = x_channel.reshape(x_channel.shape[0], -1)
+        out = self.out(x_channel)
 
         return out
 
