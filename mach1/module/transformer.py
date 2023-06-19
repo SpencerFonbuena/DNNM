@@ -169,14 +169,14 @@ class Transformer(Module):
         # Channel tower
         for i, encoder in enumerate(self.channel_tower):
             identity = x_channel
-            x_channel = std(x_channel, (1/self.stack) * self.p, 'batch')
+            x_channel = std(x_channel, (i/self.stack) * self.p, 'batch')
             y_channel = encoder(x_channel)
             x_channel = y_channel + identity
         
         #Timestep tower
         for i, encoder in enumerate(self.timestep_tower):
             identity = x_timestep
-            x_timestep = std(x_timestep, (1/self.stack) * self.p, 'batch')
+            x_timestep = std(x_timestep, (i/self.stack) * self.p, 'batch')
             y_timestep = encoder(x_timestep)
             x_timestep = y_timestep + identity
 
@@ -227,8 +227,8 @@ class Transformer(Module):
 
             # [End Gates]
         
-        x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
-        x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
+        #x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
+        #x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
 
         x_channel = x_channel.reshape(16,-1)
         x_timestep = x_timestep.reshape(16,-1)
