@@ -107,11 +107,8 @@ class Transformer(Module):
         # [End Towers]
 
         #self.fcnchannel = FCN(timestep_in,class_num)
-        self.threeout = nn.Linear(120*512, 10000)
-        self.twoout = nn.Linear(10000, 1000)
-        self.oneout = nn.Linear(1000, 100)
-        self.preout = nn.Linear(100, 10)
-        self.out = nn.Linear(10, 4)
+        self.out = nn.Linear(120*512, 4)
+
 
 
         # [Gate & Out Init]
@@ -199,11 +196,7 @@ class Transformer(Module):
             # [End Gates]
         
         x_channel = x_channel.reshape(x_channel.shape[0], -1)
-        x = self.threeout(x_channel)
-        x = self.twoout(x)
-        x = self.oneout(x)
-        x = self.preout(x)
-        out = F.softmax(self.out(x), dim=-1)
+        out = F.softmax(self.out(x_channel), dim=-1)
 
         return out
 
