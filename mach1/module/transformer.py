@@ -10,6 +10,7 @@ import torchvision.ops.stochastic_depth as std
 import matplotlib.pyplot as plt
 import numpy as np
 import torch.nn as nn
+import torch.nn.functional as F
 
 from module.hyperparameters import HyperParameters as hp
 from module.embedding import Embedding
@@ -110,7 +111,7 @@ class Transformer(Module):
         self.twoout = nn.Linear(10000, 1000)
         self.oneout = nn.Linear(1000, 100)
         self.preout = nn.Linear(100, 10)
-        self.out = nn.Linear(10, 4)
+        self.out = F.softmax(nn.Linear(10, 4), dim=-1)
 
 
         # [Gate & Out Init]
