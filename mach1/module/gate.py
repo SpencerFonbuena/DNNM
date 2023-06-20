@@ -43,7 +43,7 @@ class Gate(Module):
         self.bn4 = nn.BatchNorm2d(512)
         self.bn5 = nn.BatchNorm2d(512)
 
-        self.mlp1 = nn.Linear(65536,1000)
+        self.mlp1 = nn.Linear(131072,1000)
         self.mlp2 = nn.Linear(1000,4)
 
     def forward(self, x):
