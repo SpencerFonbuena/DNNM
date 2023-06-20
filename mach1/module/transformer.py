@@ -104,7 +104,8 @@ class Transformer(Module):
         ])
         # [End Towers]
 
-        self.gate = Gate(16)
+        self.channelgate = Gate(16)
+        self.timestepgate = Gate(16)
 
         # [Gate & Out Init]
 
@@ -194,7 +195,7 @@ class Transformer(Module):
 
             # [End Gates]
         
-        out = self.gate(x_channel)
+        out = self.channelgate(x_channel)
 
         return out
 

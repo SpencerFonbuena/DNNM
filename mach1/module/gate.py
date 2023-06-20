@@ -25,19 +25,34 @@ class Gate(Module):
         self.layer4 = nn.Conv2d(128,128,7,padding=3)
         self.layer5 = nn.Conv2d(128,256,7,padding=3)
         self.layer6 = nn.Conv2d(256,256,7,padding=3)
+        self.layer7 = nn.Conv2d(256,512,7,padding=3)
+        self.layer8 = nn.Conv2d(512,512,7,padding=3)
+        self.layer9 = nn.Conv2d(512,512,7,padding=3)
+        self.layer10 = nn.Conv2d(512,512,7,padding=3)
 
-        self.pool1 = nn.MaxPool2d(4,4)
-        self.pool2 = nn.MaxPool2d(4,4)
+
+        self.pool1 = nn.MaxPool2d(2,2)
+        self.pool2 = nn.MaxPool2d(2,2)
         self.pool3 = nn.MaxPool2d(2,2)
+        self.pool4 = nn.MaxPool2d(2,2)
+        self.pool5 = nn.MaxPool2d(2,2)
+
+        self.bn1 = nn.BatchNorm2d(64)
+        self.bn2 = nn.BatchNorm2d(128)
+        self.bn3 = nn.BatchNorm2d(256)
+        self.bn4 = nn.BatchNorm2d(512)
+        self.bn5 = nn.BatchNorm2d(512)
 
         self.mlp1 = nn.Linear(65536,1000)
         self.mlp2 = nn.Linear(1000,4)
 
     def forward(self, x):
         x = x.reshape(16,1,512,512)
-        x = self.pool1(F.gelu(self.layer2(F.gelu(self.layer1(x)))))
-        x = self.pool2(F.gelu(self.layer4(F.gelu(self.layer3(x)))))
-        x = self.pool3(F.gelu(self.layer6(F.gelu(self.layer5(x)))))
+        x = self.pool1(F.gelu(self.layer2(self.bn1(F.gelu(self.layer1(x))))))
+        x = self.pool2(F.gelu(self.layer4(self.bn2(F.gelu(self.layer3(x))))))
+        x = self.pool3(F.gelu(self.layer6(self.bn3(F.gelu(self.layer5(x))))))
+        x = self.pool4(F.gelu(self.layer8(self.bn4(F.gelu(self.layer7(x))))))
+        x = self.pool5(F.gelu(self.layer10(self.bn4(F.gelu(self.layer9(x))))))
         x = x.reshape(self.batch, -1)
 
         x = self.mlp1(x)
