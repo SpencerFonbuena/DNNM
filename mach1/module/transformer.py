@@ -106,6 +106,7 @@ class Transformer(Module):
 
         self.channelgate = Gate(16)
         self.timestepgate = Gate(16)
+        self.out = nn.Linear(262144, 4)
 
         # [Gate & Out Init]
 
@@ -195,7 +196,8 @@ class Transformer(Module):
 
             # [End Gates]
         
-        out = self.channelgate(x_channel)
+        x_channel = x_channel.reshape(x_channel.shape[0], -1)
+        out = self.out(x_channel)
 
         return out
 
