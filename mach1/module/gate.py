@@ -48,11 +48,36 @@ class Gate(Module):
 
     def forward(self, x):
         x = x.reshape(16,1,512,512)
-        x = self.pool1(F.gelu(self.layer2(self.bn1(F.gelu(self.layer1(x))))))
-        x = self.pool2(F.gelu(self.layer4(self.bn2(F.gelu(self.layer3(x))))))
-        x = self.pool3(F.gelu(self.layer6(self.bn3(F.gelu(self.layer5(x))))))
-        x = self.pool4(F.gelu(self.layer8(self.bn4(F.gelu(self.layer7(x))))))
-        x = self.pool5(F.gelu(self.layer10(self.bn4(F.gelu(self.layer9(x))))))
+        x = self.bn1(F.gelu(self.layer1(x)))
+        recurrence = x 
+        x = F.gelu(self.layer2(x))
+        x = x + recurrence
+        x = self.pool1(x)
+
+        x = self.bn2(F.gelu(self.layer3(x)))
+        recurrence = x 
+        x = F.gelu(self.layer4(x))
+        x = x + recurrence
+        x = self.pool2(x)
+
+        x = self.bn3(F.gelu(self.layer5(x)))
+        recurrence = x 
+        x = F.gelu(self.layer6(x))
+        x = x + recurrence
+        x = self.pool3(x)
+
+        x = self.bn4(F.gelu(self.layer7(x)))
+        recurrence = x 
+        x = F.gelu(self.layer8(x))
+        x = x + recurrence
+        x = self.pool4(x)
+
+        x = self.bn5(F.gelu(self.layer9(x)))
+        recurrence = x 
+        x = F.gelu(self.layer10(x))
+        x = x + recurrence
+        x = self.pool5(x)
+        
         x = x.reshape(self.batch, -1)
 
         x = self.mlp1(x)
