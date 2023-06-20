@@ -193,6 +193,7 @@ def train(config=None):
                 y_pre = net(x)
                 loss = loss_function(y_pre, y)
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(net.parameters(), 2)
                 optimizer.step()
 
                     
