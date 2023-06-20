@@ -84,13 +84,13 @@ sweep_config = {
 
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='mach23 sweeps')
+sweep_id = wandb.sweep(sweep_config, project='mach24 sweeps')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_gaus.txt'
 else:
-    path = 'models/mach1/datasets/SPY_30mins.txt'
+    path = 'models/mach1/datasets/SPY_30mins_gaus.txt'
 
 # [End General Init]
 
@@ -109,8 +109,8 @@ def pipeline(batch_size, window_size):
     samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True ,sampler=samplertrain)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True,sampler=samplertest)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True ,sampler=samplertrain)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True,sampler=samplertest)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -132,7 +132,7 @@ def pipeline(batch_size, window_size):
 '''====================================================================================================='''
 
 
-def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, stack, p, fcnstack, d_hidden):
+def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, stack, p, d_hidden):
     net = Transformer(window_size=window_size, 
                     timestep_in=d_input, 
                     channel_in=d_channel,
@@ -142,10 +142,8 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
                     dropout = dropout,
                     class_num=d_output, 
                     stack=stack, 
-                    layers=[128, 256, 512], 
-                    kss=[7, 5, 3], 
                     p=p, 
-                    fcnstack=fcnstack).to(DEVICE)
+                    ).to(DEVICE)
 
     def hiddenPrints():
         # [Printing summaries]
@@ -173,7 +171,7 @@ def train(config=None):
 
         train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
         net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
-                      dropout=config.dropout, stack=config.stack, p=config.stoch_p, fcnstack=config.fcnstack, d_hidden=config.d_hidden).to(DEVICE)
+                      dropout=config.dropout, stack=config.stack, p=config.stoch_p, d_hidden=config.d_hidden).to(DEVICE)
         # Create a loss function here using cross entropy loss
         loss_function = Myloss()
 
@@ -195,6 +193,7 @@ def train(config=None):
                 y_pre = net(x)
                 loss = loss_function(y_pre, y)
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(net.parameters(), 2)
                 optimizer.step()
 
                     
@@ -202,12 +201,12 @@ def train(config=None):
                 trainmetricaccuracy.update(y_pre, y)
                 trainmetricprecision.update(y_pre, y)
                 trainmetricrecall.update(y_pre, y)
-                #specacc.update(y_pre, y)
+
 
                 wandb.log({'Loss': loss})
                 wandb.log({'index': index})
-                    #print(specacc.specacc())
-                #validate training accuracy and test accuracy
+
+            
             trainaccuracy = trainmetricaccuracy.compute()
             trainprecision = trainmetricprecision.compute()
             trainrecall = trainmetricrecall.compute()
