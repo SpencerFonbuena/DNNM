@@ -200,12 +200,12 @@ def train(config=None):
                 trainmetricaccuracy.update(y_pre, y)
                 trainmetricprecision.update(y_pre, y)
                 trainmetricrecall.update(y_pre, y)
-                #specacc.update(y_pre, y)
+
 
                 wandb.log({'Loss': loss})
                 wandb.log({'index': index})
-                    #print(specacc.specacc())
-                #validate training accuracy and test accuracy
+
+            
             trainaccuracy = trainmetricaccuracy.compute()
             trainprecision = trainmetricprecision.compute()
             trainrecall = trainmetricrecall.compute()
