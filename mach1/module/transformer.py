@@ -110,7 +110,7 @@ class Transformer(Module):
         ])
         # [End Towers]
 
-        self.fcn = FCN(c_in=channel_in, c_out=class_num)
+        self.fcn = FCN(c_in=timestep_in, c_out=class_num)
         
         
         # [End Gate & Out]
@@ -120,8 +120,8 @@ class Transformer(Module):
 
     def forward(self, x):
         #Embed channel and timestep
-        x_channel = self.channel_embedding(x).to(torch.float32) # (16,9,512)
-        x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,120,512)
+        x_channel = self.channel_embedding(x).to(torch.float32) # (16,512,512)
+        x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,8,512)
 
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
