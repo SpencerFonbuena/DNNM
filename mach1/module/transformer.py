@@ -191,7 +191,7 @@ class Transformer(Module):
         
 
         #prepare for combination
-        x_channel= self.fcn(x_channel)
+        x_timestep= self.fcn(x_timestep)
 
         return x_channel
 
