@@ -11,7 +11,6 @@ import os
 import numpy as np
 import wandb
 import random
-import pandas as pd
 from torcheval.metrics import MulticlassPrecision, MulticlassRecall, MulticlassAccuracy
 
 
@@ -39,52 +38,10 @@ print(f'use device: {DEVICE}')
 
 
 
-# [Create WandB sweeps]
-
-sweep_config = {
-    'method': 'random',
-
-
-    'metric': {
-        'goal': 'maximize',
-        'name': 'test_acc'
-    },
-
-
-    'parameters': {
-    # [training hp]
-    'learning_rate': {
-        'values': hp.LR},
-    'batch_size':{
-        'values': hp.BATCH_SIZE},
-    'window_size':{
-        'values': hp.WINDOW_SIZE},
-
-    # [architecture hp]
-    'd_model':{
-        'values': hp.d_model},
-    'd_hidden':{
-        'values': hp.d_hidden},
-    'heads':{
-        'values': hp.heads}, # Heads
-    'stack':{
-        'values': hp.N}, # multi head attention layers
-    'stoch_p':{
-    'values': hp.p}, # multi head attention layers
-    'fcnstack':{
-    'values': hp.fcnstack}, # multi head attention layers
-
-    # [Regularizers]
-    'dropout':{
-        'values': hp.dropout},
-    }
-}
-
 # [End Sweeps]
 
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='mach25 sweeps')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -163,21 +120,18 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
     # [Place computational graph code here if desired]
 
 
-def train(config=None):
+def train():
 
-    with wandb.init(config=config):
 
-        config = wandb.config
-
-        train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
-        net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
-                      dropout=config.dropout, stack=config.stack, p=config.stoch_p, d_hidden=config.d_hidden).to(DEVICE)
+        train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=hp.BATCH_SIZE, window_size=hp.WINDOW_SIZE)
+        net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=hp.WINDOW_SIZE, heads=hp.heads, d_model=hp.d_model, 
+                      dropout=hp.dropout, stack=hp.N, p=hp.p, d_hidden=hp.d_hidden).to(DEVICE)
         # Create a loss function here using cross entropy loss
         loss_function = Myloss()
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate)
+            optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
 
         # training function
         trainmetricaccuracy = MulticlassAccuracy().to(DEVICE)
@@ -185,7 +139,6 @@ def train(config=None):
         trainmetricprecision = MulticlassPrecision().to(DEVICE)
         trainmetricrecall = MulticlassRecall().to(DEVICE)
         net.train()
-        wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
             for i, (x, y) in enumerate(train_dataloader):
                 x, y = x.to(DEVICE), y.to(DEVICE)
@@ -202,19 +155,12 @@ def train(config=None):
                 trainmetricprecision.update(y_pre, y)
                 trainmetricrecall.update(y_pre, y)
 
-
-                wandb.log({'Loss': loss})
-                wandb.log({'index': index})
-
             
             trainaccuracy = trainmetricaccuracy.compute()
             trainprecision = trainmetricprecision.compute()
             trainrecall = trainmetricrecall.compute()
             #specacc.compute()
 
-            wandb.log({"train_acc": trainaccuracy})
-            wandb.log({"Test precision": trainprecision})
-            wandb.log({"Test recall": trainrecall})
             test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
 
@@ -237,18 +183,11 @@ def test(dataloader, net, loss_function):
             metricaccuracy.update(y_pre, y)
             metricprecision.update(y_pre, y)
             metricrecall.update(y_pre, y)
-            #specacc.update(y_pre, y)
+
 
         accuracy = metricaccuracy.compute()
         precision = metricprecision.compute()
         recall = metricrecall.compute()
-        #specacc.compute()
-
-        wandb.log({"test_acc": accuracy})
-        wandb.log({"test_loss": test_loss})
-        wandb.log({"Test precision": precision})
-        wandb.log({"Test recall": recall})
-        #print(specacc.specacc())
 
 # [End Training and Testing]
 
@@ -261,5 +200,5 @@ def test(dataloader, net, loss_function):
 
 # [Run the model]
 if __name__ == '__main__':
-    wandb.agent(sweep_id, train, count=200)
+    train()
 # [End experiment]

@@ -29,8 +29,7 @@ torch.manual_seed(seed)
 
 
 
-'''-----------------------------------------------------------------------------------------------------'''
-'''====================================================================================================='''
+
 
 
 class Transformer(Module):
@@ -59,8 +58,6 @@ class Transformer(Module):
         self.p = p
         self.stack = stack  
 
-
-
         self.channel_embedding = Embedding(
                         channel_in = channel_in,
                         timestep_in = timestep_in,
@@ -79,23 +76,26 @@ class Transformer(Module):
 
 
         # [Initialize Towers]
+        
         #Channel Init
-        self.channel_tower = ModuleList([
-            TransformerEncoderLayer(
-                 d_model=d_model,
-                 nhead=heads,
-                 dim_feedforward=4 * d_model,
-                 dropout=dropout,
-                 activation=F.gelu,
-                 batch_first=True,
-                 norm_first=True,
-                 device=device
-            ) for _ in range(stack)
-        ])
+        channel_encoder = TransformerEncoderLayer(
+                d_model=d_model,
+                nhead=heads,
+                dim_feedforward=4 * d_model,
+                dropout=dropout,
+                activation=F.gelu,
+                batch_first=True,
+                norm_first=True,
+                device=device
+        )
+        self.channel_tower = nn.TransformerEncoder(
+                encoder_layer=channel_encoder,
+                num_layers=stack,
+                norm=nn.LayerNorm(d_model)
+        )
 
         #Timestep Init
-        self.timestep_tower = ModuleList([
-            TransformerEncoderLayer(
+        timestep_encoder = TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
                  dim_feedforward=4 * d_model,
@@ -104,13 +104,34 @@ class Transformer(Module):
                  batch_first=True,
                  norm_first=True,
                  device=device
-            ) for _ in range(stack)
-        ])
+            )
+        self.timestep_tower = nn.TransformerEncoder(
+                encoder_layer=timestep_encoder,
+                num_layers=stack,
+                norm=nn.LayerNorm(d_model)
+        )
+        
+        '''self.gates = Gates(gate='enc-dec',c_in = channel_in, t_in=timestep_in, c_out = class_num, d_model = d_model, class_num=class_num,
+                           heads=heads, dropout=dropout, device=device, stack=stack)'''
+
+        decoder_layer = nn.TransformerDecoderLayer(
+                 d_model=d_model,
+                 nhead=heads,
+                 dim_feedforward=4 * d_model,
+                 dropout=dropout,
+                 activation=F.gelu,
+                 batch_first=True,
+                 norm_first=True,
+                 device=device
+            )
+        self.decoder_tower = nn.TransformerDecoder(
+            decoder_layer=decoder_layer,
+            num_layers=stack,
+            norm=nn.LayerNorm(d_model)
+        )
+
         # [End Towers]
         
-
-        self.channelclassifier = nn.Linear(d_model, class_num)
-        self.timestepclassifier = nn.Linear(d_model, class_num)
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
 
@@ -119,48 +140,42 @@ class Transformer(Module):
         x_channel = self.channel_embedding(x).to(torch.float32) # (16,9,512)
         x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,120,512)
 
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
-
-        # [Loop through towers]
-
-        # Channel tower
-        for i, encoder in enumerate(self.channel_tower):
-            identity = x_channel
-            x_channel = std(x_channel, (i/self.stack) * self.p, 'batch')
-            y_channel = encoder(x_channel)
-            x_channel = y_channel + identity
+        x_channel = self.channel_tower(x_channel)
+        x_timestep = self.timestep_tower(x_timestep)
         
-        #Timestep tower
-        for i, encoder in enumerate(self.timestep_tower):
-            identity = x_timestep
-            x_timestep = std(x_timestep, (i/self.stack) * self.p, 'batch')
-            y_timestep = encoder(x_timestep)
-            x_timestep = y_timestep + identity
 
-        # [End loop]
-
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
-
-        x_channel = self.channelclassifier(x_channel)
-        x_channel = x_channel.mean(dim=1)
-        x_channel = x_channel.reshape(64,1,4)
-
-        x_timestep = self.timestepclassifier(x_timestep)
-        x_timestep = x_timestep.mean(dim=1)
-        x_timestep = x_timestep.reshape(64,1,4)
-
-        preout = torch.cat([x_channel, x_timestep], dim=1)
-        out = preout.mean(dim=1)
-
+        
+        
         return out
 
 
-# [Mock test the MHA]
-'''
-mockdata = torch.tensor(np.random.randn(16,120,9)).to(torch.float32)
-test_init = Transformer(window_size=120,timestep_in=120,channel_in=9,heads=8,d_model=512,qkpair=8,value_count=8,device=DEVICE,inner_size=2048,class_num=4)
-test_init(mockdata, 'test')
-'''
-# [End Mock Test]
+class Gates(Module):
+    def __init__(self,
+                 gate = str,
+                 c_in = int,
+                 t_in = int, 
+                 c_out = int, 
+                 d_model = int ,
+                 class_num = int):
+        super().__init__()
+        self.gate = gate
+
+        if gate == 'C_FCN':
+            self.cfcn = FCN(c_in=c_in, c_out=c_out)
+        elif gate == 'T_FCN':
+            self.tfcn = FCN(c_in=t_in, c_out=c_out)
+        elif gate == 'naive':
+            self.linear = nn.Linear(d_model, d_model)
+            self.classifier = nn.Linear(d_model, class_num)
+            
+
+    def forward(self, x):
+            
+        if self.gate == 'C-FCN':
+            return self.cfcn(x)
+        elif self.gate == 'T-FCN':
+            return self.tfcn(x)
+        elif self.gate == 'naive':
+            pooled = nn.Tanh(self.linear(x[:, 0]))
+            logits = self.classifier(pooled)
+            return logits

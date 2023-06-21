@@ -26,6 +26,7 @@ class Create_Dataset(Dataset):
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
         #Create the training and label datasets
         labeldata = df['Labels'].to_numpy()[window_size -1:]
+        seqlabeldata = df['Labels'].to_numpy()
         #normalize the data inputs
         #prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=['Labels', 'Date']).to_numpy()))
         prerawtrain = torch.tensor(df.drop(columns=['Labels']).to_numpy())
@@ -71,6 +72,7 @@ class Create_Dataset(Dataset):
         #create the training data and labels
         self.trainingdata = torch.tensor(trainingdata[:self.split]).to(torch.float32)
         self.traininglabels = torch.tensor(labeldata[:self.split]).to(torch.float32)
+        self.seqtraininglabels = torch.tensor(seqlabeldata[:self.split]).to(torch.float32)
         #can't call the iterate through a torch, so this is to create all of the weights
         self.normtraininglabels = labeldata[:self.split]
 
@@ -89,6 +91,7 @@ class Create_Dataset(Dataset):
         #create the validation data and labels
         self.valdata = torch.tensor(trainingdata[self.split:]).to(torch.float32)
         self.vallabels = torch.tensor(labeldata[self.split:]).to(torch.float32)
+        self.seqvallabels = torch.tensor(seqlabeldata[self.split:]).to(torch.float32)
         #can't call the iterate through a torch, so this is to create all of the weights
         self.normvallabels = labeldata[self.split:]
 
@@ -116,12 +119,22 @@ class Create_Dataset(Dataset):
             return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
+        
+        elif self.mode == 'seqtrain':
+            return self.trainingdata[index], self.seqtraininglabels[index]
+        elif self.mode == 'seqtest':
+            return self.valdata[index], self.seqvallabels[index]
 
     
     def __len__(self):
         if self.mode == 'train':
             return len(self.trainingdata)
         if self.mode == 'test':
+            return len(self.vallabels)
+        
+        if self.mode == 'seqtrain':
+            return len(self.trainingdata)
+        if self.mode == 'seqtest':
             return len(self.vallabels)
 
         
