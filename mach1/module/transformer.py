@@ -189,19 +189,6 @@ class Transformer(Module):
 
             # [End Gates]
         
-        # [FCN]
-        #embed channels and timesteps into convolution
-        x_channel = F.relu(self.bnchannel(self.convchannel(x_channel)))
-        x_timestep = F.relu(self.bntimestep(self.convtimestep(x_timestep)))
-
-        #feed them through the resblocks
-        for module in self.fcnchannel:
-            y = module(x_channel)
-            x_channel = y
-        
-        for module in self.fcntimestep:
-            y = module(x_timestep)
-            x_timestep = y
 
         #prepare for combination
         x_channel= self.fcn(x_channel)
