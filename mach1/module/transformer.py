@@ -193,7 +193,7 @@ class Transformer(Module):
         #prepare for combination
         x_timestep= self.fcn(x_timestep)
 
-        return x_channel
+        return x_timestep
 
 
 # [Mock test the MHA]
