@@ -110,7 +110,7 @@ class Transformer(Module):
         ])
         # [End Towers]
 
-        self.fcn = FCN(c_in=timestep_in, c_out=class_num)
+        self.fcn = FCN(c_in=channel_in, c_out=class_num)
         
         
         # [End Gate & Out]
