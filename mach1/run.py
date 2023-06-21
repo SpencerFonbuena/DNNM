@@ -84,7 +84,7 @@ sweep_config = {
 
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='mach24 sweeps')
+sweep_id = wandb.sweep(sweep_config, project='mach25 baselines')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -193,7 +193,7 @@ def train(config=None):
                 y_pre = net(x)
                 loss = loss_function(y_pre, y)
                 loss.backward()
-                torch.nn.utils.clip_grad_norm_(net.parameters(), 2)
+                torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
 
                     
