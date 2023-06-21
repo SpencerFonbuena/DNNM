@@ -110,7 +110,7 @@ class Transformer(Module):
         ])
         # [End Towers]
 
-        self.fcn = FCN(c_in=channel_in, c_out=class_num)
+        self.fcn = FCN(c_in=timestep_in, c_out=class_num)
         
         
         # [End Gate & Out]
@@ -191,9 +191,9 @@ class Transformer(Module):
         
 
         #prepare for combination
-        x_timestep= self.fcn(x_timestep)
+        x_channel= self.fcn(x_channel)
 
-        return x_timestep
+        return x_channel
 
 
 # [Mock test the MHA]
