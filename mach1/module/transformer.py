@@ -133,7 +133,7 @@ class Transformer(Module):
         channel_out = self.channel_encoder(x_channel).reshape(hp.BATCH_SIZE, 1, -1)
         timestep_out = self.timestep_encoder(x_timestep).reshape(hp.BATCH_SIZE, 1, -1)
 
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
+        gate = torch.nn.functional.softmax(self.gate(torch.cat([channel_out, timestep_out], dim=-1)), dim=-1)
 
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
