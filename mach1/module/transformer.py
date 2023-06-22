@@ -130,10 +130,14 @@ class Transformer(Module):
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
         
-        channel_out = self.channel_encoder(x_channel).reshape(hp.BATCH_SIZE, 1, -1)
-        timestep_out = self.timestep_encoder(x_timestep).reshape(hp.BATCH_SIZE, 1, -1)
+        x_channel = self.channel_encoder(x_channel)
+        x_timestep = self.timestep_encoder(x_timestep)
 
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([channel_out, timestep_out], dim=-1)), dim=-1)
+        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
+        x_channel = x_channel.reshape(x_channel.shape[0], -1)
+
+        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_channel, x_timestep], dim=-1)), dim=-1)
+        print(gate.shape)
 
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
