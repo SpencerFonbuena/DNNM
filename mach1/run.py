@@ -226,7 +226,7 @@ def test(dataloader, net, loss_function):
             y_pre = net(x)
             #test_loss = loss_function(y_pre, y)
             metricaccuracy.update(y_pre, y)
-            testspecacc.update(y_pre, y)
+            testspecacc.update(y_pre.to(torch.int64), y.to(torch.int64))
 
         accuracy = metricaccuracy.compute()
         wandb.log({"test_acc": accuracy})
