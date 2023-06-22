@@ -110,7 +110,8 @@ class Transformer(Module):
         ])
         # [End Towers]
 
-        self.fcn = FCN(c_in=timestep_in, c_out=class_num)
+        self.channelfcn = FCN(c_in=timestep_in, c_out=class_num)
+        self.timestepfcn = FCN(c_in=channel_in, c_out=class_num)
         
         
         # [End Gate & Out]
@@ -191,9 +192,14 @@ class Transformer(Module):
         
 
         #prepare for combination
-        x_channel= self.fcn(x_channel)
+        x_channel= self.channelfcn(x_channel).reshape(hp.BATCH_SIZE, 1, 4)
+        x_timestep = self.timestepfcn(x_timestep).reshape(hp.BATCH_SIZE, 1, 4)
 
-        return x_channel
+        x = torch.cat([x_channel,x_timestep], dim=1).to(torch.float)
+        out = x.mean(dim=1).reshape(hp.BATCH_SIZE, 4)
+
+
+        return out
 
 
 # [Mock test the MHA]
