@@ -137,7 +137,6 @@ class Transformer(Module):
         x_channel = x_channel.reshape(x_channel.shape[0], -1)
 
         gate = torch.nn.functional.softmax(self.gate(torch.cat([x_channel, x_timestep], dim=-1)), dim=-1)
-        print(gate.shape)
 
         gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
 
