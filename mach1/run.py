@@ -109,8 +109,8 @@ def pipeline(batch_size, window_size):
     samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True ,sampler=samplertrain, drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=24,pin_memory=True,sampler=samplertest, drop_last=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True ,sampler=samplertrain, drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True,sampler=samplertest, drop_last=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -196,7 +196,6 @@ def train(config=None):
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
 
-                    
 
                 trainmetricaccuracy.update(y_pre, y)
                 trainmetricprecision.update(y_pre, y)
