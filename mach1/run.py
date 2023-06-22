@@ -229,7 +229,7 @@ def test(dataloader, net, loss_function):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
-            test_loss = loss_function(y_pre, y)
+            #test_loss = loss_function(y_pre, y)
             
             
 
@@ -244,7 +244,7 @@ def test(dataloader, net, loss_function):
         #specacc.compute()
 
         wandb.log({"test_acc": accuracy})
-        wandb.log({"test_loss": test_loss})
+        #wandb.log({"test_loss": test_loss})
         wandb.log({"Test precision": precision})
         wandb.log({"Test recall": recall})
         #print(specacc.specacc())
