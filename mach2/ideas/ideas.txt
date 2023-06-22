@@ -1,6 +1,0 @@
-Gating:
-    FCN for spatial information (channel tower) and FFN (timestep tower)
-Data:
-Architecture:
-    Changing skip connections in FCN
-    
