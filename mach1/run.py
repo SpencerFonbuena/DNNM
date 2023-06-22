@@ -198,7 +198,7 @@ def train(config=None):
                     print(net.channel_tower.linear2.weight.grad)
 
                 trainmetricaccuracy.update(y_pre, y)
-                specacc.update(y_pre, y)
+                specacc.update(y_pre.to(torch.int64), y.to(torch.int64))
 
 
                 wandb.log({'Loss': loss})
