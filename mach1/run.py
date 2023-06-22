@@ -217,7 +217,7 @@ def train(config=None):
 # test function
 def test(dataloader, net, loss_function):
     metricaccuracy = MulticlassAccuracy().to(DEVICE)
-    testspecacc = MulticlassAccuracy(average=None, num_classes=4)
+    testspecacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
 
     net.eval()
     with torch.no_grad():
