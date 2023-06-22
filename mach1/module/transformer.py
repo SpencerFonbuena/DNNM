@@ -58,9 +58,7 @@ class Transformer(Module):
 
         self.p = p
         self.stack = stack  
-        layers = [128, 256, 512]
-        kss = [7, 5, 3]
-        fcnstack = 2
+
 
 
         self.channel_embedding = Embedding(
@@ -82,7 +80,7 @@ class Transformer(Module):
 
         # [Initialize Towers]
         #Channel Init
-        channel_tower = TransformerEncoderLayer(
+        self.channel_tower = TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
                  dim_feedforward=4 * d_model,
@@ -92,13 +90,14 @@ class Transformer(Module):
                  norm_first=True,
                  device=device
             ) 
+        
         self.channel_encoder = nn.TransformerEncoder(
-            encoder_layer=channel_tower,
+            encoder_layer=self.channel_tower,
             num_layers=stack,
             norm=nn.LayerNorm(d_model)
             
         )
-
+        
         #Timestep Init
         timestep_tower = TransformerEncoderLayer(
                  d_model=d_model,
@@ -119,8 +118,9 @@ class Transformer(Module):
         )
         # [End Towers]
 
-
-        
+        self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
+        self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
+                                          out_features=class_num)
 
     def forward(self, x):
         #Embed channel and timestep
@@ -133,8 +133,12 @@ class Transformer(Module):
         channel_out = self.channel_encoder(x_channel).reshape(hp.BATCH_SIZE, 1, -1)
         timestep_out = self.timestep_encoder(x_timestep).reshape(hp.BATCH_SIZE, 1, -1)
 
-        out = torch.cat([channel_out, timestep_out], dim=1).to(torch.float).mean(dim=1).reshape(hp.BATCH_SIZE, -1)
-        
+        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_timestep, x_channel], dim=-1)), dim=-1)
+
+        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
+
+        out = self.linear_out(gate_out)
+
 
         return out
 
