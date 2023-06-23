@@ -193,9 +193,6 @@ def train(config=None):
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
-                
-                if 1 % 1000 == 0:
-                    print(net.channel_tower.linear2.weight.grad)
 
                 trainmetricaccuracy.update(y_pre, y)
                 specacc.update(y_pre.to(torch.int64), y.to(torch.int64))
