@@ -190,7 +190,7 @@ def train(config=None):
             for i, (x, y) in enumerate(train_dataloader):
                 x, y = x.to(DEVICE), y.to(DEVICE)
                 optimizer.zero_grad()
-                y_pre = net(x)
+                y_pre = net(x, True)
                 loss = loss_function(y_pre, y)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
@@ -227,7 +227,7 @@ def test(dataloader, net, loss_function):
     with torch.no_grad():
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x)
+            y_pre = net(x, False)
             metricaccuracy.update(y_pre, y)
             testspecacc.update(y_pre.to(torch.int64), y.to(torch.int64))
             testprecision.update(y_pre.to(torch.int64), y.to(torch.int64))
