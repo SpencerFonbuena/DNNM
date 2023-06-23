@@ -8,7 +8,7 @@ class HyperParameters:
     d_hidden = [2048]
     queries = 8 # Queries
     values = 8 # Values
-    heads = [96] # Heads
+    heads = [128] # Heads
     N = [96] # multi head attention layers
     dropout = [0.0]
     split = .85
