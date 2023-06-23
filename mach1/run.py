@@ -12,7 +12,7 @@ import numpy as np
 import wandb
 import random
 import pandas as pd
-from torcheval.metrics import  MulticlassAccuracy
+from torcheval.metrics import  MulticlassAccuracy, MulticlassPrecision, MulticlassRecall
 
 
 
@@ -88,9 +88,9 @@ sweep_id = wandb.sweep(sweep_config, project='mach25 baselines')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_gaus.txt'
 else:
-    path = 'models/mach1/datasets/SPY_30mins.txt'
+    path = 'models/mach1/datasets/SPY_30mins_gaus.txt'
 
 # [End General Init]
 
@@ -182,6 +182,8 @@ def train(config=None):
         # training function
         trainmetricaccuracy = MulticlassAccuracy().to(DEVICE)
         specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
+        trainprecision = MulticlassPrecision(average=None, num_classes=4).to(DEVICE)
+        trainrecall = MulticlassRecall(average=None, num_classes=4).to(DEVICE)
         net.train()
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
@@ -196,6 +198,8 @@ def train(config=None):
 
                 trainmetricaccuracy.update(y_pre, y)
                 specacc.update(y_pre.to(torch.int64), y.to(torch.int64))
+                trainprecision.update(y_pre.to(torch.int64), y.to(torch.int64))
+                trainrecall.update(y_pre.to(torch.int64), y.to(torch.int64))
 
 
                 wandb.log({'Loss': loss})
@@ -203,7 +207,9 @@ def train(config=None):
 
             
             trainaccuracy = trainmetricaccuracy.compute()
-            print('Train',specacc.compute())
+            print('TrainAcc',specacc.compute())
+            print('TrainPrecision',trainprecision.compute())
+            print('TrainRecall',trainrecall.compute())
 
 
             wandb.log({"train_acc": trainaccuracy})
@@ -215,20 +221,23 @@ def train(config=None):
 def test(dataloader, net, loss_function):
     metricaccuracy = MulticlassAccuracy().to(DEVICE)
     testspecacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
-
+    testprecision = MulticlassPrecision(average=None, num_classes=4).to(DEVICE)
+    testrecall = MulticlassRecall(average=None, num_classes=4).to(DEVICE)
     net.eval()
     with torch.no_grad():
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
-            test_loss = loss_function(y_pre, y)
             metricaccuracy.update(y_pre, y)
             testspecacc.update(y_pre.to(torch.int64), y.to(torch.int64))
-            wandb.log({"test_loss": test_loss})
+            testprecision.update(y_pre.to(torch.int64), y.to(torch.int64))
+            testrecall.update(y_pre.to(torch.int64), y.to(torch.int64))
+        
         accuracy = metricaccuracy.compute()
         wandb.log({"test_acc": accuracy})
-
         print('test',testspecacc.compute())
+        print('TestPrecision',testprecision.compute())
+        print('TestRecall',testrecall.compute())
 
 
 # [Save Model]
