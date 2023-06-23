@@ -12,7 +12,7 @@ import numpy as np
 import wandb
 import random
 import pandas as pd
-from torcheval.metrics import  MulticlassPrecision, MulticlassRecall, MulticlassAccuracy
+from torcheval.metrics import  MulticlassAccuracy
 
 
 
@@ -88,9 +88,9 @@ sweep_id = wandb.sweep(sweep_config, project='mach25 baselines')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_gaus.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins.txt'
 else:
-    path = 'models/mach1/datasets/SPY_30mins_gaus.txt'
+    path = 'models/mach1/datasets/SPY_30mins.txt'
 
 # [End General Init]
 
@@ -206,7 +206,7 @@ def train(config=None):
 
             
             trainaccuracy = trainmetricaccuracy.compute()
-            print(specacc.compute())
+            print('Train',specacc.compute())
 
 
             wandb.log({"train_acc": trainaccuracy})
@@ -224,21 +224,15 @@ def test(dataloader, net, loss_function):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
-            #test_loss = loss_function(y_pre, y)
+            test_loss = loss_function(y_pre, y)
             metricaccuracy.update(y_pre, y)
             testspecacc.update(y_pre.to(torch.int64), y.to(torch.int64))
-
+            wandb.log({"test_loss": test_loss})
         accuracy = metricaccuracy.compute()
         wandb.log({"test_acc": accuracy})
-        print(testspecacc.compute())
 
+        print('test',testspecacc.compute())
 
-        #print(specacc.specacc())
-
-# [End Training and Testing]
-
-'''-----------------------------------------------------------------------------------------------------'''
-'''====================================================================================================='''
 
 # [Save Model]
 
