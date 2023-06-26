@@ -9,8 +9,8 @@ class HyperParameters:
     queries = 8 # Queries
     values = 8 # Values
     heads = [64] # Heads
-    N = [8] # multi head attention layers
-    dropout = [0.3]
+    N = [64] # multi head attention layers
+    dropout = [0.7]
     split = .85
     optimizer_name = 'AdamW'
     clip = .9
