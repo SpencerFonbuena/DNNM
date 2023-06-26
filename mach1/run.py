@@ -181,9 +181,9 @@ def train(config=None):
 
         # training function
         trainmetricaccuracy = MulticlassAccuracy().to(DEVICE)
-        specacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
-        trainprecision = MulticlassPrecision(average=None, num_classes=4).to(DEVICE)
-        trainrecall = MulticlassRecall(average=None, num_classes=4).to(DEVICE)
+        specacc = MulticlassAccuracy(average=None, num_classes=3).to(DEVICE)
+        trainprecision = MulticlassPrecision(average=None, num_classes=3).to(DEVICE)
+        trainrecall = MulticlassRecall(average=None, num_classes=3).to(DEVICE)
         net.train()
         wandb.watch(net, log='all')
         for index in tqdm(range(hp.EPOCH)):
@@ -220,9 +220,9 @@ def train(config=None):
 # test function
 def test(dataloader, net, loss_function):
     metricaccuracy = MulticlassAccuracy().to(DEVICE)
-    testspecacc = MulticlassAccuracy(average=None, num_classes=4).to(DEVICE)
-    testprecision = MulticlassPrecision(average=None, num_classes=4).to(DEVICE)
-    testrecall = MulticlassRecall(average=None, num_classes=4).to(DEVICE)
+    testspecacc = MulticlassAccuracy(average=None, num_classes=3).to(DEVICE)
+    testprecision = MulticlassPrecision(average=None, num_classes=3).to(DEVICE)
+    testrecall = MulticlassRecall(average=None, num_classes=3).to(DEVICE)
     net.eval()
     with torch.no_grad():
         for x, y in dataloader:

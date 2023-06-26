@@ -104,7 +104,7 @@ class Create_Dataset(Dataset):
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
         self.input_len = window_size# number of time parts
         self.channel_len = self.trainingdata.shape[2]# Number of features (Channels)
-        self.output_len = 4 # classification category
+        self.output_len = 3 # classification category
         self.test_len = self.valdata.shape[0]
         
         #[End dimension variables]
