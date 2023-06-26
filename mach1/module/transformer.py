@@ -76,7 +76,7 @@ class Transformer(Module):
 
         # [Initialize Towers]
         #Channel Init
-        self.channel_tower = TransformerEncoderLayer(
+        self.channel_tower = nn.ModuleList ([TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
                  dim_feedforward=4 * d_model,
@@ -85,8 +85,8 @@ class Transformer(Module):
                  batch_first=True,
                  norm_first=True,
                  device=device
-            ) 
-        
+            ) for _ in range(stack)
+        ])
         '''self.channel_encoder = nn.TransformerEncoder(
             encoder_layer=self.channel_tower,
             num_layers=stack,
@@ -95,7 +95,7 @@ class Transformer(Module):
         )'''
         
         #Timestep Init
-        self.timestep_tower = TransformerEncoderLayer(
+        self.timestep_tower = nn.ModuleList ([TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
                  dim_feedforward=4 * d_model,
@@ -104,8 +104,8 @@ class Transformer(Module):
                  batch_first=True,
                  norm_first=True,
                  device=device
-            )
-        
+            ) for _ in range(stack)
+        ])
         '''self.timestep_encoder = nn.TransformerEncoder(
             encoder_layer=self.timestep_tower,
             num_layers=stack,
