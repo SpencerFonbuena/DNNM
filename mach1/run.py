@@ -209,7 +209,7 @@ def train(config=None):
             trainaccuracy = trainmetricaccuracy.compute()
             print('TrainAcc',specacc.compute())
             print('TrainPrecision',trainprecision.compute())
-            print('TrainRecall',trainrecall.compute())
+            print('TrainRecall ',trainrecall.compute())
 
 
             wandb.log({"train_acc": trainaccuracy})
