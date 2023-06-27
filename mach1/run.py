@@ -42,7 +42,7 @@ print(f'use device: {DEVICE}')
 # [Create WandB sweeps]
 
 sweep_config = {
-    'method': 'random',
+    'method': 'grid',
 
 
     'metric': {
@@ -246,5 +246,5 @@ def test(dataloader, net, loss_function):
 
 # [Run the model]
 if __name__ == '__main__':
-    wandb.agent(sweep_id, train, count=200)
+    wandb.agent(sweep_id, train, count=4)
 # [End experiment]
