@@ -11,7 +11,7 @@ df['50SMA'] = df['Close'].rolling(50).mean()
 #200 period moving average
 df['200SMA'] = df['Close'].rolling(200).mean()
 
-def RSI(df, lookback):
+'''def RSI(df, lookback):
     deltas = np.diff(df)
     seed = deltas[:lookback+1]
     up = seed[seed>= 0].sum()/lookback
@@ -35,7 +35,7 @@ def RSI(df, lookback):
         rsi[i] = 100. - 100./(1. +rs)
 
     return rsi
-df['RSI'] = RSI(df['Close'], 14)
+df['RSI'] = RSI(df['Close'], 14)'''
     
 def create_labels(df):
 
