@@ -14,6 +14,6 @@ class HyperParameters:
     split = .85
     optimizer_name = 'AdamW'
     clip = .9
-    p = [.7] # [0.5, 0.6, 0.7, 0.8,]
+    p = [.8] # [0.5, 0.6, 0.7, 0.8,]
     fcnstack = [2]
     logs = 5
