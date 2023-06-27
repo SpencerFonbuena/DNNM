@@ -9,11 +9,11 @@ class HyperParameters:
     queries = 8 # Queries
     values = 8 # Values
     heads = [64] # Heads
-    N = [12] # multi head attention layers
-    dropout = [0.8]
+    N = [8] # multi head attention layers
+    dropout = [0.7]
     split = .85
     optimizer_name = 'AdamW'
     clip = .9
-    p = [.5] # [0.5, 0.6, 0.7, 0.8,]
+    p = [0.0] # [0.5, 0.6, 0.7, 0.8,]
     fcnstack = [2]
     logs = 5
