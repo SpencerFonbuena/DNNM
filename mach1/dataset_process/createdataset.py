@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 
-df = pd.read_csv('/root/DNNM/mach1/datasets/ES_1min_continuous_adjusted.txt', sep=',', index_col=0, header=None, names=["Date", 'Open', 'High', 'low', 'Close', 'Volume'])
+df = pd.read_csv('/root/DNNM/mach1/datasets/SPY_full_1min_adjsplit.txt', sep=',', index_col=0, header=None, names=["Date", 'Open', 'High', 'low', 'Close', 'Volume'])
 
 #50 period moving average
 df['50SMA'] = df['Close'].rolling(50).mean()
@@ -130,4 +130,4 @@ dataframe['Labels'] = df['Labels']
 
 print(dataframe['Labels'].value_counts())
 
-dataframe.to_csv('/root/DNNM/mach1/datasets/ES_1min_continuous_dataset.txt')
+dataframe.to_csv('/root/DNNM/mach1/datasets/ES_1min_dataset')
