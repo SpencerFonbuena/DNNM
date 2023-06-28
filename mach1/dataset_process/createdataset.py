@@ -125,9 +125,8 @@ dataframe['Close'] = df['Close'].pct_change()
 dataframe['Volume'] = df['Volume']
 dataframe['50SMA'] = df['50SMA'].pct_change()
 dataframe['200SMA'] = df['200SMA'].pct_change()
-dataframe['RSI'] = df['RSI'].pct_change()
 dataframe['Labels'] = df['Labels']
 
 print(dataframe['Labels'].value_counts())
 
-dataframe.to_csv('/root/DNNM/mach1/datasets/ES_1min_dataset')
+dataframe.to_csv('/root/DNNM/mach1/datasets/SPY_1min_dataset')
