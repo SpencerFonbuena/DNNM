@@ -9,7 +9,7 @@ class HyperParameters:
     queries = 8 # Queries
     values = 8 # Values
     heads = [64] # Heads
-    N = [16,24,32,40,48,52,64] # multi head attention layers
+    N = [24,32,40,48,52,64] # multi head attention layers
     dropout = [0.7]
     split = .85
     optimizer_name = 'AdamW'
