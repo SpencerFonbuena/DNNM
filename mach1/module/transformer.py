@@ -76,7 +76,7 @@ class Transformer(Module):
 
         # [Initialize Towers]
         #Channel Init
-        self.channel_tower = nn.ModuleList ([TransformerEncoderLayer(
+        self.channel_tower = TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
                  dim_feedforward=4 * d_model,
@@ -85,17 +85,17 @@ class Transformer(Module):
                  batch_first=True,
                  norm_first=True,
                  device=device
-            ) for _ in range(stack)
-        ])
-        '''self.channel_encoder = nn.TransformerEncoder(
+            ) 
+        
+        self.channel_encoder = nn.TransformerEncoder(
             encoder_layer=self.channel_tower,
             num_layers=stack,
             norm=nn.LayerNorm(d_model)
             
-        )'''
+        )
         
         #Timestep Init
-        self.timestep_tower = nn.ModuleList ([TransformerEncoderLayer(
+        self.timestep_tower = TransformerEncoderLayer(
                  d_model=d_model,
                  nhead=heads,
                  dim_feedforward=4 * d_model,
@@ -104,14 +104,14 @@ class Transformer(Module):
                  batch_first=True,
                  norm_first=True,
                  device=device
-            ) for _ in range(stack)
-        ])
-        '''self.timestep_encoder = nn.TransformerEncoder(
+            )
+        
+        self.timestep_encoder = nn.TransformerEncoder(
             encoder_layer=self.timestep_tower,
             num_layers=stack,
             norm=nn.LayerNorm(d_model)
             
-        )'''
+        )
         # [End Towers]
 
         self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
@@ -126,18 +126,8 @@ class Transformer(Module):
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
         
-        for i, encoder in enumerate(self.channel_tower):
-            x_channel = std(x_channel, (i/self.stack) * self.p, 'batch', training=stage)
-            x_channel = encoder(x_channel)
-
-        
-        #Timestep tower
-        for i, encoder in enumerate(self.timestep_tower):
-            x_timestep = std(x_timestep, (i/self.stack) * self.p, 'batch', training=stage)
-            x_timestep = encoder(x_timestep)
-
-
-
+        x_channel = self.channel_encoder(x_channel)
+        x_timestep = self.timestep_encoder(x_timestep)
 
 
         x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
@@ -149,11 +139,3 @@ class Transformer(Module):
 
         return out
 
-
-# [Mock test the MHA]
-'''
-mockdata = torch.tensor(np.random.randn(16,120,9)).to(torch.float32)
-test_init = Transformer(window_size=120,timestep_in=120,channel_in=9,heads=8,d_model=512,qkpair=8,value_count=8,device=DEVICE,inner_size=2048,class_num=4)
-test_init(mockdata, 'test')
-'''
-# [End Mock Test]
