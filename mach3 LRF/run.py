@@ -17,7 +17,6 @@ from torcheval.metrics import  MulticlassAccuracy, MulticlassPrecision, Multicla
 
 
 
-from module.transformer import Transformer
 from module.loss import Myloss
 from module.hyperparameters import HyperParameters as hp
 
