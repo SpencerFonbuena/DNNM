@@ -13,6 +13,7 @@ import wandb
 import random
 import pandas as pd
 from torcheval.metrics import  MeanSquaredError
+import matplotlib.pyplot as plt
 
 
 
@@ -107,8 +108,8 @@ def pipeline(batch_size, window_size, pred_size):
 
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -186,14 +187,27 @@ def train(config=None):
 
                 optimizer.zero_grad()
                 y_pre = net(x)
+
+                print(y_pre.shape, y.shape)
+                
+
                 loss = loss_function(y_pre, y)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
                 
-    
+
                 wandb.log({'Loss': loss})
                 wandb.log({'index': index})
+            
+            pre = torch.tensor(y_pre).cpu().detach().numpy()[0,:,3].squeeze()
+            act = torch.tensor(y).cpu().detach().numpy()[0,:,3].squeeze()
+
+            fig, ax = plt.subplots()
+
+            ax.plot(pre)
+            ax.plot(act)
+            wandb.log({"train plot": fig})
             mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
             print(mae,mse,rmse,mape,mspe)
@@ -216,6 +230,16 @@ def test(dataloader, net, loss_function):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
+        
+        pre = torch.tensor(y_pre).cpu().detach().numpy()[0,:,3].squeeze()
+        act = torch.tensor(y).cpu().detach().numpy()[0,:,3].squeeze()
+
+        fig, ax = plt.subplots()
+
+        ax.plot(pre)
+        ax.plot(act)
+        wandb.log({"test plot": fig})
+        
         mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
         print(mae,mse,rmse,mape,mspe)
