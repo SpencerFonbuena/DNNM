@@ -17,5 +17,5 @@ class HyperParameters:
     p = [0.3]
     seg_len = [30]
     logs = 5
-    pred_size = [25]
+    pred_size = [200]
 

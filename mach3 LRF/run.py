@@ -207,9 +207,9 @@ def train(config=None):
             ax.plot(pre)
             ax.plot(act)
             wandb.log({"train plot": wandb.Image(fig)})
-            mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
+            '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
-            print(mae,mse,rmse,mape,mspe)
+            print(mae,mse,rmse,mape,mspe)'''
 
             
             
@@ -239,9 +239,9 @@ def test(dataloader, net, loss_function):
         ax.plot(act)
         wandb.log({"test plot": wandb.Image(fig)})
         
-        mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
+        '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
-        print(mae,mse,rmse,mape,mspe)
+        print(mae,mse,rmse,mape,mspe)'''
         
         
         #wandb.log({"test_mse": tmse})
