@@ -188,7 +188,6 @@ def train(config=None):
                 optimizer.zero_grad()
                 y_pre = net(x)
 
-                print(y_pre.shape, y.shape)
                 
 
                 loss = loss_function(y_pre, y)
