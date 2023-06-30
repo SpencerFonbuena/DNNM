@@ -237,7 +237,7 @@ def test(dataloader, net, loss_function):
 
         ax.plot(pre)
         ax.plot(act)
-        wandb.log({"test plot": fig})
+        wandb.log({"test plot": wandb.Image(fig)})
         
         mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
