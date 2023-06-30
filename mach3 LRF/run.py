@@ -191,9 +191,10 @@ def train(config=None):
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
                 
+    
                 wandb.log({'Loss': loss})
                 wandb.log({'index': index})
-            mae,mse,rmse,mape,mspe = metric(y_pre.detach().numpy(), y.detach().numpy())
+            mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
             print(mae,mse,rmse,mape,mspe)
 
@@ -215,7 +216,7 @@ def test(dataloader, net, loss_function):
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
-        mae,mse,rmse,mape,mspe = metric(y_pre.detach().numpy(), y.detach().numpy())
+        mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
         print(mae,mse,rmse,mape,mspe)
         
