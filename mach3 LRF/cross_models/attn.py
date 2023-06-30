@@ -20,9 +20,9 @@ class FullAttention(nn.Module):
         _, S, _, D = values.shape
         scale = self.scale or 1./sqrt(E)
 
-        scores = torch.einsum("blhe,bshe->bhls", queries, keys)
+        scores = torch.einsum("blhe,bshe->bhls", queries, keys) #normal transformer matmul
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
-        V = torch.einsum("bhls,bshd->blhd", A, values)
+        V = torch.einsum("bhls,bshd->blhd", A, values) #normal self attention
         
         return V.contiguous()
 

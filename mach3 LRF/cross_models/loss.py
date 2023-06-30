@@ -18,7 +18,7 @@ class Myloss(Module):
         self.loss_function = MSELoss()
 
     def forward(self, y_pre, y_true):
-        y_true = y_true.type(torch.LongTensor).to(DEVICE)
+        y_true = y_true.type(torch.float32).to(DEVICE)
         loss = self.loss_function(y_pre, y_true)
 
         return loss

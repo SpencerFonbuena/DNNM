@@ -19,16 +19,16 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
-    def __init__(self, datafile, window_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
+    def __init__(self, datafile, window_size, pred_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
         # [Reading in and pre-processing data]
 
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
-        #Create the training and label datasets
-        prerawtrain = torch.tensor(df.drop(columns=['Labels']).to_numpy() )
-        #recasting data as pandas dataframe. I couldn't find a way to normalize with pandas, so I cast it first to torch, then back to pandas.
-        rawtrainingdata = pd.DataFrame(prerawtrain).to_numpy()
+        #Create the training data
+        rawtrainingdata = pd.DataFrame(df).to_numpy()
         
+        #create the labels
+        rawtraininglabels = pd.DataFrame(df).to_numpy()
         # [End pre-processing]
 
 
@@ -52,12 +52,27 @@ class Create_Dataset(Dataset):
         #First array is a row vector, which broadcasts with dataset_array
         window_array = np.array([np.arange(window_size)])
         #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
-        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
+        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size - pred_size + 1)).reshape(len(rawtrainingdata)-window_size - pred_size + 1, 1)
         #broadcast the data together
         indexdata = window_array + dataset_array
         # Index into the raw training data with our preset windows to create datasets quickly
         trainingdata = rawtrainingdata[indexdata]
+        #print(trainingdata[0,-1:,:], trainingdata.shape)
+        #[End windowing dataset]
 
+
+        # [Window the dataset]
+        
+        #First array is a row vector, which broadcasts with dataset_array
+        window_array = np.array([np.arange(pred_size)])
+        #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
+        dataset_array = np.array(np.arange(len(rawtrainingdata)- pred_size-window_size+ 1)).reshape(len(rawtrainingdata) - pred_size - window_size+ 1, 1)
+        #broadcast the data together
+        indexdata = window_array + dataset_array + window_size - 1
+        # Index into the raw training data with our preset windows to create datasets quickly
+        labeldata = rawtraininglabels[indexdata]
+        #print(labeldata[0] ,labeldata.shape)
+   
         #[End windowing dataset]
 
 
