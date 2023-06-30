@@ -204,8 +204,9 @@ def train(config=None):
 
             fig, ax = plt.subplots()
 
-            ax.plot(pre)
-            ax.plot(act)
+            ax.plot(pre, label='predictions')
+            ax.plot(act, label ='actual')
+            plt.legend()
             wandb.log({"train plot": wandb.Image(fig)})
             '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
@@ -235,8 +236,9 @@ def test(dataloader, net, loss_function):
 
         fig, ax = plt.subplots()
 
-        ax.plot(pre)
-        ax.plot(act)
+        ax.plot(pre, label='prediction')
+        ax.plot(act, label='actual')
+        plt.legend()
         wandb.log({"test plot": wandb.Image(fig)})
         
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
