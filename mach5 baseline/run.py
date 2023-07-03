@@ -69,8 +69,6 @@ sweep_config = {
         'values': hp.N}, # multi head attention layers
     'pred_size':{
     'values': hp.pred_size}, # multi head attention layers
-    'seg_len':{
-    'values': hp.seg_len}, # multi head attention layers
 
     # [Regularizers]
     'dropout':{
@@ -104,8 +102,8 @@ def pipeline(batch_size, window_size, pred_size):
 
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -123,29 +121,20 @@ def pipeline(batch_size, window_size, pred_size):
     return train_dataloader, test_dataloader, d_channel
 
 
-'''              enc_in,
-                 seq_len,
-                 p_hidden_dims,
-                 p_hidden_layers,
-                 pred_len,
-                 label_len,
-                 d_model,
+'''              d_model,
                  heads,
                  dropout,
-                 device,
-                 rbn,
+                 dim_feedforward,
                  stack'''
-def network( d_channel, window_size, heads, d_model, dropout, stack, d_hidden, pred_size, seg_len):
-    net = Model(data_dim=d_channel,
-                    in_len=window_size,
-                    out_len=pred_size,
-                    seg_len=seg_len,
+def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size):
+    net = Model(
                     d_model=d_model,
-                    n_heads=heads,
-                    e_layers=stack,
-                    d_ff=d_hidden,
+                    heads=heads,
+                    stack=stack,
+                    dim_feedforward=d_hidden,
                     dropout=dropout,
-                    device=DEVICE,
+                    channel_in=channel_in,
+                    window_size=window_size
                     ).to(DEVICE)
 
     def hiddenPrints():
@@ -174,8 +163,13 @@ def train(config=None):
 
         train_dataloader, test_dataloader, d_channel = pipeline(batch_size=config.batch_size, window_size=config.window_size, pred_size=config.pred_size)
         
-        net = network( d_channel=d_channel, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
-                      dropout=config.dropout, stack=config.stack, d_hidden=config.d_hidden, pred_size=config.pred_size, seg_len=config.seg_len).to(DEVICE)
+        net = network(d_model=config.d_model,
+                        heads=config.heads,
+                        stack=config.stack,
+                        d_hidden=config.d_hidden,
+                        dropout=config.dropout,
+                        channel_in=d_channel,
+                        window_size=config.window_size).to(DEVICE)
         # Create a loss function here using cross entropy loss
         loss_function = Myloss()
 
@@ -193,7 +187,7 @@ def train(config=None):
                 x, y = x.to(DEVICE), y.to(DEVICE)
 
                 optimizer.zero_grad()
-                y_pre = net(x)
+                y_pre = net(x, y)
 
                 
 
@@ -218,10 +212,6 @@ def train(config=None):
             '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
             print(mae,mse,rmse,mape,mspe)'''
-
-            
-            
-            
 
             #wandb.log({"train_mse": mse})
             
@@ -263,5 +253,5 @@ def test(dataloader, net, loss_function):
 
 # [Run the model]
 if __name__ == '__main__':
-    wandb.agent(sweep_id, train, count=200)
+    wandb.agent(sweep_id, train, count=5)
 # [End experiment]

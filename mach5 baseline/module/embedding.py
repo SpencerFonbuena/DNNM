@@ -20,8 +20,8 @@ torch.manual_seed(seed)
 
 class Embedding(Module):
     def __init__(self,
-                 channel_in = str,
-                 d_model = str,
+                 channel_in = int,
+                 d_model = int,
                  window_size = int,):
         super(Embedding, self).__init__()
 
@@ -35,7 +35,7 @@ class Embedding(Module):
         '''====================================================================================================='''
 
         # [Init layers]
-        self.ffchannelembedding = nn.Linear(channel_in, d_model)
+        self.ffchannelembedding = nn.Linear(channel_in, 512)
         # positional encoding of some sort
         # [End Init]
     

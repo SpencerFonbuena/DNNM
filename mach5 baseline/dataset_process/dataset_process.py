@@ -28,7 +28,7 @@ class Create_Dataset(Dataset):
         rawtrainingdata = pd.DataFrame(df).to_numpy()
         
         #create the labels
-        rawtraininglabels = pd.DataFrame(df).to_numpy()
+        rawtraininglabels = pd.DataFrame(df['Close']).to_numpy()
         # [End pre-processing]
 
 

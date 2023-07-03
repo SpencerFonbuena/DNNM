@@ -1,141 +1,74 @@
-from torch.nn import Module
-from torch.nn import ModuleList
-
-
 import torch
-import math
-import random
-import torch.nn.functional as F
-import torchvision.ops.stochastic_depth as std
-import matplotlib.pyplot as plt
-import numpy as np
 import torch.nn as nn
-import torch.nn.functional as F
-
-from module.hyperparameters import HyperParameters as hp
 from module.embedding import Embedding
-from torch.nn import TransformerEncoderLayer
+from module.layers import Projector, Ns_Transformer
+import torchvision.ops.stochastic_depth as std
 
-
-
-# [Maintain random seed]
-seed = 10
-np.random.seed(seed)
-random.seed(seed)
-torch.manual_seed(seed)
-# [End maintenance]
-
-
-
-'''-----------------------------------------------------------------------------------------------------'''
-'''====================================================================================================='''
-
-
-class Transformer(Module):
+class Model(nn.Module):
+    """
+    Non-stationary Transformer
+    """
     def __init__(self,
-                 
-                 #Embedding Variables
-                 window_size = int,
-                 timestep_in = str,
-                 channel_in = str,
-
-                 #MHA Variables
-                 heads = int,
-                 d_model = int,
-                 device = str,
-                 stack = int,
-                 dropout = float,
-                 
-                 #FCN Variables
-                 class_num = int,
-                 p = float,
+                 enc_in,
+                 seq_len,
+                 p_hidden_dims,
+                 p_hidden_layers,
+                 pred_len,
+                 label_len,
+                 d_model,
+                 heads,
+                 dropout,
+                 device,
+                 rbn,
+                 stack
                  ):
-        
-        super(Transformer, self).__init__()
+        super(Model, self).__init__()
 
-        self.p = p
-        self.stack = stack  
+        self.pred_len = pred_len
+        self.seq_len = seq_len
+        self.label_len = label_len
 
+        # [Destationary factors]
+        self.tau_learner   = Projector(enc_in=enc_in, seq_len=seq_len, hidden_dims=p_hidden_dims, hidden_layers=p_hidden_layers, output_dim=1)
+        self.delta_learner = Projector(enc_in=enc_in, seq_len=seq_len, hidden_dims=p_hidden_dims, hidden_layers=p_hidden_layers, output_dim=seq_len)
 
-        self.channel_embedding = Embedding(
-                        channel_in = channel_in,
-                        timestep_in = timestep_in,
-                        d_model = d_model,
-                        window_size = window_size,
-                        tower='channel')
-        
-        #Timestep embedding Init
-        self.timestep_embedding = Embedding(
-                 channel_in = channel_in,
-                 timestep_in = timestep_in,
-                 d_model = d_model,
-                 window_size = window_size,
-                 tower='timestep')
-        
-
-
-        # [Initialize Towers]
-        #Channel Init
-        self.channel_tower = TransformerEncoderLayer(
+        # [Encoder]
+        self.encoder = nn.ModuleList ({Ns_Transformer(
                  d_model=d_model,
-                 nhead=heads,
-                 dim_feedforward=4 * d_model,
+                 num_heads=heads,
                  dropout=dropout,
-                 activation=F.gelu,
-                 batch_first=True,
-                 norm_first=True,
-                 device=device
-            ) 
-        
-        self.channel_encoder = nn.TransformerEncoder(
-            encoder_layer=self.channel_tower,
-            num_layers=stack,
-            norm=nn.LayerNorm(d_model)
-            
-        )
-        
-        #Timestep Init
-        self.timestep_tower = TransformerEncoderLayer(
-                 d_model=d_model,
-                 nhead=heads,
-                 dim_feedforward=4 * d_model,
-                 dropout=dropout,
-                 activation=F.gelu,
-                 batch_first=True,
-                 norm_first=True,
-                 device=device
-            )
-        
-        self.timestep_encoder = nn.TransformerEncoder(
-            encoder_layer=self.timestep_tower,
-            num_layers=stack,
-            norm=nn.LayerNorm(d_model)
-            
-        )
-        # [End Towers]
+                 rbn=rbn
+            )} for _ in range(stack)
+        ) 
 
-        self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
-        self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
-                                          out_features=class_num)
-
-    def forward(self, x, stage):
-        #Embed channel and timestep
-        x_channel = self.channel_embedding(x).to(torch.float32) # (16,window,512)
-        x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,channel,512)
-
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
-        
-        x_channel = self.channel_encoder(x_channel)
-        x_timestep = self.timestep_encoder(x_timestep)
+        # [Decoder]
+        decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads)
+        self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack)
 
 
-        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
-        x_channel = x_channel.reshape(x_channel.shape[0], -1)
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_channel, x_timestep], dim=-1)), dim=-1)
-        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
-        out = self.linear_out(gate_out)
+    def forward(self, x_enc, tgt):
+
+        x_raw = x_enc.clone().detach() # Use the raw x to later approximate de-stationary features
+
+        # [Normalization]
+        mean_enc = x_enc.mean(1, keepdim=True).detach() # B x 1 x E |
+        x_enc = x_enc - mean_enc # Subtract Mean
+        std_enc = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
+        x_enc = x_enc / std_enc # Divide by standard deviation
+        #x_dec_new = torch.cat([x_enc[:, -self.label_len: , :], torch.zeros_like(x_dec[:, -self.pred_len:, :])], dim=1).to(x_enc.device).clone()
+
+        tau = self.tau_learner(x_raw, std_enc).exp()     # B x S x E, B x 1 x E -> B x 1, positive scalar    
+        delta = self.delta_learner(x_raw, mean_enc)      # B x S x E, B x 1 x E -> B x S
+
+        # [Encoding]
+        for i, encoder in enumerate(self.encoder):
+            x_encoder = std(x_encoder, (i/self.stack) * self.p, 'batch')
+            x_encoder = encoder(x_encoder, tau, delta)
 
 
-        return out
+        dec_out = self.decoder(tgt,x_encoder)
 
+        # De-normalization
+        dec_out = dec_out * std_enc + mean_enc
+
+        return dec_out
