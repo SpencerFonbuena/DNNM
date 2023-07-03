@@ -39,7 +39,7 @@ print(f'use device: {DEVICE}')
 
 # [Create WandB sweeps]
 
-sweep_config = {
+'''sweep_config = {
     'method': 'random',
 
 
@@ -74,13 +74,13 @@ sweep_config = {
     'dropout':{
         'values': hp.dropout},
     }
-}
+}'''
 
 # [End Sweeps]
 
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='mach30 forecast ')
+wandb.init(project='mach30 trash', name='try')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -155,67 +155,65 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size):
 
 
 
-def train(config=None):
+def train():
 
-    with wandb.init(config=config):
 
-        config = wandb.config
 
-        train_dataloader, test_dataloader, d_channel = pipeline(batch_size=config.batch_size, window_size=config.window_size, pred_size=config.pred_size)
-        
-        net = network(d_model=config.d_model,
-                        heads=config.heads,
-                        stack=config.stack,
-                        d_hidden=config.d_hidden,
-                        dropout=config.dropout,
-                        channel_in=d_channel,
-                        window_size=config.window_size).to(DEVICE)
-        # Create a loss function here using cross entropy loss
-        loss_function = Myloss()
+    train_dataloader, test_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+    
+    net = network(d_model=hp.d_model,
+                    heads=hp.heads,
+                    stack=hp.stack,
+                    d_hidden=hp.d_hidden,
+                    dropout=hp.dropout,
+                    channel_in=d_channel,
+                    window_size=hp.window_size).to(DEVICE)
+    # Create a loss function here using cross entropy loss
+    loss_function = Myloss()
 
-        #Select optimizer in an un-optimized way
-        if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate)
+    #Select optimizer in an un-optimized way
+    if hp.optimizer_name == 'AdamW':
+        optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
 
-        # training function
-        
-        
-        net.train()
-        wandb.watch(net, log='all')
-        for index in tqdm(range(hp.EPOCH)):
-            for i, (x, y) in enumerate(train_dataloader):
-                x, y = x.to(DEVICE), y.to(DEVICE)
+    # training function
+    
+    
+    net.train()
+    wandb.watch(net, log='all')
+    for index in tqdm(range(hp.EPOCH)):
+        for i, (x, y) in enumerate(train_dataloader):
+            x, y = x.to(DEVICE), y.to(DEVICE)
 
-                optimizer.zero_grad()
-                y_pre = net(x, y)
+            optimizer.zero_grad()
+            y_pre = net(x, y)
 
-                
-
-                loss = loss_function(y_pre, y)
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
-                optimizer.step()
-                
-
-                wandb.log({'Loss': loss})
-                wandb.log({'index': index})
             
-            pre = torch.tensor(y_pre).cpu().detach().numpy()[0,:,3].squeeze()
-            act = torch.tensor(y).cpu().detach().numpy()[0,:,3].squeeze()
 
-            fig, ax = plt.subplots()
-
-            ax.plot(pre, label='predictions')
-            ax.plot(act, label ='actual')
-            plt.legend()
-            wandb.log({"train plot": wandb.Image(fig)})
-            '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
-                
-            print(mae,mse,rmse,mape,mspe)'''
-
-            #wandb.log({"train_mse": mse})
+            loss = loss_function(y_pre, y)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
+            optimizer.step()
             
-            test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+
+            wandb.log({'Loss': loss})
+            wandb.log({'index': index})
+        
+        pre = torch.tensor(y_pre).cpu().detach().numpy()[0,:,3].squeeze()
+        act = torch.tensor(y).cpu().detach().numpy()[0,:,3].squeeze()
+
+        fig, ax = plt.subplots()
+
+        ax.plot(pre, label='predictions')
+        ax.plot(act, label ='actual')
+        plt.legend()
+        wandb.log({"train plot": wandb.Image(fig)})
+        '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
+            
+        print(mae,mse,rmse,mape,mspe)'''
+
+        #wandb.log({"train_mse": mse})
+        
+        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
 
 # test function
@@ -253,5 +251,5 @@ def test(dataloader, net, loss_function):
 
 # [Run the model]
 if __name__ == '__main__':
-    wandb.agent(sweep_id, train, count=5)
+    train()
 # [End experiment]
