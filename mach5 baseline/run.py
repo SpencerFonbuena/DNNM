@@ -251,7 +251,6 @@ def test(dataloader, net, loss_function):
 # [path save]
 save_path = '/root/saved_models/vanilla_transformer.pt'
 
-torch.save()
 # [Save Model]
 
 # [End Save Model]
