@@ -80,7 +80,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach31', name='try')
+wandb.init(project='mach32', name='try')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -102,8 +102,8 @@ def pipeline(batch_size, window_size, pred_size):
 
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -215,9 +215,9 @@ def train():
 
         #wandb.log({"train_mse": mse})
         
-        '''test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
         # Save the model after each epoch
-        torch.save(net.state_dict(), save_path)'''
+        #torch.save(net.state_dict(), save_path)
 
 
 
@@ -233,8 +233,8 @@ def test(dataloader, net, loss_function):
             y_pre = net(x, y)
 
             if i % 500 == 0:
-                pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
-                act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
+                pre = torch.tensor(y_pre).cpu().detach().numpy()[-1].squeeze()
+                act = torch.tensor(y).cpu().detach().numpy()[-1].squeeze()
 
                 fig, ax = plt.subplots()
 
