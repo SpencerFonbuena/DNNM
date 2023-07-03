@@ -249,7 +249,7 @@ def test(dataloader, net, loss_function):
         #wandb.log({"test_mse": tmse})
 
 # [path save]
-save_path = '/root/saved_models/vanilla_transformer.pt'
+save_path = '/root/DNNM/saved_models/vanilla_transformer.pt'
 
 # [Save Model]
 
