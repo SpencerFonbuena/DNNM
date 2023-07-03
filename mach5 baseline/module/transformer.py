@@ -18,9 +18,13 @@ class Model(nn.Module):
  
                  # [Embedding]
                  channel_in = int,
-                 window_size = int
+                 window_size = int,
+                 pred_size = int
                  ):
         super(Model, self).__init__()
+        
+        def mask(dim1: int, dim2: int):
+            return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
 
         self.embedding = Embedding(channel_in=channel_in, window_size=window_size)
 
@@ -28,8 +32,12 @@ class Model(nn.Module):
         encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu',batch_first=True, norm_first=True,)
         self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
         
+        # [Mask]
+        self.tgt_mask = mask(window_size, pred_size)
+        self.src_mask = mask(pred_size, pred_size)
+
         # [Decoder]
-        decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
         self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
 
         self.out = nn.Linear(d_model, 9)
@@ -38,6 +46,8 @@ class Model(nn.Module):
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
-        out = self.decoder(tgt, memory)
+        out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
         out = self.out(out)
         return out
+    
+    

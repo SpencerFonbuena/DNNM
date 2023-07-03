@@ -126,7 +126,7 @@ def pipeline(batch_size, window_size, pred_size):
                  dropout,
                  dim_feedforward,
                  stack'''
-def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size):
+def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, pred_size):
     net = Model(
                     d_model=d_model,
                     heads=heads,
@@ -134,7 +134,8 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size):
                     dim_feedforward=d_hidden,
                     dropout=dropout,
                     channel_in=channel_in,
-                    window_size=window_size
+                    window_size=window_size,
+                    pred_size=pred_size
                     ).to(DEVICE)
 
     def hiddenPrints():
@@ -167,7 +168,8 @@ def train():
                     d_hidden=hp.d_hidden,
                     dropout=hp.dropout,
                     channel_in=d_channel,
-                    window_size=hp.window_size).to(DEVICE)
+                    window_size=hp.window_size,
+                    pred_size=hp.pred_size).to(DEVICE)
     # Create a loss function here using cross entropy loss
     loss_function = Myloss()
 
@@ -213,9 +215,9 @@ def train():
 
         #wandb.log({"train_mse": mse})
         
-        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        '''test(dataloader=test_dataloader, net=net, loss_function=loss_function)
         # Save the model after each epoch
-        torch.save(net.state_dict(), save_path)
+        torch.save(net.state_dict(), save_path)'''
 
 
 
