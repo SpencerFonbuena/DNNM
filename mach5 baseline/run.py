@@ -214,6 +214,10 @@ def train():
         #wandb.log({"train_mse": mse})
         
         test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        # Save the model after each epoch
+        torch.save(net.state_dict(), save_path)
+
+
 
 
 # test function
@@ -222,19 +226,20 @@ def test(dataloader, net, loss_function):
     
     net.eval()
     with torch.no_grad():
-        for x, y in dataloader:
+        for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, y)
-        
-        pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
-        act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
 
-        fig, ax = plt.subplots()
+            if i % 500 == 0:
+                pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+                act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
 
-        ax.plot(pre, label='prediction')
-        ax.plot(act, label='actual')
-        plt.legend()
-        wandb.log({"test plot": wandb.Image(fig)})
+                fig, ax = plt.subplots()
+
+                ax.plot(pre, label='prediction')
+                ax.plot(act, label='actual')
+                plt.legend()
+                wandb.log({"test plot": wandb.Image(fig)})
         
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
                 
@@ -243,8 +248,10 @@ def test(dataloader, net, loss_function):
         
         #wandb.log({"test_mse": tmse})
 
+# [path save]
+save_path = '/root/saved_models/vanilla_transformer.pt'
 
-
+torch.save()
 # [Save Model]
 
 # [End Save Model]
