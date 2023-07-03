@@ -224,7 +224,7 @@ def test(dataloader, net, loss_function):
     with torch.no_grad():
         for x, y in dataloader:
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x)
+            y_pre = net(x, y)
         
         pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
         act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
