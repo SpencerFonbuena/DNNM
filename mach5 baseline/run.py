@@ -198,8 +198,8 @@ def train():
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
         
-        pre = torch.tensor(y_pre).cpu().detach().numpy()[0,:,3].squeeze()
-        act = torch.tensor(y).cpu().detach().numpy()[0,:,3].squeeze()
+        pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+        act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
 
         fig, ax = plt.subplots()
 
@@ -226,8 +226,8 @@ def test(dataloader, net, loss_function):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
         
-        pre = torch.tensor(y_pre).cpu().detach().numpy()[0,:,3].squeeze()
-        act = torch.tensor(y).cpu().detach().numpy()[0,:,3].squeeze()
+        pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+        act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
 
         fig, ax = plt.subplots()
 
