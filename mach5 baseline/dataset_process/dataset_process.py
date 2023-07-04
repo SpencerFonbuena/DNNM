@@ -132,4 +132,3 @@ class Create_Dataset(Dataset):
             return len(self.inference_data)
         
         
-
