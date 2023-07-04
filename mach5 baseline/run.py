@@ -84,9 +84,9 @@ wandb.init(project='mach32', name='try')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30min_adjsplit.txt'
 else:
-    path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
+    path = 'DNNM/mach1/datasets/SPY_30min_adjsplit.txt'
 
 # [End General Init]
 
@@ -98,14 +98,14 @@ def pipeline(batch_size, window_size, pred_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
-    infer_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
+    #infer_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
 
 
 
     #Load the data
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
-    infer_dataloader = DataLoader(dataset=infer_dataset, batch_size=window_size, shuffle=False, num_workers=12, pin_memory=True)
+    #infer_dataloader = DataLoader(dataset=infer_dataset, batch_size=window_size, shuffle=False, num_workers=12, pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -120,7 +120,7 @@ def pipeline(batch_size, window_size, pred_size):
 
     # [End Dataset Init]
 
-    return train_dataloader, test_dataloader, infer_dataloader, d_channel
+    return train_dataloader, test_dataloader,  d_channel
 
 
 '''              d_model,
@@ -162,7 +162,7 @@ def train():
 
 
 
-    train_dataloader, test_dataloader, infer_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+    train_dataloader, test_dataloader,  d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
     
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
@@ -217,7 +217,7 @@ def train():
 
         #wandb.log({"train_mse": mse})
         
-        test(dataloader=test_dataloader, net=net, infer_dataloader=infer_dataloader)
+        test(dataloader=test_dataloader, net=net)
         # Save the model after each epoch
         #torch.save(net.state_dict(), save_path)
 
@@ -225,7 +225,7 @@ def train():
 
 
 # test function
-def test(dataloader, net, infer_dataloader):
+def test(dataloader, net):
     
     
     net.eval()
@@ -248,7 +248,7 @@ def test(dataloader, net, infer_dataloader):
     net.eval()
     with torch.no_grad():
     
-        for i, (src, _) in enumerate(infer_dataloader):
+        for i, (src, _) in enumerate(dataloader):
 
             prediction = run_encoder_decoder_inference(
                 model=net, 

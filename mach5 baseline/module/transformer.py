@@ -42,7 +42,7 @@ class Model(nn.Module):
         decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
         self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
 
-        self.out = nn.Linear(d_model, 1)
+        self.out = nn.Linear(d_model, 9)
     def forward(self, x, tgt):
 
         x = self.embedding(x)
