@@ -12,7 +12,7 @@ import numpy as np
 import wandb
 import random
 import pandas as pd
-from torcheval.metrics import  MeanSquaredError
+#from torcheval.metrics import  MeanSquaredError
 import matplotlib.pyplot as plt
 from module.hyperparameters import HyperParameters as hp
 from module.transformer import Model
@@ -84,9 +84,9 @@ wandb.init(project='mach32', name='try')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_gaus.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
 else:
-    path = 'DNNM/mach1/datasets/SPY_30mins_gaus.txt'
+    path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
 
 # [End General Init]
 
