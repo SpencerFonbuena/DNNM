@@ -98,14 +98,14 @@ def pipeline(batch_size, window_size, pred_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
-    #infer_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
+    infer_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
 
 
 
     #Load the data
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
-    #infer_dataloader = DataLoader(dataset=infer_dataset, batch_size=window_size, shuffle=False, num_workers=12, pin_memory=True)
+    infer_dataloader = DataLoader(dataset=infer_dataset, batch_size=window_size, shuffle=False, num_workers=12, pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -162,7 +162,7 @@ def train():
 
 
 
-    train_dataloader, test_dataloader,  d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+    train_dataloader, test_dataloader,  infer_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
     
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
@@ -216,9 +216,9 @@ def train():
         print(mae,mse,rmse,mape,mspe)'''
 
         #wandb.log({"train_mse": mse})
+        #infer(dataloader=infer_dataloader,net=net)
+        #test(dataloader=test_dataloader, net=net)
         
-        test(dataloader=test_dataloader, net=net)
-        #infer(dataloader=test_dataloader,net=net)
         # Save the model after each epoch
         #torch.save(net.state_dict(), save_path)
 
