@@ -120,7 +120,7 @@ def pipeline(batch_size, window_size, pred_size):
 
     # [End Dataset Init]
 
-    return train_dataloader, test_dataloader,  d_channel
+    return train_dataloader, test_dataloader, infer_dataloader, d_channel
 
 
 '''              d_model,
