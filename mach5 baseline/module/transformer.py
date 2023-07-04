@@ -54,7 +54,7 @@ class Model(nn.Module):
         std_enc = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
         x = x / std_enc'''
 
-        x = self.scaler(x)
+        x = self.scaler.fit_transform(x)
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
