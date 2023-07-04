@@ -83,9 +83,9 @@ wandb.init(project='mach34', name='01')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_raw.txt'
 else:
-    path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
+    path = 'DNNM/mach1/datasets/SPY_30mins_raw.txt'
 
 # [End General Init]
 
