@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from module.hyperparameters import HyperParameters as hp
 from module.transformer import Model
 from module.loss import Myloss
-
+from module.layers import run_encoder_decoder_inference
 
 
 '''-----------------------------------------------------------------------------------------------------'''
@@ -98,12 +98,14 @@ def pipeline(batch_size, window_size, pred_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
+    infer_dataset = Create_Dataset(datafile=path, window_size=window_size, mode='inference', pred_size=pred_size)
 
 
 
     #Load the data
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
+    infer_dataloader = DataLoader(dataset=infer_dataset, batch_size=window_size, shuffle=False, num_workers=12, pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -118,7 +120,7 @@ def pipeline(batch_size, window_size, pred_size):
 
     # [End Dataset Init]
 
-    return train_dataloader, test_dataloader, d_channel
+    return train_dataloader, test_dataloader, infer_dataloader, d_channel
 
 
 '''              d_model,
@@ -160,7 +162,7 @@ def train():
 
 
 
-    train_dataloader, test_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+    train_dataloader, test_dataloader, infer_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
     
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
@@ -215,7 +217,7 @@ def train():
 
         #wandb.log({"train_mse": mse})
         
-        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        test(dataloader=test_dataloader, net=net, infer_dataloader=infer_dataloader)
         # Save the model after each epoch
         #torch.save(net.state_dict(), save_path)
 
@@ -223,7 +225,7 @@ def train():
 
 
 # test function
-def test(dataloader, net, loss_function):
+def test(dataloader, net, infer_dataloader):
     
     
     net.eval()
@@ -243,13 +245,23 @@ def test(dataloader, net, loss_function):
                 plt.legend()
                 wandb.log({"test plot": wandb.Image(fig)})
         
-        '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
-                
-        print(mae,mse,rmse,mape,mspe)'''
-        
-        
-        #wandb.log({"test_mse": tmse})
+    net.eval()
+    with torch.no_grad():
+    
+        for i, (src, _) in enumerate(infer_dataloader):
 
+            prediction = run_encoder_decoder_inference(
+                model=net, 
+                src=src, 
+                forecast_window=hp.pred_size,
+                batch_size=src.shape[1]
+                )
+        out = torch.tensor(prediction).cpu().detach().numpy()[-1].squeeze()
+        fig, ax = plt.subplots()
+        ax.plot(out, label='final prediction')
+        plt.legend()
+        wandb.log({"finale prediction plot": wandb.Image(fig)})
+        
 # [path save]
 save_path = '/root/DNNM/saved_models/vanilla_transformer.pt'
 

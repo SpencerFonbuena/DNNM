@@ -99,7 +99,9 @@ class Create_Dataset(Dataset):
 
         #[end of creating validation data and labels]
         
-        
+        # [Inference Data]
+        self.inference_data = rawtrainingdata[len(rawtrainingdata)-window_size :]
+        self.inference_labels = rawtrainingdata[len(rawtrainingdata)-window_size :] # This is really a throw away, we just need it for the dataloaders sake
 
         # [Creating dimension variables for easy computing on other sheets]
         
@@ -118,14 +120,16 @@ class Create_Dataset(Dataset):
             return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
-
+        elif self.mode == 'train':
+            return self.inference_data[index, self.inference_labels[index]]
     
     def __len__(self):
         if self.mode == 'train':
             return len(self.trainingdata)
         if self.mode == 'test':
             return len(self.vallabels)
-
+        if self.mode == 'inference':
+            return len(self.inference_data)
         
         
 
