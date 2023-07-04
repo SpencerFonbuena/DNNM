@@ -12,12 +12,11 @@ import numpy as np
 import wandb
 import random
 import pandas as pd
-#from torcheval.metrics import  MeanSquaredError
 import matplotlib.pyplot as plt
 from module.hyperparameters import HyperParameters as hp
 from module.transformer import Model
 from module.loss import Myloss
-from module.layers import run_encoder_decoder_inference
+
 
 
 '''-----------------------------------------------------------------------------------------------------'''
@@ -80,13 +79,13 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach33', name='try')
+wandb.init(project='mach31', name='try')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_gaus.txt'
 else:
-    path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
+    path = 'DNNM/mach1/datasets/SPY_30mins_gaus.txt'
 
 # [End General Init]
 
@@ -98,14 +97,12 @@ def pipeline(batch_size, window_size, pred_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
-    infer_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
 
 
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
-    infer_dataloader = DataLoader(dataset=infer_dataset, batch_size=window_size, shuffle=False, num_workers=12, pin_memory=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -120,7 +117,7 @@ def pipeline(batch_size, window_size, pred_size):
 
     # [End Dataset Init]
 
-    return train_dataloader, test_dataloader, infer_dataloader, d_channel
+    return train_dataloader, test_dataloader, d_channel
 
 
 '''              d_model,
@@ -162,7 +159,7 @@ def train():
 
 
 
-    train_dataloader, test_dataloader,  infer_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+    train_dataloader, test_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
     
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
@@ -216,17 +213,16 @@ def train():
         print(mae,mse,rmse,mape,mspe)'''
 
         #wandb.log({"train_mse": mse})
-        #infer(dataloader=infer_dataloader,net=net)
-        test(dataloader=test_dataloader, net=net)
         
+        '''test(dataloader=test_dataloader, net=net, loss_function=loss_function)
         # Save the model after each epoch
-        #torch.save(net.state_dict(), save_path)
+        torch.save(net.state_dict(), save_path)'''
 
 
 
 
 # test function
-def test(dataloader, net):
+def test(dataloader, net, loss_function):
     
     
     net.eval()
@@ -236,8 +232,8 @@ def test(dataloader, net):
             y_pre = net(x, y)
 
             if i % 500 == 0:
-                pre = torch.tensor(y_pre).cpu().detach().numpy()[-1].squeeze()
-                act = torch.tensor(y).cpu().detach().numpy()[-1].squeeze()
+                pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+                act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
 
                 fig, ax = plt.subplots()
 
@@ -246,23 +242,12 @@ def test(dataloader, net):
                 plt.legend()
                 wandb.log({"test plot": wandb.Image(fig)})
         
-def infer(dataloader, net):
-    net.eval()
-    with torch.no_grad():
-    
-        for i, (src, _) in enumerate(dataloader):
-
-            prediction = run_encoder_decoder_inference(
-                model=net, 
-                src=src, 
-                forecast_window=hp.pred_size,
-                batch_size=src.shape[1]
-                )
-        out = torch.tensor(prediction).cpu().detach().numpy()[-1].squeeze()
-        fig, ax = plt.subplots()
-        ax.plot(out, label='final prediction')
-        plt.legend()
-        wandb.log({"finale prediction plot": wandb.Image(fig)})
+        '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
+                
+        print(mae,mse,rmse,mape,mspe)'''
+        
+        
+        #wandb.log({"test_mse": tmse})
 
 # [path save]
 save_path = '/root/DNNM/saved_models/vanilla_transformer.pt'
