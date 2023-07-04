@@ -93,7 +93,7 @@ else:
 
 
 #[Create and load the dataset]
-def pipeline(batch_size, window_size, pred_size):
+def pipeline(batch_size, window_size,  pred_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
