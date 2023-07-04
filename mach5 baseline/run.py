@@ -218,6 +218,7 @@ def train():
         #wandb.log({"train_mse": mse})
         
         test(dataloader=test_dataloader, net=net)
+        #infer(dataloader=test_dataloader,net=net)
         # Save the model after each epoch
         #torch.save(net.state_dict(), save_path)
 
@@ -245,6 +246,7 @@ def test(dataloader, net):
                 plt.legend()
                 wandb.log({"test plot": wandb.Image(fig)})
         
+def infer(dataloader, net):
     net.eval()
     with torch.no_grad():
     

@@ -148,7 +148,6 @@ def run_encoder_decoder_inference(
     src: torch.Tensor, 
     forecast_window: int,
     batch_size: int,
-    device,
     batch_first: bool=True
     ) -> torch.Tensor:
 
