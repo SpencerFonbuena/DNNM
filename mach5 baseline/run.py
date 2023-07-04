@@ -98,7 +98,7 @@ def pipeline(batch_size, window_size, pred_size):
     #create the datasets to be loaded
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
-    infer_dataset = Create_Dataset(datafile=path, window_size=window_size, mode='inference', pred_size=pred_size)
+    infer_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
 
 
 
@@ -261,7 +261,7 @@ def test(dataloader, net, infer_dataloader):
         ax.plot(out, label='final prediction')
         plt.legend()
         wandb.log({"finale prediction plot": wandb.Image(fig)})
-        
+
 # [path save]
 save_path = '/root/DNNM/saved_models/vanilla_transformer.pt'
 
