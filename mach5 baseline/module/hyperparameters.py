@@ -1,6 +1,6 @@
 class HyperParameters:
     # hyperparameter settings
-    EPOCH = 20
+    EPOCH = 6
     batch_size = 64
     window_size = 120
     LR = .00001 #.00001,.00003,.00005,.00007,.00009
@@ -17,4 +17,4 @@ class HyperParameters:
     p = 0.3
     fcnstack = 2
     logs = 5
-    pred_size = 60
+    pred_size = 200
