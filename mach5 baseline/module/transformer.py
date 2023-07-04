@@ -48,7 +48,7 @@ class Model(nn.Module):
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
-        out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
+        out = self.decoder(tgt, memory)
         out = self.out(out)
         return out
     
