@@ -46,10 +46,10 @@ class Model(nn.Module):
         self.out = nn.Linear(d_model, 1)
     def forward(self, x, tgt):
         
-        '''mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
+        mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
         x = x - mean_enc
         std_enc = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
-        x = x / std_enc'''
+        x = x / std_enc
 
         x = self.embedding(x)
         tgt = self.embedding(tgt)
@@ -57,7 +57,7 @@ class Model(nn.Module):
         out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
         out = self.out(out)
 
-        #out = out * std_enc + mean_enc
+        out = out * std_enc + mean_enc
 
         return out
     
