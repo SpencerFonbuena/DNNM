@@ -28,6 +28,7 @@ class Model(nn.Module):
         def mask(dim1: int, dim2: int):
             return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
 
+
         self.embedding = Embedding(channel_in=channel_in, window_size=window_size)
 
         # [Encoder]
@@ -44,12 +45,20 @@ class Model(nn.Module):
 
         self.out = nn.Linear(d_model, 9)
     def forward(self, x, tgt):
+        
+        mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
+        x = x - mean_enc
+        std_enc = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
+        x = x / std_enc
 
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
         out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
         out = self.out(out)
+
+        out = out * std_enc + mean_enc
+        
         return out
     
     
