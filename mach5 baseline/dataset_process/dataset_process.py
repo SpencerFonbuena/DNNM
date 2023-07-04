@@ -8,6 +8,7 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import random
+from sklearn.preprocessing import StandardScaler
 
 seed = 10
 np.random.seed(seed)
@@ -24,11 +25,14 @@ class Create_Dataset(Dataset):
         # [Reading in and pre-processing data]
 
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
+        scaler = StandardScaler()
         #Create the training data
         rawtrainingdata = pd.DataFrame(df['Close']).to_numpy()
-        
+        rawtrainingdata = pd.DataFrame(scaler.fit_transform(rawtrainingdata)).to_numpy()
+
         #create the labels
         rawtraininglabels = pd.DataFrame(df['Close']).to_numpy()
+        rawtraininglabels = pd.DataFrame(scaler.fit_transform(rawtraininglabels)).to_numpy()
         # [End pre-processing]
 
 
