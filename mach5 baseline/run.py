@@ -83,9 +83,9 @@ wandb.init(project='mach33', name='01')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_gaus.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
 else:
-    path = 'DNNM/mach1/datasets/SPY_30mins_gaus.txt'
+    path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
 
 # [End General Init]
 
@@ -214,9 +214,9 @@ def train():
 
         #wandb.log({"train_mse": mse})
         
-        '''test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
         # Save the model after each epoch
-        torch.save(net.state_dict(), save_path)'''
+        #torch.save(net.state_dict(), save_path)
 
 
 
