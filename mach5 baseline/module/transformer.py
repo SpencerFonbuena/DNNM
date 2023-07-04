@@ -4,6 +4,7 @@ from module.embedding import Embedding
 from module.layers import Projector, Ns_Transformer
 import torchvision.ops.stochastic_depth as std
 from module.embedding import Embedding
+from sklearn.preprocessing import StandardScaler
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -44,6 +45,8 @@ class Model(nn.Module):
         self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
 
         self.out = nn.Linear(d_model, 1)
+
+        self.scaler = StandardScaler()
     def forward(self, x, tgt):
         
         '''mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
@@ -51,7 +54,7 @@ class Model(nn.Module):
         std_enc = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
         x = x / std_enc'''
 
-        x = torch.nn.functional.normalize(x)
+        x = self.scaler(x)
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
