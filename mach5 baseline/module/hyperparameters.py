@@ -17,4 +17,4 @@ class HyperParameters:
     p = 0.3
     fcnstack = 2
     logs = 5
-    pred_size = 200
+    pred_size = 60
