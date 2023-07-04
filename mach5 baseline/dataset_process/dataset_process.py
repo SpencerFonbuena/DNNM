@@ -25,10 +25,10 @@ class Create_Dataset(Dataset):
 
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
         #Create the training data
-        rawtrainingdata = pd.DataFrame(df['Close']).to_numpy()
+        rawtrainingdata = pd.DataFrame(df[4]).to_numpy()
         
         #create the labels
-        rawtraininglabels = pd.DataFrame(df['Close']).to_numpy()
+        rawtraininglabels = pd.DataFrame(df[4]).to_numpy()
         # [End pre-processing]
 
 
