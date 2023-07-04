@@ -120,7 +120,7 @@ class Create_Dataset(Dataset):
             return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
-        elif self.mode == 'train':
+        elif self.mode == 'inference':
             return self.inference_data[index, self.inference_labels[index]]
     
     def __len__(self):
