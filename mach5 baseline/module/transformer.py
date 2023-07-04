@@ -43,13 +43,13 @@ class Model(nn.Module):
         decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
         self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
 
-        self.out = nn.Linear(d_model, 9)
+        self.out = nn.Linear(d_model, 1)
     def forward(self, x, tgt):
         
-        mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
+        '''mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
         x = x - mean_enc
         std_enc = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
-        x = x / std_enc
+        x = x / std_enc'''
 
         x = self.embedding(x)
         tgt = self.embedding(tgt)
@@ -57,8 +57,8 @@ class Model(nn.Module):
         out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
         out = self.out(out)
 
-        out = out * std_enc + mean_enc
-        
+        #out = out * std_enc + mean_enc
+
         return out
     
     
