@@ -46,15 +46,13 @@ class Model(nn.Module):
 
         self.out = nn.Linear(d_model, 1)
 
-        self.scaler = StandardScaler()
+
     def forward(self, x, tgt):
         
         '''mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
         x = x - mean_enc
         std_enc = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
         x = x / std_enc'''
-
-        x = self.scaler.fit_transform(x.cpu())
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
