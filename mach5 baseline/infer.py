@@ -36,56 +36,15 @@ print(f'use device: {DEVICE}')
 
 
 
-# [Create WandB sweeps]
-
-'''sweep_config = {
-    'method': 'random',
-
-
-    'metric': {
-        'goal': 'maximize',
-        'name': 'test_acc'
-    },
-
-
-    'parameters': {
-    # [training hp]
-    'learning_rate': {
-        'values': hp.LR},
-    'batch_size':{
-        'values': hp.BATCH_SIZE},
-    'window_size':{
-        'values': hp.WINDOW_SIZE},
-
-    # [architecture hp]
-    'd_model':{
-        'values': hp.d_model},
-    'd_hidden':{
-        'values': hp.d_hidden},
-    'heads':{
-        'values': hp.heads}, # Heads
-    'stack':{
-        'values': hp.N}, # multi head attention layers
-    'pred_size':{
-    'values': hp.pred_size}, # multi head attention layers
-
-    # [Regularizers]
-    'dropout':{
-        'values': hp.dropout},
-    }
-}'''
-
-# [End Sweeps]
-
 # Log on Weights and Biases
 
-wandb.init(project='mach34', name='06')
+wandb.init(project='mach35', name='trash')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
     path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
 else:
-    path = 'DNNM/mach1/datasets/SPY_full_test.txt'
+    path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
 
 # [End General Init]
 
@@ -122,11 +81,6 @@ def pipeline(batch_size, window_size,  pred_size):
     return train_dataloader, test_dataloader, inference_dataloader, d_channel
 
 
-'''              d_model,
-                 heads,
-                 dropout,
-                 dim_feedforward,
-                 stack'''
 def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, pred_size):
     net = Model(
                     d_model=d_model,
@@ -156,114 +110,44 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
     return net
 
 
-
-def train():
-
-
-
-    train_dataloader, test_dataloader, inference_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
-    
-    net = network(d_model=hp.d_model,
-                    heads=hp.heads,
-                    stack=hp.stack,
-                    d_hidden=hp.d_hidden,
-                    dropout=hp.dropout,
-                    channel_in=d_channel,
-                    window_size=hp.window_size,
-                    pred_size=hp.pred_size).to(DEVICE)
-    # Create a loss function here using cross entropy loss
-    loss_function = Myloss()
-
-    #Select optimizer in an un-optimized way
-    if hp.optimizer_name == 'AdamW':
-        optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
-
-    # training function
-    
-    
-    net.train()
-    wandb.watch(net, log='all')
-    for index in tqdm(range(hp.EPOCH)):
-        for i, (x, y) in enumerate(train_dataloader):
-            x, y = x.to(DEVICE), y.to(DEVICE)
-
-            optimizer.zero_grad()
-            y_pre = net(x, y)
-
-            
-
-            loss = loss_function(y_pre, y)
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
-            optimizer.step()
-            
-
-            wandb.log({'Loss': loss})
-            wandb.log({'index': index})
         
-        pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
-        act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
-
-        fig, ax = plt.subplots()
-
-        ax.plot(pre, label='predictions')
-        ax.plot(act, label ='actual')
-        plt.legend()
-        wandb.log({"train plot": wandb.Image(fig)})
-        '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
-            
-        print(mae,mse,rmse,mape,mspe)'''
-        path = '/root/DNNM/model_0.pth'
-        torch.save(net.state_dict(), path)
-        #wandb.log({"train_mse": mse})
+def infer():
         
-        #test(dataloader=test_dataloader, net=net, loss_function=loss_function)
-        #infer(dataloader=inference_dataloader, net=net, window_size=hp.window_size)
+        _,_, inference_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+    
+        net = network(d_model=hp.d_model,
+                        heads=hp.heads,
+                        stack=hp.stack,
+                        d_hidden=hp.d_hidden,
+                        dropout=hp.dropout,
+                        channel_in=d_channel,
+                        window_size=hp.window_size,
+                        pred_size=hp.pred_size).to(DEVICE)
         
-        # Save the model after each epoch
-        #torch.save(net.state_dict(), save_path)
+        net.load_state_dict(torch.load('DNNM/model_0.pth'))
 
-
-
-
-# test function
-def test(dataloader, net, loss_function):
-    
-    
-    net.eval()
-    with torch.no_grad():
-        for i, (x, y) in enumerate(dataloader):
-            x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x, y)
-
-            if i % 500 == 0:
-                pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
-                act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
-
-                fig, ax = plt.subplots()
-
-                ax.plot(pre, label='prediction')
-                ax.plot(act, label='actual')
-                plt.legend()
-                wandb.log({"test plot": wandb.Image(fig)})
-
-
-
-def infer(dataloader, net, window_size):
+        #Select optimizer in an un-optimized way
+        if hp.optimizer_name == 'AdamW':
+            optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
         net.eval()
         with torch.no_grad():
-            for i, (x, _) in enumerate(dataloader):
+            for i, (x, _) in enumerate(inference_dataloader):
                 x = x.to(DEVICE)
                 predictions = run_encoder_decoder_inference(model=net, 
                                                             src=x, 
-                                                            forecast_window = window_size,
+                                                            forecast_window = hp.pred_size,
                                                             batch_size = 1,
                                                             )
         
-        #wandb.log({"test_mse": tmse})
+        pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
 
-# [path save]
-save_path = '/root/DNNM/saved_models/vanilla_transformer.pt'
+        fig, ax = plt.subplots()
+
+        ax.plot(pre, label='prediction')
+        plt.legend()
+        wandb.log({"test plot": wandb.Image(fig)})
+
+
 
 # [Save Model]
 
@@ -271,5 +155,5 @@ save_path = '/root/DNNM/saved_models/vanilla_transformer.pt'
 
 # [Run the model]
 if __name__ == '__main__':
-    train()
+    infer()
 # [End experiment]

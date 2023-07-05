@@ -195,7 +195,7 @@ def run_encoder_decoder_inference(
 
         # Make prediction
         prediction = model(src, tgt) 
-
+        print(prediction)
         # If statement simply makes sure that the predicted value is 
         # extracted and reshaped correctly
         if batch_first == False:
