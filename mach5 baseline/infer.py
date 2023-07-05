@@ -131,7 +131,7 @@ def infer():
             optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
         net.eval()
         with torch.no_grad():
-            for i, (x, _) in enumerate(inference_dataloader):
+            for x, _ in inference_dataloader:
                 x = x.to(DEVICE)
                 predictions = run_encoder_decoder_inference(model=net, 
                                                             src=x, 
