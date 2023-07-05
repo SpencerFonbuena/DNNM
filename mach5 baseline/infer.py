@@ -138,7 +138,8 @@ def infer():
                                                             forecast_window = hp.pred_size,
                                                             batch_size = 1,
                                                             )
-        predictions = hp.scaler.inverse_transform(predictions.cpu())
+        
+        predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
         pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
         fig, ax = plt.subplots()
 
