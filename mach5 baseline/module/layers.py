@@ -253,7 +253,7 @@ def run_encoder_decoder_inference(
     
     final_prediction = model(src, tgt, tgt_mask, src_mask)
 
-    return final_prediction
+    return tgt
 
 
 def Scaler():
