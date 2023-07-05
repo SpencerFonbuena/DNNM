@@ -86,7 +86,7 @@ wandb.init(project='mach34', name='10')
 if torch.cuda.is_available():
     path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
 else:
-    path = 'DNNM/mach1/datasets/SPY_full_test.txt'
+    path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
 
 # [End General Init]
 
@@ -103,9 +103,9 @@ def pipeline(batch_size, window_size,  pred_size, scaler):
 
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
-    inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=12,pin_memory=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True)
+    inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=1,pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -123,11 +123,6 @@ def pipeline(batch_size, window_size,  pred_size, scaler):
     return train_dataloader, test_dataloader, inference_dataloader, d_channel
 
 
-'''              d_model,
-                 heads,
-                 dropout,
-                 dim_feedforward,
-                 stack'''
 def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, pred_size):
     net = Model(
                     d_model=d_model,
@@ -155,7 +150,6 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
         #make_dot(y.mean(), show_attrs=True, show_saved=True,  params=dict(net.named_parameters())).render("GTN_torchviz", format="png")
 
     return net
-
 
 
 def train():
@@ -187,7 +181,6 @@ def train():
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
-
             optimizer.zero_grad()
             y_pre = net(x, y)
 
