@@ -184,7 +184,6 @@ def train():
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
-        j = 0
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
 
@@ -214,8 +213,7 @@ def train():
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
             
         print(mae,mse,rmse,mape,mspe)'''
-        j += 1
-        path = f'/root/DNNM/model_{j}.pth'
+        path = '/root/DNNM/model_0.pth'
         torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
