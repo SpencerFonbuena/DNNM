@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 
 class Attention(nn.Module):
     def __init__(self,
@@ -201,12 +201,12 @@ def run_encoder_decoder_inference(
         tgt_mask = mask(
             dim1=dim_a,
             dim2=dim_a,
-            )
+            ).to(DEVICE)
 
         src_mask = mask(
             dim1=dim_a,
             dim2=dim_b,
-            )
+            ).to(DEVICE)
 
         # Make prediction
 
@@ -234,8 +234,7 @@ def run_encoder_decoder_inference(
         # Detach the predicted element from the graph and concatenate with 
         # tgt in dimension 1 or 0
         tgt = torch.cat((tgt, last_predicted_value.detach()), target_seq_dim)
-        print(tgt)
-        print(tgt.shape)
+
 
     dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
 
@@ -244,12 +243,12 @@ def run_encoder_decoder_inference(
     tgt_mask = mask(
         dim1=dim_a,
         dim2=dim_a,
-        )
+        ).to(DEVICE)
 
     src_mask = mask(
         dim1=dim_a,
         dim2=dim_b,
-        )
+        ).to(DEVICE)
     
     final_prediction = model(src, tgt, tgt_mask, src_mask)
 
