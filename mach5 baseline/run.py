@@ -217,8 +217,8 @@ def train():
         torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
-        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
-        infer(dataloader=inference_dataloader, net=net, window_size=hp.window_size)
+        #test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        #infer(dataloader=inference_dataloader, net=net, window_size=hp.window_size)
         
         # Save the model after each epoch
         #torch.save(net.state_dict(), save_path)
