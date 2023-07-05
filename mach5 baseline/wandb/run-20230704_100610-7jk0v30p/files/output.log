@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 261, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 162, in train
+    train_dataloader, test_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+  File "/root/DNNM/mach5 baseline/run.py", line 104, in pipeline
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
+  File "/root/ml/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 351, in __init__
+    sampler = RandomSampler(dataset, generator=generator)  # type: ignore[arg-type]
+  File "/root/ml/lib/python3.10/site-packages/torch/utils/data/sampler.py", line 107, in __init__
+    raise ValueError("num_samples should be a positive integer "
+ValueError: num_samples should be a positive integer value, but got num_samples=0

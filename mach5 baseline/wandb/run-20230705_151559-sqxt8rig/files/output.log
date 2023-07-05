@@ -1,0 +1,15 @@
+data structure: [lines, timesteps, features]
+train data size: [(122030, 120, 1)]
+mytest data size: [(21356, 120, 1)]
+Number of classes: 4
+/root/ml/lib/python3.10/site-packages/torch/cuda/__init__.py:546: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+  0%|                                                                                                                                                                                                                                                  | 0/20 [05:28<?, ?it/s]
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 272, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 197, in train
+    torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/utils/clip_grad.py", line 76, in clip_grad_norm_
+    torch._foreach_mul_(grads, clip_coef_clamped.to(device))  # type: ignore[call-overload]
+KeyboardInterrupt
