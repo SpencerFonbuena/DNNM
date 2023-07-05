@@ -14,7 +14,7 @@ import random
 import pandas as pd
 import matplotlib.pyplot as plt
 from module.hyperparameters import HyperParameters as hp
-from module.transformer import Model
+from module.infer_transformer import Inf_Model
 from module.loss import Myloss
 from module.layers import run_encoder_decoder_inference
 
@@ -63,7 +63,7 @@ def pipeline(batch_size, window_size,  pred_size):
     #Load the data
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
-    inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=12,pin_memory=True)
+    inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=1,pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -82,7 +82,7 @@ def pipeline(batch_size, window_size,  pred_size):
 
 
 def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, pred_size):
-    net = Model(
+    net = Inf_Model(
                     d_model=d_model,
                     heads=heads,
                     stack=stack,

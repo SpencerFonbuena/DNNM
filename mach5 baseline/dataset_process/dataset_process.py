@@ -104,8 +104,8 @@ class Create_Dataset(Dataset):
         #[end of creating validation data and labels]
         
         # [Inference Data]
-        self.inference_data = rawtrainingdata[len(rawtrainingdata)-window_size :]
-        self.inference_labels = rawtrainingdata[len(rawtrainingdata)-window_size :] # This is really a throw away, we just need it for the dataloaders sake
+        self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size :].reshape(1,window_size,1)).to(torch.float32)
+        self.inference_labels = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size :].reshape(1,window_size,1)).to(torch.float32) # This is really a throw away, we just need it for the dataloaders sake
 
         # [Creating dimension variables for easy computing on other sheets]
         
@@ -114,6 +114,7 @@ class Create_Dataset(Dataset):
         self.channel_len = self.trainingdata.shape[2]# Number of features (Channels)
         self.output_len = 4 # classification category
         self.test_len = self.valdata.shape[0]
+
         
         #[End dimension variables]
 
@@ -125,7 +126,7 @@ class Create_Dataset(Dataset):
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
         elif self.mode == 'inference':
-            return self.inference_data[index, self.inference_labels[index]]
+            return self.inference_data[index], self.inference_labels[index]
     
     def __len__(self):
         if self.mode == 'train':

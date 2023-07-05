@@ -189,13 +189,28 @@ def run_encoder_decoder_inference(
     if batch_first == False and batch_size > 1:
         tgt = tgt.unsqueeze(0).unsqueeze(-1)'''
     # [I don't think this pertains to me]
-
+    tgt = tgt.unsqueeze(0).unsqueeze(0)
     # Iteratively concatenate tgt with the first element in the prediction
     for _ in range(forecast_window-1):
+        
+        # Create masks
+        dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
+
+        dim_b = src.shape[1] if batch_first == True else src.shape[0]
+
+        tgt_mask = mask(
+            dim1=dim_a,
+            dim2=dim_a,
+            )
+
+        src_mask = mask(
+            dim1=dim_a,
+            dim2=dim_b,
+            )
 
         # Make prediction
-        prediction = model(src, tgt) 
-        print(prediction)
+
+        prediction = model(src, tgt, tgt_mask, src_mask) 
         # If statement simply makes sure that the predicted value is 
         # extracted and reshaped correctly
         if batch_first == False:
@@ -214,12 +229,28 @@ def run_encoder_decoder_inference(
 
             # Reshape from [batch_size, 1] --> [batch_size, 1, 1]
             last_predicted_value = last_predicted_value.unsqueeze(-1)
+            
 
         # Detach the predicted element from the graph and concatenate with 
         # tgt in dimension 1 or 0
         tgt = torch.cat((tgt, last_predicted_value.detach()), target_seq_dim)
-    
+        print(tgt)
+        print(tgt.shape)
 
-    final_prediction = model(src, tgt)
+    dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
+
+    dim_b = src.shape[1] if batch_first == True else src.shape[0]
+
+    tgt_mask = mask(
+        dim1=dim_a,
+        dim2=dim_a,
+        )
+
+    src_mask = mask(
+        dim1=dim_a,
+        dim2=dim_b,
+        )
+    
+    final_prediction = model(src, tgt, tgt_mask, src_mask)
 
     return final_prediction
