@@ -9,7 +9,7 @@ from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import random
 from sklearn.preprocessing import StandardScaler
-
+from module.layers import Scaler
 seed = 10
 np.random.seed(seed)
 random.seed(seed)
@@ -20,12 +20,12 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
-    def __init__(self, datafile, window_size, pred_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
+    def __init__(self, datafile, window_size, pred_size, split, scaler, mode = str ): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
         # [Reading in and pre-processing data]
 
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
-        scaler = StandardScaler()
+  
         #Create the training data
         rawtrainingdata = pd.DataFrame(df['Close']).to_numpy()
         rawtrainingdata = pd.DataFrame(scaler.fit_transform(rawtrainingdata)).to_numpy()

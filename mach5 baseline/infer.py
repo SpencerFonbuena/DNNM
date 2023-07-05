@@ -52,11 +52,11 @@ else:
 
 
 #[Create and load the dataset]
-def pipeline(batch_size, window_size,  pred_size):
+def pipeline(batch_size, window_size,  pred_size, scaler):
     #create the datasets to be loaded
-    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
-    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
-    inference_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
+    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='train', pred_size=pred_size)
+    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='test', pred_size=pred_size)
+    inference_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='inference', pred_size=pred_size)
 
 
 
@@ -113,7 +113,7 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
         
 def infer():
         
-        _,_, inference_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+        _,_, inference_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
     
         net = network(d_model=hp.d_model,
                         heads=hp.heads,
@@ -138,7 +138,7 @@ def infer():
                                                             forecast_window = hp.pred_size,
                                                             batch_size = 1,
                                                             )
-        
+                predictions = hp.scaler.inverse_transform(predictions)
         pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
 
         fig, ax = plt.subplots()

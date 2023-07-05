@@ -1,3 +1,5 @@
+from sklearn.preprocessing import StandardScaler
+
 class HyperParameters:
     # hyperparameter settings
     EPOCH = 20
@@ -18,3 +20,4 @@ class HyperParameters:
     fcnstack = 2
     logs = 5
     pred_size = 60
+    scaler = StandardScaler()

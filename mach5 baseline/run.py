@@ -17,6 +17,7 @@ from module.hyperparameters import HyperParameters as hp
 from module.transformer import Model
 from module.loss import Myloss
 from module.layers import run_encoder_decoder_inference
+from sklearn.preprocessing import StandardScaler
 
 
 '''-----------------------------------------------------------------------------------------------------'''
@@ -79,7 +80,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach34', name='09')
+wandb.init(project='mach34', name='10')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -93,11 +94,11 @@ else:
 
 
 #[Create and load the dataset]
-def pipeline(batch_size, window_size,  pred_size):
+def pipeline(batch_size, window_size,  pred_size, scaler):
     #create the datasets to be loaded
-    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=pred_size)
-    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=pred_size)
-    inference_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='inference', pred_size=pred_size)
+    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='train', pred_size=pred_size)
+    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='test', pred_size=pred_size)
+    inference_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='inference', pred_size=pred_size)
 
 
 
@@ -139,7 +140,6 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
                     pred_size=pred_size
                     ).to(DEVICE)
     
-    net.load_state_dict(torch.load('/root/DNNM/model_0.pth'))
     def hiddenPrints():
         # [Printing summaries]
         '''print (
@@ -162,7 +162,7 @@ def train():
 
 
 
-    train_dataloader, test_dataloader, inference_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+    train_dataloader, test_dataloader, inference_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
     
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
@@ -214,7 +214,7 @@ def train():
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
             
         print(mae,mse,rmse,mape,mspe)'''
-        path = '/root/DNNM/model_0.pth'
+        path = '/root/DNNM/model.pth'
         torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
@@ -264,7 +264,7 @@ def infer(dataloader, net, window_size):
         #wandb.log({"test_mse": tmse})
 
 # [path save]
-save_path = '/root/DNNM/saved_models/vanilla_transformer.pt'
+
 
 # [Save Model]
 

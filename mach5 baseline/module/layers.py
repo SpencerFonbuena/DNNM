@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from sklearn.preprocessing import StandardScaler
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 
@@ -253,3 +254,8 @@ def run_encoder_decoder_inference(
     final_prediction = model(src, tgt, tgt_mask, src_mask)
 
     return final_prediction
+
+
+def Scaler():
+    scaler = StandardScaler()
+    return scaler
