@@ -239,7 +239,6 @@ def run_encoder_decoder_inference(
         # Detach the predicted element from the graph and concatenate with 
         # tgt in dimension 1 or 0
         tgt = torch.cat((tgt, last_predicted_value.detach()), target_seq_dim)
-        print(scaler.inverse_transform(tgt.reshape(1,-1)))
         print(tgt)
         print('next')
 
