@@ -124,7 +124,7 @@ def infer():
                         window_size=hp.window_size,
                         pred_size=hp.pred_size).to(DEVICE)
         
-        net.load_state_dict(torch.load('/root/DNNM/model.pth_0'))
+        net.load_state_dict(torch.load('/root/DNNM/model_0.pth'))
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
