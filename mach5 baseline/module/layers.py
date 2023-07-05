@@ -125,7 +125,8 @@ def run_encoder_decoder_inference(
     src: torch.Tensor, 
     forecast_window: int,
     batch_size: int,
-    batch_first: bool=True
+    batch_first: bool=True,
+    scaler: object=None
     ) -> torch.Tensor:
 
     """
@@ -174,6 +175,7 @@ def run_encoder_decoder_inference(
     """
 
     # Dimension of a batched model input that contains the target sequence values
+    #src = src.permute(1,0,2)
     target_seq_dim = 0 if batch_first == False else 1 # This is saying that we want to predict sequence, and if the batch is first, then the sequence dimension is dimension 1, if not, it's 0
 
     # Take the last value of the target variable in all batches in src and make it tgt
@@ -182,13 +184,13 @@ def run_encoder_decoder_inference(
 
 
     # [I don't think this pertains to me]
-    '''# Change shape from [batch_size] to [1, batch_size, 1]
+     # Change shape from [batch_size] to [1, batch_size, 1]
     if batch_size == 1 and batch_first == False:
         tgt = tgt.unsqueeze(0).unsqueeze(0) # change from [1] to [1, 1, 1]
 
     # Change shape from [batch_size] to [1, batch_size, 1]
     if batch_first == False and batch_size > 1:
-        tgt = tgt.unsqueeze(0).unsqueeze(-1)'''
+        tgt = tgt.unsqueeze(0).unsqueeze(-1)
     # [I don't think this pertains to me]
     tgt = tgt.unsqueeze(0).unsqueeze(0)
     # Iteratively concatenate tgt with the first element in the prediction
@@ -211,7 +213,9 @@ def run_encoder_decoder_inference(
 
         # Make prediction
 
-        prediction = model(src, tgt, tgt_mask, src_mask) 
+        prediction = model(src, tgt)
+        
+         
         # If statement simply makes sure that the predicted value is 
         # extracted and reshaped correctly
         if batch_first == False:
@@ -235,6 +239,9 @@ def run_encoder_decoder_inference(
         # Detach the predicted element from the graph and concatenate with 
         # tgt in dimension 1 or 0
         tgt = torch.cat((tgt, last_predicted_value.detach()), target_seq_dim)
+        print(scaler.inverse_transform(tgt.reshape(1,-1)))
+        print(tgt)
+        print('next')
 
 
     dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
@@ -251,9 +258,9 @@ def run_encoder_decoder_inference(
         dim2=dim_b,
         ).to(DEVICE)
     
-    final_prediction = model(src, tgt, tgt_mask, src_mask)
+    final_prediction = model(src, tgt)
 
-    return tgt
+    return final_prediction
 
 
 def Scaler():

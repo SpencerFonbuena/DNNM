@@ -111,7 +111,8 @@ class Create_Dataset(Dataset):
         # [Inference Data]
         self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32)
         self.inference_labels = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32) # This is really a throw away, we just need it for the dataloaders sake
-        demo = torch.tensor(rawtrainingdata[-1000: -940])
+        demo = torch.tensor(rawtrainingdata[-1001: -941])
+
 
         fig, ax = plt.subplots()
 

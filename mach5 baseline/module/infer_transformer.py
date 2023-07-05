@@ -47,7 +47,7 @@ class Inf_Model(nn.Module):
         self.out = nn.Linear(d_model, 1)
 
 
-    def forward(self, x, tgt, tgt_mask, src_mask):
+    def forward(self, x, tgt):
         
         '''mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
         x = x - mean_enc
@@ -56,9 +56,8 @@ class Inf_Model(nn.Module):
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
-        out = self.decoder(tgt, memory, tgt_mask, src_mask)
+        out = self.decoder(tgt, memory)
         out = self.out(out)
-
         #out = out * std_enc + mean_enc
 
         return out

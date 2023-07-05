@@ -124,7 +124,7 @@ def infer():
                         window_size=hp.window_size,
                         pred_size=hp.pred_size).to(DEVICE)
         
-        net.load_state_dict(torch.load('/root/DNNM/model_0.pth'))
+        net.load_state_dict(torch.load('DNNM/model_0.pth', map_location=torch.device('cpu')))
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
@@ -134,9 +134,10 @@ def infer():
             for x, _ in inference_dataloader:
                 x = x.to(DEVICE)
                 predictions = run_encoder_decoder_inference(model=net, 
-                                                            src=x, 
+                                                            src=x,
                                                             forecast_window = hp.pred_size,
                                                             batch_size = 1,
+                                                            scaler=hp.scaler
                                                             )
         
         predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
