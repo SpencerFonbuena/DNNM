@@ -79,7 +79,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach34', name='06')
+wandb.init(project='mach34', name='09')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -138,7 +138,8 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
                     window_size=window_size,
                     pred_size=pred_size
                     ).to(DEVICE)
-
+    
+    net.load_state_dict(torch.load('/root/DNNM/model_0.pth'))
     def hiddenPrints():
         # [Printing summaries]
         '''print (
@@ -217,7 +218,7 @@ def train():
         torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
-        #test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
         #infer(dataloader=inference_dataloader, net=net, window_size=hp.window_size)
         
         # Save the model after each epoch
