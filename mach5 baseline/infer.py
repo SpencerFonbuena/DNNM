@@ -124,7 +124,7 @@ def infer():
                         window_size=hp.window_size,
                         pred_size=hp.pred_size).to(DEVICE)
         
-        net.load_state_dict(torch.load('/root/DNNM/model_0.pth'))
+        net.load_state_dict(torch.load('/root/DNNM/model.pth_0'))
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':
@@ -138,9 +138,8 @@ def infer():
                                                             forecast_window = hp.pred_size,
                                                             batch_size = 1,
                                                             )
-                predictions = hp.scaler.inverse_transform(predictions)
+        predictions = hp.scaler.inverse_transform(predictions)
         pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
-
         fig, ax = plt.subplots()
 
         ax.plot(pre, label='prediction')

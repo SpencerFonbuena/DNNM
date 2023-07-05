@@ -10,6 +10,9 @@ import pandas as pd
 import random
 from sklearn.preprocessing import StandardScaler
 from module.layers import Scaler
+import matplotlib.pyplot as plt
+import wandb
+
 seed = 10
 np.random.seed(seed)
 random.seed(seed)
@@ -17,6 +20,8 @@ torch.manual_seed(seed)
 
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 #print(f'Use device {DEVICE}')
+
+wandb.init(project='mach36', name='01')
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
@@ -104,9 +109,15 @@ class Create_Dataset(Dataset):
         #[end of creating validation data and labels]
         
         # [Inference Data]
-        self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size :].reshape(1,window_size,1)).to(torch.float32)
-        self.inference_labels = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size :].reshape(1,window_size,1)).to(torch.float32) # This is really a throw away, we just need it for the dataloaders sake
+        self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32)
+        self.inference_labels = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32) # This is really a throw away, we just need it for the dataloaders sake
+        demo = torch.tensor(rawtrainingdata[-1000: -940])
 
+        fig, ax = plt.subplots()
+
+        ax.plot(demo, label='prediction')
+        plt.legend()
+        wandb.log({"test plot": wandb.Image(fig)})
         # [Creating dimension variables for easy computing on other sheets]
         
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
