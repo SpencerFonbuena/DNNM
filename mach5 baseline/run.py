@@ -213,7 +213,7 @@ def train():
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
             
         print(mae,mse,rmse,mape,mspe)'''
-        path = f'/root/DNNM/saved_models/model_{index}.pth'
+        path = f'/root/DNNM/model_{index}.pth'
         torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
