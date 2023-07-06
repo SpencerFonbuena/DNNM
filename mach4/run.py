@@ -129,13 +129,13 @@ def train():
             optimizer.step()
 
             if i % 200 == 0:
-                print(y_pre[0])
-                print(y[0])
+                print('Train Pred:',y_pre[0])
+                print('Train Truth',y[0])
 
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
 
-            test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
 
 
@@ -148,9 +148,9 @@ def test(dataloader, net, loss_function):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x)
             
-            if i % 500 == 0:
-                print(y_pre[0])
-                print(y[0])
+            if i % 100 == 0:
+                print('Test Pred:',y_pre[0])
+                print('Test Truth',y[0])
                 
 
 if __name__ == '__main__':
