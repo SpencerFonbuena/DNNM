@@ -184,7 +184,15 @@ def train():
             optimizer.zero_grad()
             y_pre = net(x, y)
 
-            
+            if i % 200 == 0:
+                pre = y_pre.detach().numpy()[0]
+                ys = y.detach().numpy()[0]
+                fig, ax = plt.subplots()
+
+                ax.plot(pre, label='predictions')
+                ax.plot(ys, label ='actual')
+                plt.legend()
+                wandb.log({'through plots': wandb.Image(fig)})
 
             loss = loss_function(y_pre, y)
             loss.backward()

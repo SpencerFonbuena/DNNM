@@ -21,7 +21,7 @@ torch.manual_seed(seed)
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 #print(f'Use device {DEVICE}')
 
-wandb.init(project='mach37', name='01')
+wandb.init(project='mach38', name='01')
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
@@ -114,11 +114,11 @@ class Create_Dataset(Dataset):
         demo = torch.tensor(rawtrainingdata[-1001: -941])
 
 
-        fig, ax = plt.subplots()
+        '''fig, ax = plt.subplots()
 
         ax.plot(demo, label='prediction')
         plt.legend()
-        wandb.log({"mock plot": wandb.Image(fig)})
+        wandb.log({"mock plot": wandb.Image(fig)})'''
         # [Creating dimension variables for easy computing on other sheets]
         
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
