@@ -25,7 +25,7 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
-    def __init__(self, datafile, window_size, pred_size, split, scaler, mode = str ): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
+    def __init__(self, datafile, window_size, split, scaler, mode = str ): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
         # [Reading in and pre-processing data]
 
