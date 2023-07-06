@@ -81,7 +81,7 @@ def pipeline(batch_size, window_size,  pred_size, scaler):
     return train_dataloader, test_dataloader, inference_dataloader, d_channel
 
 
-def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, pred_size):
+def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size):
     net = Inf_Model(
                     d_model=d_model,
                     heads=heads,
@@ -90,7 +90,6 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
                     dropout=dropout,
                     channel_in=channel_in,
                     window_size=window_size,
-                    pred_size=pred_size
                     ).to(DEVICE)
 
     def hiddenPrints():
@@ -122,13 +121,12 @@ def infer():
                         dropout=hp.dropout,
                         channel_in=d_channel,
                         window_size=hp.window_size,
-                        pred_size=hp.pred_size).to(DEVICE)
+                        ).to(DEVICE)
         
+        # [Load Model]
         net.load_state_dict(torch.load('DNNM/model_3.pth', map_location=torch.device('cpu')) ) # , map_location=torch.device('cpu')
 
-        #Select optimizer in an un-optimized way
-        if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
+
         net.eval()
         with torch.no_grad():
             for x, _ in inference_dataloader:
@@ -141,6 +139,8 @@ def infer():
                                                             )
         
         predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
+        
+        # [Log Graph]
         pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
         fig, ax = plt.subplots()
 

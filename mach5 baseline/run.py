@@ -38,7 +38,6 @@ print(f'use device: {DEVICE}')
 
 
 # [Create WandB sweeps]
-
 '''sweep_config = {
     'method': 'random',
 
@@ -75,11 +74,9 @@ print(f'use device: {DEVICE}')
         'values': hp.dropout},
     }
 }'''
-
 # [End Sweeps]
 
 # Log on Weights and Biases
-
 wandb.init(project='mach40', name='10')
 
 #switch datasets depending on local or virtual run
@@ -95,14 +92,13 @@ else:
 
 #[Create and load the dataset]
 def pipeline(batch_size, window_size,  pred_size, scaler):
-    #create the datasets to be loaded
+    
+    # [create the datasets to be loaded]
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='train', pred_size=pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='test', pred_size=pred_size)
     inference_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='inference', pred_size=pred_size)
 
-
-
-    #Load the data
+    # [Load the data]
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True)
     inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=1,pin_memory=True)
@@ -112,7 +108,7 @@ def pipeline(batch_size, window_size,  pred_size, scaler):
     d_channel = train_dataset.channel_len # feature dimension
     d_output = train_dataset.output_len # classification category
 
-    # Dimension display
+    # [Dimension display]
     print('data structure: [lines, timesteps, features]')
     print(f'train data size: [{DATA_LEN, d_input, d_channel}]')
     print(f'mytest data size: [{train_dataset.test_len, d_input, d_channel}]')
@@ -153,11 +149,10 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
 
 
 def train():
-
-
-
+    # [Define Pipeline]
     train_dataloader, test_dataloader, _, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
     
+    # [Define Model]
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
                     stack=hp.stack,
@@ -166,16 +161,14 @@ def train():
                     channel_in=d_channel,
                     window_size=hp.window_size,
                     pred_size=hp.pred_size).to(DEVICE)
-    # Create a loss function here using cross entropy loss
+    
+    # [Define Loss]
     loss_function = Myloss()
 
-    #Select optimizer in an un-optimized way
-    if hp.optimizer_name == 'AdamW':
-        optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
+    # [Define Optimizer]
+    optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
 
-    # training function
-    
-    
+    # [Training function]
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
@@ -183,7 +176,16 @@ def train():
             x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
             y_pre = net(x, y)
-
+            loss = loss_function(y_pre, y)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
+            optimizer.step()
+            
+            # [Log Evaluation Metrics]
+            wandb.log({'Loss': loss})
+            wandb.log({'index': index})
+        
+            # [Logging the graph]
             if i % 200 == 0:
                 pre = y_pre.cpu().detach().numpy()[0]
                 ys = y.cpu().detach().numpy()[0]
@@ -194,25 +196,16 @@ def train():
                 plt.legend()
                 wandb.log({'through plots': wandb.Image(fig)})
 
-            loss = loss_function(y_pre, y)
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
-            optimizer.step()
-            
-
-            wandb.log({'Loss': loss})
-            wandb.log({'index': index})
-        
-
+        # [Save the model]
         path = '/root/DNNM/model_3.pth'
         torch.save(net.state_dict(), path)
-        #wandb.log({"train_mse": mse})
         
-        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        # [Validate Model]
+        test(dataloader=test_dataloader, net=net)
 
 
 # test function
-def test(dataloader, net, loss_function):
+def test(dataloader, net):
     
     
     net.eval()
@@ -221,16 +214,15 @@ def test(dataloader, net, loss_function):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, y)
             
+            # [Logging the Graph]
             if i % 500 == 0:
-                print(y_pre[0])
-                print(y[0])
                 pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
                 act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
 
                 fig, ax = plt.subplots()
-
                 ax.plot(pre, label='prediction')
                 ax.plot(act, label='actual')
+                
                 plt.legend()
                 plt.close()
                 wandb.log({"test plot": wandb.Image(fig)})

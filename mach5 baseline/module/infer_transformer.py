@@ -22,7 +22,6 @@ class Inf_Model(nn.Module):
                  # [Embedding]
                  channel_in = int,
                  window_size = int,
-                 pred_size = int
                  ):
         super(Inf_Model, self).__init__()
         
