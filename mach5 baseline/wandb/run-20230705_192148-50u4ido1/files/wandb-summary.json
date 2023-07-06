@@ -1,0 +1,1 @@
+{"test plot": {"_type": "image-file", "sha256": "8c04efb4079e516a9151d72d1582fad237f07cd0a6a67342134f720895eff535", "size": 34001, "path": "media/images/test plot_2_8c04efb4079e516a9151.png", "format": "png", "width": 640, "height": 480}, "_timestamp": 1688584911.4235725, "_runtime": 3.1548285484313965, "_step": 2, "_wandb": {"runtime": 6}}

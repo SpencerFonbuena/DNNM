@@ -1,0 +1,97 @@
+{
+    "os": "Linux-5.15.0-75-generic-x86_64-with-glibc2.35",
+    "python": "3.10.6",
+    "heartbeatAt": "2023-07-06T04:28:00.412005",
+    "startedAt": "2023-07-06T04:27:59.852354",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/root/DNNM/mach5 baseline/run.py",
+    "codePath": "mach5 baseline/run.py",
+    "git": {
+        "remote": "git@github.com:SpencerFonbuena/DNNM.git",
+        "commit": "13d6cf6a11d6f3323e229cdb87fb84ec106029ac"
+    },
+    "email": null,
+    "root": "/root/DNNM",
+    "host": "vultr",
+    "username": "root",
+    "executable": "/root/ml/bin/python3",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 2992.9680000000003,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "total": 1312.5102462768555,
+        "used": 31.864013671875
+    },
+    "memory": {
+        "total": 117.91753768920898
+    }
+}

@@ -1,0 +1,14 @@
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_setup.py:_flush():76] Current SDK version is 0.15.4
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_setup.py:_flush():76] Configure stats pid to 61565
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_setup.py:_flush():76] Loading settings from /root/.config/wandb/settings
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_setup.py:_flush():76] Loading settings from /root/DNNM/mach5 baseline/wandb/settings
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'mach5 baseline/infer.py', 'program': '/root/DNNM/mach5 baseline/infer.py'}
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_init.py:_log_setup():507] Logging user logs to /root/DNNM/mach5 baseline/wandb/run-20230705_230408-qvld20oe/logs/debug.log
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_init.py:_log_setup():508] Logging internal logs to /root/DNNM/mach5 baseline/wandb/run-20230705_230408-qvld20oe/logs/debug-internal.log
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_init.py:init():547] calling init triggers
+2023-07-05 23:04:08,132 INFO    MainThread:61565 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-07-05 23:04:08,133 INFO    MainThread:61565 [wandb_init.py:init():591] wandb.init() called when a run is still active
+2023-07-05 23:04:22,327 WARNING MsgRouterThr:61565 [router.py:message_loop():77] message_loop has been closed

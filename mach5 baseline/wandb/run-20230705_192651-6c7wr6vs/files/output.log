@@ -1,0 +1,10 @@
+use device: cuda:0
+use device: cuda:0
+data structure: [lines, timesteps, features]
+train data size: [(122030, 120, 1)]
+mytest data size: [(21356, 120, 1)]
+Number of classes: 4
+/root/ml/lib/python3.10/site-packages/torch/cuda/__init__.py:546: UserWarning: Can't initialize NVML
+  warnings.warn("Can't initialize NVML")
+/root/ml/lib/python3.10/site-packages/torch/nn/modules/activation.py:1160: UserWarning: Converting mask without torch.bool dtype to bool; this will negatively affect performance. Prefer to use a boolean mask directly. (Triggered internally at ../aten/src/ATen/native/transformers/attention.cpp:150.)
+  return torch._native_multi_head_attention(
