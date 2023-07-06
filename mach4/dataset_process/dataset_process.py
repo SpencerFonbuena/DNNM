@@ -73,9 +73,8 @@ class Create_Dataset(Dataset):
         # [Window the dataset]
         labelindexdata = np.array([np.arange(start=window_size, stop=len(rawtraininglabels-1))]).reshape(-1,1)
         # Index into the raw training data with our preset windows to create datasets quickly
-        labeldata = rawtraininglabels[labelindexdata]
-
-
+        labeldata = rawtraininglabels[labelindexdata].squeeze(1)
+        
 
         #[End windowing dataset]
         

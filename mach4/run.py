@@ -79,7 +79,7 @@ def pipeline(batch_size, window_size,  pred_size, scaler):
     return train_dataloader, test_dataloader, inference_dataloader, d_channel
 
 
-def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, pred_size):
+def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, batch_size):
     net = Model(
                 d_model=d_model,
                 heads=heads,
@@ -88,7 +88,7 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
                 dropout=dropout,
                 channel_in=channel_in,
                 window_size=window_size,
-                pred_size=pred_size
+                batch_size=batch_size
                 ).to(DEVICE)
     return net
     
@@ -105,7 +105,7 @@ def train():
                     dropout=hp.dropout,
                     channel_in=d_channel,
                     window_size=hp.window_size,
-                    pred_size=hp.pred_size).to(DEVICE)
+                    batch_size=hp.batch_size).to(DEVICE)
     # Create a loss function here using cross entropy loss
     loss_function = Myloss()
 
@@ -123,22 +123,20 @@ def train():
             x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
             y_pre = net(x)
-
-            if i % 200 == 0:
-                pre = y_pre.cpu().detach().numpy()[0]
-                ys = y.cpu().detach().numpy()[0]
-                fig, ax = plt.subplots()
-
-                ax.plot(pre, label='predictions')
-                ax.plot(ys, label ='actual')
-                plt.legend()
-                wandb.log({'through plots': wandb.Image(fig)})
-
             loss = loss_function(y_pre, y)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
             optimizer.step()
             
+            print(y_pre.shape)
+            print(y.shape)
+
+            print(y_pre[0])
+            print(y[0])
+
+            if i % 200 == 0:
+                print(y_pre[0])
+                print(y[0])
 
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
@@ -159,16 +157,7 @@ def test(dataloader, net, loss_function):
             if i % 500 == 0:
                 print(y_pre[0])
                 print(y[0])
-                pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
-                act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
-
-                fig, ax = plt.subplots()
-
-                ax.plot(pre, label='prediction')
-                ax.plot(act, label='actual')
-                plt.legend()
-                plt.close()
-                wandb.log({"test plot": wandb.Image(fig)})
+                
 
 if __name__ == '__main__':
     train()
