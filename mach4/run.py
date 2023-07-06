@@ -36,7 +36,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach41', name='01')
+wandb.init(project='mach42', name='01')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -127,12 +127,6 @@ def train():
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
             optimizer.step()
-            
-            print(y_pre.shape)
-            print(y.shape)
-
-            print(y_pre[0])
-            print(y[0])
 
             if i % 200 == 0:
                 print(y_pre[0])
