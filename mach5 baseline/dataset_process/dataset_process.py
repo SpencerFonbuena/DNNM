@@ -21,7 +21,7 @@ torch.manual_seed(seed)
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 #print(f'Use device {DEVICE}')
 
-wandb.init(project='mach39', name='01')
+#wandb.init(project='mach39', name='03')
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):

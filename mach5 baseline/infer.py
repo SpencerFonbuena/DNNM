@@ -38,7 +38,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach39', name='01')
+wandb.init(project='mach39', name='03')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -124,7 +124,7 @@ def infer():
                         window_size=hp.window_size,
                         pred_size=hp.pred_size).to(DEVICE)
         
-        net.load_state_dict(torch.load('DNNM/model.pth') ) # , map_location=torch.device('cpu')
+        net.load_state_dict(torch.load('DNNM/model_2.pth', map_location=torch.device('cpu')) ) # , map_location=torch.device('cpu')
 
         #Select optimizer in an un-optimized way
         if hp.optimizer_name == 'AdamW':

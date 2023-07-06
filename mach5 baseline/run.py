@@ -80,7 +80,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach38', name='10')
+wandb.init(project='mach40', name='10')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -216,7 +216,7 @@ def train():
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
             
         print(mae,mse,rmse,mape,mspe)'''
-        path = '/root/DNNM/model_2.pth'
+        path = '/root/DNNM/model_3.pth'
         torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
@@ -253,18 +253,6 @@ def test(dataloader, net, loss_function):
                 plt.close()
                 wandb.log({"test plot": wandb.Image(fig)})
 
-
-
-def infer(dataloader, net, window_size):
-        net.eval()
-        with torch.no_grad():
-            for i, (x, _) in enumerate(dataloader):
-                x = x.to(DEVICE)
-                predictions = run_encoder_decoder_inference(model=net, 
-                                                            src=x, 
-                                                            forecast_window = window_size,
-                                                            batch_size = 1,
-                                                            )
         
         #wandb.log({"test_mse": tmse})
 
