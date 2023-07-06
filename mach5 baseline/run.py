@@ -216,8 +216,8 @@ def train():
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
             
         print(mae,mse,rmse,mape,mspe)'''
-        #path = '/root/DNNM/model.pth'
-        #torch.save(net.state_dict(), path)
+        path = '/root/DNNM/model_2.pth'
+        torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
         test(dataloader=test_dataloader, net=net, loss_function=loss_function)
