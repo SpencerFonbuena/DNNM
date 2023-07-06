@@ -135,7 +135,7 @@ def train():
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
 
-            test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
 
 
