@@ -203,6 +203,7 @@ def train():
         ax.plot(pre, label='predictions')
         ax.plot(act, label ='actual')
         plt.legend()
+        plt.close()
         wandb.log({"train plot": wandb.Image(fig)})
         '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
             
@@ -241,6 +242,7 @@ def test(dataloader, net, loss_function):
                 ax.plot(pre, label='prediction')
                 ax.plot(act, label='actual')
                 plt.legend()
+                plt.close()
                 wandb.log({"test plot": wandb.Image(fig)})
 
 

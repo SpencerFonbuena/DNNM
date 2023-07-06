@@ -75,15 +75,14 @@ class Create_Dataset(Dataset):
         #First array is a row vector, which broadcasts with dataset_array
         window_array = np.array([np.arange(pred_size)])
         #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
-        dataset_array = np.array(np.arange(len(rawtrainingdata)- pred_size-window_size+ 1)).reshape(len(rawtrainingdata) - pred_size - window_size+ 1, 1)
+        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size+ 1)).reshape(len(rawtrainingdata)  - window_size+ 1, 1)
         #broadcast the data together
-        indexlabeldata = window_array + dataset_array + window_size - 1
+        indexlabeldata = window_array + dataset_array + 1
         # Index into the raw training data with our preset windows to create datasets quickly
         labeldata = rawtraininglabels[indexlabeldata]
         #print(labeldata[0] ,labeldata.shape)
    
         #[End windowing dataset]''
-
 
 
 
