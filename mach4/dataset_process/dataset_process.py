@@ -8,6 +8,10 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import random
+from sklearn.preprocessing import StandardScaler
+from module.layers import Scaler
+import matplotlib.pyplot as plt
+import wandb
 
 seed = 10
 np.random.seed(seed)
@@ -17,18 +21,23 @@ torch.manual_seed(seed)
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 #print(f'Use device {DEVICE}')
 
+wandb.init(project='mach37', name='01')
+
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
-    def __init__(self, datafile, window_size, pred_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
+    def __init__(self, datafile, window_size, pred_size, split, scaler, mode = str ): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
         # [Reading in and pre-processing data]
 
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
+  
         #Create the training data
-        rawtrainingdata = pd.DataFrame(df).to_numpy()
-        
+        rawtrainingdata = pd.DataFrame(df['Close']).to_numpy()
+        rawtrainingdata = pd.DataFrame(scaler.fit_transform(rawtrainingdata)).to_numpy()
+
         #create the labels
-        rawtraininglabels = pd.DataFrame(df).to_numpy()
+        rawtraininglabels = pd.DataFrame(df['Close']).to_numpy()
+        rawtraininglabels = pd.DataFrame(scaler.fit_transform(rawtraininglabels)).to_numpy()
         # [End pre-processing]
 
 
@@ -68,9 +77,9 @@ class Create_Dataset(Dataset):
         #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
         dataset_array = np.array(np.arange(len(rawtrainingdata)- pred_size-window_size+ 1)).reshape(len(rawtrainingdata) - pred_size - window_size+ 1, 1)
         #broadcast the data together
-        indexdata = window_array + dataset_array + window_size - 1
+        indexlabeldata = window_array + dataset_array + window_size - 1
         # Index into the raw training data with our preset windows to create datasets quickly
-        labeldata = rawtraininglabels[indexdata]
+        labeldata = rawtraininglabels[indexlabeldata]
         #print(labeldata[0] ,labeldata.shape)
    
         #[End windowing dataset]''
@@ -99,8 +108,17 @@ class Create_Dataset(Dataset):
 
         #[end of creating validation data and labels]
         
-        
+        # [Inference Data]
+        self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32)
+        self.inference_labels = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32) # This is really a throw away, we just need it for the dataloaders sake
+        demo = torch.tensor(rawtrainingdata[-1001: -941])
 
+
+        fig, ax = plt.subplots()
+
+        ax.plot(demo, label='prediction')
+        plt.legend()
+        wandb.log({"mock plot": wandb.Image(fig)})
         # [Creating dimension variables for easy computing on other sheets]
         
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
@@ -108,6 +126,7 @@ class Create_Dataset(Dataset):
         self.channel_len = self.trainingdata.shape[2]# Number of features (Channels)
         self.output_len = 4 # classification category
         self.test_len = self.valdata.shape[0]
+
         
         #[End dimension variables]
 
@@ -118,14 +137,15 @@ class Create_Dataset(Dataset):
             return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
-
+        elif self.mode == 'inference':
+            return self.inference_data[index], self.inference_labels[index]
     
     def __len__(self):
         if self.mode == 'train':
             return len(self.trainingdata)
         if self.mode == 'test':
             return len(self.vallabels)
-
+        if self.mode == 'inference':
+            return len(self.inference_data)
         
         
-

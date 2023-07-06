@@ -3,72 +3,64 @@ import torch.nn as nn
 from module.embedding import Embedding
 from module.layers import Projector, Ns_Transformer
 import torchvision.ops.stochastic_depth as std
+from module.embedding import Embedding
+from sklearn.preprocessing import StandardScaler
+
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Model(nn.Module):
     """
     Non-stationary Transformer
     """
     def __init__(self,
-                 enc_in,
-                 seq_len,
-                 p_hidden_dims,
-                 p_hidden_layers,
-                 pred_len,
-                 label_len,
-                 d_model,
-                 heads,
-                 dropout,
-                 device,
-                 rbn,
-                 stack
+                 d_model = int,
+                 heads = int,
+                 dropout = float,
+                 dim_feedforward = int,
+                 stack = int, 
+ 
+                 # [Embedding]
+                 channel_in = int,
+                 window_size = int,
+                 pred_size = int
                  ):
         super(Model, self).__init__()
+        
+        def mask(dim1: int, dim2: int):
+            return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
 
-        self.pred_len = pred_len
-        self.seq_len = seq_len
-        self.label_len = label_len
 
-        # [Destationary factors]
-        self.tau_learner   = Projector(enc_in=enc_in, seq_len=seq_len, hidden_dims=p_hidden_dims, hidden_layers=p_hidden_layers, output_dim=1)
-        self.delta_learner = Projector(enc_in=enc_in, seq_len=seq_len, hidden_dims=p_hidden_dims, hidden_layers=p_hidden_layers, output_dim=seq_len)
+        self.embedding = Embedding(channel_in=channel_in, window_size=window_size)
 
         # [Encoder]
-        self.encoder = nn.ModuleList ({Ns_Transformer(
-                 d_model=d_model,
-                 num_heads=heads,
-                 dropout=dropout,
-                 rbn=rbn
-            )} for _ in range(stack)
-        ) 
+        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu',batch_first=True, norm_first=True,)
+        self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
+        
+        # [Mask]
+        self.tgt_mask = mask(pred_size, pred_size).to(DEVICE)
+        self.src_mask = mask(pred_size, window_size).to(DEVICE)
 
         # [Decoder]
-        decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads)
-        self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
+        self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
+
+        self.out = nn.Linear(d_model, 1)
 
 
-    def forward(self, x_enc, tgt):
+    def forward(self, x, tgt):
+        
+        '''mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
+        x = x - mean_enc
+        std_enc = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
+        x = x / std_enc'''
+        x = self.embedding(x)
+        tgt = self.embedding(tgt)
+        memory = self.encoder(x)
+        out = self.decoder(tgt, memory, self.tgt_mask)
+        out = self.out(out)
 
-        x_raw = x_enc.clone().detach() # Use the raw x to later approximate de-stationary features
+        #out = out * std_enc + mean_enc
 
-        # [Normalization]
-        mean_enc = x_enc.mean(1, keepdim=True).detach() # B x 1 x E |
-        x_enc = x_enc - mean_enc # Subtract Mean
-        std_enc = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach() # B x 1 x E
-        x_enc = x_enc / std_enc # Divide by standard deviation
-        #x_dec_new = torch.cat([x_enc[:, -self.label_len: , :], torch.zeros_like(x_dec[:, -self.pred_len:, :])], dim=1).to(x_enc.device).clone()
-
-        tau = self.tau_learner(x_raw, std_enc).exp()     # B x S x E, B x 1 x E -> B x 1, positive scalar    
-        delta = self.delta_learner(x_raw, mean_enc)      # B x S x E, B x 1 x E -> B x S
-
-        # [Encoding]
-        for i, encoder in enumerate(self.encoder):
-            x_encoder = std(x_encoder, (i/self.stack) * self.p, 'batch')
-            x_encoder = encoder(x_encoder, tau, delta)
-
-
-        dec_out = self.decoder(tgt,x_encoder)
-
-        # De-normalization
-        dec_out = dec_out * std_enc + mean_enc
-
-        return dec_out
+        return out
+    
+    

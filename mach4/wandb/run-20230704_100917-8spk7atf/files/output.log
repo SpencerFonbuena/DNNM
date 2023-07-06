@@ -1,0 +1,23 @@
+data structure: [lines, timesteps, features]
+train data size: [(122030, 120, 8)]
+mytest data size: [(21356, 120, 8)]
+Number of classes: 4
+  0%|                                                                                                                                                                                                                                                    | 0/20 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 261, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 189, in train
+    y_pre = net(x, y)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1538, in _call_impl
+    result = forward_call(*args, **kwargs)
+  File "/root/DNNM/mach5 baseline/module/transformer.py", line 56, in forward
+    tgt = self.embedding(tgt)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/DNNM/mach5 baseline/module/embedding.py", line 46, in forward
+    x = self.ffchannelembedding(x)#(16,120,512)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 114, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (3840x1 and 8x512)

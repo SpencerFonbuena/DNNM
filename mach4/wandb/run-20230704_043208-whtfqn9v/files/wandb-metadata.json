@@ -1,0 +1,105 @@
+{
+    "os": "Linux-5.15.0-75-generic-x86_64-with-glibc2.35",
+    "python": "3.10.6",
+    "heartbeatAt": "2023-07-04T04:32:08.629665",
+    "startedAt": "2023-07-04T04:32:08.101887",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/root/DNNM/mach5 baseline/run.py",
+    "codePath": "mach5 baseline/run.py",
+    "git": {
+        "remote": "git@github.com:SpencerFonbuena/DNNM.git",
+        "commit": "b1829d3284a096804fa6b436901902dee9494c09"
+    },
+    "email": null,
+    "root": "/root/DNNM",
+    "host": "vultr",
+    "username": "root",
+    "executable": "/root/ml/bin/python3",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 2992.9680000000003,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2992.968,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "total": 1312.5102462768555,
+        "used": 27.98212432861328
+    },
+    "gpu": "GRID A100D-7-80C",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "GRID A100D-7-80C",
+            "memory_total": 85899345920
+        }
+    ],
+    "memory": {
+        "total": 117.91753768920898
+    }
+}

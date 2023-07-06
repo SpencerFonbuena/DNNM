@@ -1,0 +1,31 @@
+data structure: [lines, timesteps, features]
+train data size: [(122053, 120, 1)]
+mytest data size: [(21360, 120, 1)]
+Number of classes: 4
+  0%|                                                                                                                                                                                                                                                    | 0/20 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 262, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 190, in train
+    y_pre = net(x, y)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1538, in _call_impl
+    result = forward_call(*args, **kwargs)
+  File "/root/DNNM/mach5 baseline/module/transformer.py", line 49, in forward
+    out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/transformer.py", line 369, in forward
+    output = mod(output, memory, tgt_mask=tgt_mask,
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/transformer.py", line 712, in forward
+    x = x + self._sa_block(self.norm1(x), tgt_mask, tgt_key_padding_mask, tgt_is_causal)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/transformer.py", line 725, in _sa_block
+    x = self.self_attn(x, x, x,
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/activation.py", line 1205, in forward
+    attn_output, attn_output_weights = F.multi_head_attention_forward(
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/functional.py", line 5373, in multi_head_attention_forward
+    attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!

@@ -1,0 +1,23 @@
+data structure: [lines, timesteps, features]
+train data size: [(122030, 120, 1)]
+mytest data size: [(21216, 120, 1)]
+Number of classes: 4
+  0%|                                                                                                                                                                                                                                                   | 0/6 [00:00<?, ?it/s]/root/DNNM/mach5 baseline/run.py:205: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+/root/DNNM/mach5 baseline/run.py:206: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
+/root/DNNM/mach5 baseline/run.py:239: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  pre = torch.tensor(y_pre).cpu().detach().numpy()[-1].squeeze()
+/root/DNNM/mach5 baseline/run.py:240: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  act = torch.tensor(y).cpu().detach().numpy()[-1].squeeze()
+ 17%|██████████████████████████████████████▌                                                                                                                                                                                                | 1/6 [19:44<1:38:44, 1184.92s/it]
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 276, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 197, in train
+    loss.backward()
+  File "/root/ml/lib/python3.10/site-packages/torch/_tensor.py", line 487, in backward
+    torch.autograd.backward(
+  File "/root/ml/lib/python3.10/site-packages/torch/autograd/__init__.py", line 200, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

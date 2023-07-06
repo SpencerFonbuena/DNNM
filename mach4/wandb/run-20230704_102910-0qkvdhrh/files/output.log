@@ -1,0 +1,15 @@
+data structure: [lines, timesteps, features]
+train data size: [(122030, 120, 1)]
+mytest data size: [(21356, 120, 1)]
+Number of classes: 4
+  0%|                                                                                                                                                                                                                                                    | 0/20 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 261, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 189, in train
+    y_pre = net(x, y)
+  File "/root/ml/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1538, in _call_impl
+    result = forward_call(*args, **kwargs)
+  File "/root/DNNM/mach5 baseline/module/transformer.py", line 57, in forward
+    x = self.scaler(x)
+TypeError: 'StandardScaler' object is not callable

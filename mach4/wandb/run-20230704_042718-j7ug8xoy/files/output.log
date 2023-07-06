@@ -1,0 +1,10 @@
+data structure: [lines, timesteps, features]
+train data size: [(122030, 120, 1)]
+mytest data size: [(21216, 120, 1)]
+Number of classes: 4
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 276, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 165, in train
+    train_dataloader, test_dataloader,  infer_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size)
+ValueError: not enough values to unpack (expected 4, got 3)

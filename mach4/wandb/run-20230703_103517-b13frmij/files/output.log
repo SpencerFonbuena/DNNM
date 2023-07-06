@@ -1,0 +1,27 @@
+data structure: [lines, timesteps, features]
+train data size: [(122053, 120, 1)]
+mytest data size: [(21360, 120, 1)]
+Number of classes: 4
+  0%|                                                                                                                                                                              | 0/20 [00:00<?, ?it/s]/root/ml/lib/python3.10/site-packages/torch/nn/modules/loss.py:536: UserWarning: Using a target size (torch.Size([64, 60, 1])) that is different to the input size (torch.Size([64, 60, 9])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return F.mse_loss(input, target, reduction=self.reduction)
+/root/DNNM/mach5 baseline/run.py:201: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+/root/DNNM/mach5 baseline/run.py:202: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
+/root/DNNM/mach5 baseline/run.py:234: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+/root/DNNM/mach5 baseline/run.py:235: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
+  0%|                                                                                                                                                                              | 0/20 [09:11<?, ?it/s]
+Traceback (most recent call last):
+  File "/root/DNNM/mach5 baseline/run.py", line 260, in <module>
+    train()
+  File "/root/DNNM/mach5 baseline/run.py", line 218, in train
+    torch.save(net.state_dict(), save_path)
+  File "/root/ml/lib/python3.10/site-packages/torch/serialization.py", line 440, in save
+    with _open_zipfile_writer(f) as opened_zipfile:
+  File "/root/ml/lib/python3.10/site-packages/torch/serialization.py", line 315, in _open_zipfile_writer
+    return container(name_or_buffer)
+  File "/root/ml/lib/python3.10/site-packages/torch/serialization.py", line 288, in __init__
+    super().__init__(torch._C.PyTorchFileWriter(str(name)))
+RuntimeError: Parent directory /root/saved_models does not exist.
