@@ -11,7 +11,7 @@ class HyperParameters:
     queries = 8 # Queries
     values = 8 # Values
     heads = 64 # Heads
-    stack = 8 # multi head attention layers
+    stack = 16 # multi head attention layers
     dropout = 0.7
     split = .85
     optimizer_name = 'AdamW'
@@ -19,5 +19,5 @@ class HyperParameters:
     p = 0.3
     fcnstack = 2
     logs = 5
-    pred_size = 60
+    pred_size = 120
     scaler = StandardScaler()
