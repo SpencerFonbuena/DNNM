@@ -110,8 +110,8 @@ def train():
     loss_function = Myloss()
 
     #Select optimizer in an un-optimized way
-    if hp.optimizer_name == 'AdamW':
-        optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
+
+    optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
 
     # training function
     
