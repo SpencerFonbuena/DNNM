@@ -42,7 +42,7 @@ class Model(nn.Module):
         
         x = self.embedding(x)
         x = self.encoder(x)
-        x = x.reshape(self.batch_size, -1)
+        x = x.reshape(x.shape[0], -1)
         x = F.gelu(self.preout(x))
         x = self.out(x)
 
