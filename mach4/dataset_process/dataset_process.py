@@ -61,7 +61,7 @@ class Create_Dataset(Dataset):
         #First array is a row vector, which broadcasts with dataset_array
         window_array = np.array([np.arange(window_size)])
         #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
-        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
+        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size)).reshape(len(rawtrainingdata)-window_size, 1)
         #broadcast the data together
         indexdata = window_array + dataset_array
         # Index into the raw training data with our preset windows to create datasets quickly
@@ -71,18 +71,15 @@ class Create_Dataset(Dataset):
 
 
         # [Window the dataset]
-        indexlabeldata = indexdata + 1
-        indexlabeldata = indexlabeldata[:,-1].reshape(-1,1)
-        print(len(rawtrainingdata))
-        print(indexdata.shape)
-        print(indexlabeldata.shape)
-        print(rawtraininglabels.shape)
-        labeldata = rawtraininglabels[indexlabeldata]
-   
-        #[End windowing dataset]''
+        labelindexdata = np.array([np.arange(start=window_size, stop=len(rawtraininglabels-1))]).reshape(-1,1)
+        # Index into the raw training data with our preset windows to create datasets quickly
+        labeldata = rawtraininglabels[labelindexdata]
 
 
 
+        #[End windowing dataset]
+        
+        
 
         #[beginning of creating test data and labels]
 
@@ -106,7 +103,7 @@ class Create_Dataset(Dataset):
         #[end of creating validation data and labels]
         
         # [Inference Data]
-        self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32)
+        '''self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32)
         self.inference_labels = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32) # This is really a throw away, we just need it for the dataloaders sake
         demo = torch.tensor(rawtrainingdata[-1001: -941])
 
@@ -115,7 +112,7 @@ class Create_Dataset(Dataset):
 
         ax.plot(demo, label='prediction')
         plt.legend()
-        wandb.log({"mock plot": wandb.Image(fig)})
+        wandb.log({"mock plot": wandb.Image(fig)})'''
         # [Creating dimension variables for easy computing on other sheets]
         
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set

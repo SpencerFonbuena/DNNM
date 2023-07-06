@@ -81,15 +81,16 @@ def pipeline(batch_size, window_size,  pred_size, scaler):
 
 def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, pred_size):
     net = Model(
-                    d_model=d_model,
-                    heads=heads,
-                    stack=stack,
-                    dim_feedforward=d_hidden,
-                    dropout=dropout,
-                    channel_in=channel_in,
-                    window_size=window_size,
-                    pred_size=pred_size
-                    ).to(DEVICE)
+                d_model=d_model,
+                heads=heads,
+                stack=stack,
+                dim_feedforward=d_hidden,
+                dropout=dropout,
+                channel_in=channel_in,
+                window_size=window_size,
+                pred_size=pred_size
+                ).to(DEVICE)
+    return net
     
 def train():
 
