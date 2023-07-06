@@ -36,7 +36,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach43', name='02')
+wandb.init(project='mach43', name='04')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
