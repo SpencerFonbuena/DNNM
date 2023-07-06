@@ -125,9 +125,10 @@ def train():
             
             y_pre = net(x)
             loss = loss_function(y_pre, y)
-            loss.backward()
+            
             torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
-            if i+1 % 2 == 0:
+            if i+1 % 4 == 0:
+                loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
             if i % 200 == 0:
