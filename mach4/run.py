@@ -154,7 +154,7 @@ def test(dataloader, net, loss_function):
     with torch.no_grad():
         for i, (x, y) in enumerate(dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x, y)
+            y_pre = net(x)
             
             if i % 500 == 0:
                 print(y_pre[0])
