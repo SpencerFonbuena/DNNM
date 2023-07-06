@@ -185,8 +185,8 @@ def train():
             y_pre = net(x, y)
 
             if i % 200 == 0:
-                pre = y_pre.detach().numpy()[0]
-                ys = y.detach().numpy()[0]
+                pre = y_pre.cpu().detach().numpy()[0]
+                ys = y.cpu().detach().numpy()[0]
                 fig, ax = plt.subplots()
 
                 ax.plot(pre, label='predictions')
