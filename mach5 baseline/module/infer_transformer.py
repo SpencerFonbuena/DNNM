@@ -26,8 +26,7 @@ class Inf_Model(nn.Module):
                  ):
         super(Inf_Model, self).__init__()
         
-        def mask(dim1: int, dim2: int):
-            return torch.triu(torch.ones(dim1, dim2) * float('-inf'), diagonal=1)
+
 
 
         self.embedding = Embedding(channel_in=channel_in, window_size=window_size)
@@ -36,9 +35,6 @@ class Inf_Model(nn.Module):
         encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu',batch_first=True, norm_first=True,)
         self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
         
-        # [Mask]
-        self.tgt_mask = mask(pred_size, pred_size).to(DEVICE)
-        self.src_mask = mask(pred_size, window_size).to(DEVICE)
 
         # [Decoder]
         decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
@@ -47,7 +43,7 @@ class Inf_Model(nn.Module):
         self.out = nn.Linear(d_model, 1)
 
 
-    def forward(self, x, tgt):
+    def forward(self, x, tgt, mask):
         
         '''mean_enc = x.mean(1, keepdim=True).detach() # B x 1 x E
         x = x - mean_enc
@@ -56,7 +52,7 @@ class Inf_Model(nn.Module):
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
-        out = self.decoder(tgt, memory)
+        out = self.decoder(tgt, memory, mask)
         out = self.out(out)
         #out = out * std_enc + mean_enc
 

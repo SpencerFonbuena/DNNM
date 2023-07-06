@@ -199,21 +199,15 @@ def run_encoder_decoder_inference(
         # Create masks
         dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
 
-        dim_b = src.shape[1] if batch_first == True else src.shape[0]
-
         tgt_mask = mask(
             dim1=dim_a,
             dim2=dim_a,
             ).to(DEVICE)
 
-        src_mask = mask(
-            dim1=dim_a,
-            dim2=dim_b,
-            ).to(DEVICE)
 
         # Make prediction
 
-        prediction = model(src, tgt)
+        prediction = model(src, tgt, torch.zeros_like(tgt_mask))
         
          
         # If statement simply makes sure that the predicted value is 
@@ -245,19 +239,16 @@ def run_encoder_decoder_inference(
 
     dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
 
-    dim_b = src.shape[1] if batch_first == True else src.shape[0]
+
 
     tgt_mask = mask(
         dim1=dim_a,
         dim2=dim_a,
         ).to(DEVICE)
 
-    src_mask = mask(
-        dim1=dim_a,
-        dim2=dim_b,
-        ).to(DEVICE)
+
     
-    final_prediction = model(src, tgt)
+    final_prediction = model(src, tgt, tgt_mask)
 
     return final_prediction
 
