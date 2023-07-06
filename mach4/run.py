@@ -36,7 +36,7 @@ print(f'use device: {DEVICE}')
 
 # Log on Weights and Biases
 
-wandb.init(project='mach43', name='01')
+wandb.init(project='mach43', name='02')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -59,7 +59,7 @@ def pipeline(batch_size, window_size, scaler):
 
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True)
     inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=1,pin_memory=True)
 
@@ -96,7 +96,7 @@ def train():
 
 
 
-    train_dataloader, test_dataloader, _, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
+    train_dataloader, test_dataloader, _, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, scaler=hp.scaler)
     
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
