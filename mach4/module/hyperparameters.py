@@ -13,4 +13,5 @@ class HyperParameters:
     dropout = 0.7
     split = .85
     clip = .9
+    pred_size = 60
     scaler = StandardScaler()
