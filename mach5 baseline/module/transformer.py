@@ -56,7 +56,7 @@ class Model(nn.Module):
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
-        out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
+        out = self.decoder(tgt, memory, tgt_key_padding_mask = self.tgt_mask, memory_key_padding_mask = self.src_mask)
         out = self.out(out)
 
         #out = out * std_enc + mean_enc
