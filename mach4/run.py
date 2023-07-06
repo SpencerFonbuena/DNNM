@@ -117,17 +117,19 @@ def train():
     
     
     net.train()
+    optimizer.zero_grad()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
-            optimizer.zero_grad()
+            
             y_pre = net(x)
             loss = loss_function(y_pre, y)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
-            optimizer.step()
-
+            if i+1 % 2 == 0:
+                optimizer.step()
+                optimizer.zero_grad()
             if i % 200 == 0:
                 print('Train Pred:',y_pre[0])
                 print('Train Truth',y[0])
