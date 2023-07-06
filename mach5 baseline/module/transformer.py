@@ -37,8 +37,8 @@ class Model(nn.Module):
         self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
         
         # [Mask]
-        self.tgt_mask = torch.zeros_like(mask(pred_size, pred_size)).to(DEVICE)
-        self.src_mask = torch.zeros_like(mask(pred_size, window_size)).to(DEVICE)
+        self.tgt_mask = mask(pred_size, pred_size).to(DEVICE)
+        self.src_mask = mask(pred_size, window_size).to(DEVICE)
 
         # [Decoder]
         decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
@@ -56,7 +56,7 @@ class Model(nn.Module):
         x = self.embedding(x)
         tgt = self.embedding(tgt)
         memory = self.encoder(x)
-        out = self.decoder(tgt, memory, tgt_key_padding_mask = self.tgt_mask, memory_key_padding_mask = self.src_mask)
+        out = self.decoder(tgt, memory, self.tgt_mask, self.src_mask)
         out = self.out(out)
 
         #out = out * std_enc + mean_enc

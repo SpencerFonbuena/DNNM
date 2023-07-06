@@ -4,7 +4,7 @@ class HyperParameters:
     # hyperparameter settings
     EPOCH = 20
     batch_size = 64
-    window_size = 120
+    window_size = 10
     LR = .00001 #.00001,.00003,.00005,.00007,.00009
     d_model = 512
     d_hidden = 2048
