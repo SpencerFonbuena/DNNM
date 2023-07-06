@@ -5,6 +5,7 @@ from module.layers import Projector, Ns_Transformer
 import torchvision.ops.stochastic_depth as std
 from module.embedding import Embedding
 from sklearn.preprocessing import StandardScaler
+import torch.nn.functional as F
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -42,7 +43,7 @@ class Model(nn.Module):
         x = self.embedding(x)
         x = self.encoder(x)
         x = x.reshape(self.batch_size, -1)
-        x = self.preout(x)
+        x = F.gelu(self.preout(x))
         x = self.out(x)
 
         return x
