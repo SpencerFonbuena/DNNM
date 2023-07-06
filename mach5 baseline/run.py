@@ -156,7 +156,7 @@ def train():
 
 
 
-    train_dataloader, test_dataloader, inference_dataloader, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
+    train_dataloader, test_dataloader, _, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
     
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
@@ -203,30 +203,12 @@ def train():
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
         
-        pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
-        act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
 
-        fig, ax = plt.subplots()
-
-        ax.plot(pre, label='predictions')
-        ax.plot(act, label ='actual')
-        plt.legend()
-        plt.close()
-        wandb.log({"train plot": wandb.Image(fig)})
-        '''mae,mse,rmse,mape,mspe = metric(y_pre.cpu().detach().numpy(), y.cpu().detach().numpy())
-            
-        print(mae,mse,rmse,mape,mspe)'''
         path = '/root/DNNM/model_3.pth'
         torch.save(net.state_dict(), path)
         #wandb.log({"train_mse": mse})
         
         test(dataloader=test_dataloader, net=net, loss_function=loss_function)
-        #infer(dataloader=inference_dataloader, net=net, window_size=hp.window_size)
-        
-        # Save the model after each epoch
-        #torch.save(net.state_dict(), save_path)
-
-
 
 
 # test function
@@ -254,12 +236,6 @@ def test(dataloader, net, loss_function):
                 wandb.log({"test plot": wandb.Image(fig)})
 
         
-        #wandb.log({"test_mse": tmse})
-
-# [path save]
-
-
-# [Save Model]
 
 # [End Save Model]
 

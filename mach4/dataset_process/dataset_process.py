@@ -32,7 +32,7 @@ class Create_Dataset(Dataset):
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
   
         #Create the training data
-        rawtrainingdata = pd.DataFrame(df['Close']).to_numpy()
+        rawtrainingdata = pd.DataFrame(df).to_numpy()
         rawtrainingdata = pd.DataFrame(scaler.fit_transform(rawtrainingdata)).to_numpy()
 
         #create the labels
@@ -58,29 +58,26 @@ class Create_Dataset(Dataset):
         
         # [Window the dataset]
         
-        ''#First array is a row vector, which broadcasts with dataset_array
+        #First array is a row vector, which broadcasts with dataset_array
         window_array = np.array([np.arange(window_size)])
         #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
-        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size - pred_size + 1)).reshape(len(rawtrainingdata)-window_size - pred_size + 1, 1)
+        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
         #broadcast the data together
         indexdata = window_array + dataset_array
         # Index into the raw training data with our preset windows to create datasets quickly
         trainingdata = rawtrainingdata[indexdata]
-        #print(trainingdata[0,-1:,:], trainingdata.shape)
+
         #[End windowing dataset]
 
 
         # [Window the dataset]
-        
-        #First array is a row vector, which broadcasts with dataset_array
-        window_array = np.array([np.arange(pred_size)])
-        #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
-        dataset_array = np.array(np.arange(len(rawtrainingdata)- pred_size-window_size+ 1)).reshape(len(rawtrainingdata) - pred_size - window_size+ 1, 1)
-        #broadcast the data together
-        indexlabeldata = window_array + dataset_array + window_size - 1
-        # Index into the raw training data with our preset windows to create datasets quickly
+        indexlabeldata = indexdata + 1
+        indexlabeldata = indexlabeldata[:,-1].reshape(-1,1)
+        print(len(rawtrainingdata))
+        print(indexdata.shape)
+        print(indexlabeldata.shape)
+        print(rawtraininglabels.shape)
         labeldata = rawtraininglabels[indexlabeldata]
-        #print(labeldata[0] ,labeldata.shape)
    
         #[End windowing dataset]''
 

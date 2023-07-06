@@ -193,6 +193,7 @@ def run_encoder_decoder_inference(
         tgt = tgt.unsqueeze(0).unsqueeze(-1)
     # [I don't think this pertains to me]
     tgt = tgt.unsqueeze(0).unsqueeze(0)
+    
     # Iteratively concatenate tgt with the first element in the prediction
     for _ in range(forecast_window-1):
         
@@ -234,7 +235,6 @@ def run_encoder_decoder_inference(
         # tgt in dimension 1 or 0
         tgt = torch.cat((tgt, last_predicted_value.detach()), target_seq_dim)
         print(tgt)
-        print('next')
 
 
     dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]

@@ -18,7 +18,6 @@ from module.transformer import Model
 from module.loss import Myloss
 from module.layers import run_encoder_decoder_inference
 from sklearn.preprocessing import StandardScaler
-from transformers import TimeSeriesTransformerConfig, TimeSeriesTransformerModel
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
 
@@ -92,7 +91,83 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
                     pred_size=pred_size
                     ).to(DEVICE)
     
-config = TimeSeriesTransformerConfig(
-    prediction_length=hp.pred_size,
-    context_length=hp.window_size,
-    embedding_dimension=512
+def train():
+
+
+
+    train_dataloader, test_dataloader, _, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
+    
+    net = network(d_model=hp.d_model,
+                    heads=hp.heads,
+                    stack=hp.stack,
+                    d_hidden=hp.d_hidden,
+                    dropout=hp.dropout,
+                    channel_in=d_channel,
+                    window_size=hp.window_size,
+                    pred_size=hp.pred_size).to(DEVICE)
+    # Create a loss function here using cross entropy loss
+    loss_function = Myloss()
+
+    #Select optimizer in an un-optimized way
+    if hp.optimizer_name == 'AdamW':
+        optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
+
+    # training function
+    
+    
+    net.train()
+    wandb.watch(net, log='all')
+    for index in tqdm(range(hp.EPOCH)):
+        for i, (x, y) in enumerate(train_dataloader):
+            x, y = x.to(DEVICE), y.to(DEVICE)
+            optimizer.zero_grad()
+            y_pre = net(x)
+
+            if i % 200 == 0:
+                pre = y_pre.cpu().detach().numpy()[0]
+                ys = y.cpu().detach().numpy()[0]
+                fig, ax = plt.subplots()
+
+                ax.plot(pre, label='predictions')
+                ax.plot(ys, label ='actual')
+                plt.legend()
+                wandb.log({'through plots': wandb.Image(fig)})
+
+            loss = loss_function(y_pre, y)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
+            optimizer.step()
+            
+
+            wandb.log({'Loss': loss})
+            wandb.log({'index': index})
+
+            test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+
+
+
+def test(dataloader, net, loss_function):
+    
+    
+    net.eval()
+    with torch.no_grad():
+        for i, (x, y) in enumerate(dataloader):
+            x, y = x.to(DEVICE), y.to(DEVICE)
+            y_pre = net(x, y)
+            
+            if i % 500 == 0:
+                print(y_pre[0])
+                print(y[0])
+                pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
+                act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
+
+                fig, ax = plt.subplots()
+
+                ax.plot(pre, label='prediction')
+                ax.plot(act, label='actual')
+                plt.legend()
+                plt.close()
+                wandb.log({"test plot": wandb.Image(fig)})
+
+if __name__ == '__main__':
+    train()
