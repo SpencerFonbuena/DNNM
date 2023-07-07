@@ -197,7 +197,7 @@ def train():
                 ax.plot(pre, label='predictions')
                 ax.plot(ys, label ='actual')
                 plt.legend()
-                wandb.log({'through plots': wandb.Image(fig)})
+                wandb.log({'train plots': wandb.Image(fig)})
 
         # [Save the model]
         path = '/root/DNNM/model_3.pth'
@@ -224,7 +224,7 @@ def infer(dataloader, net):
     predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
     
     # [Log Graph]
-    pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
+    pre = torch.tensor(predictions[0]).cpu().detach().numpy()[0].squeeze()
     fig, ax = plt.subplots()
 
     ax.plot(pre, label='prediction')
