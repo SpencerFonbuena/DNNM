@@ -176,6 +176,7 @@ def train():
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
+            print('test')
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, y, train_mask)
             loss = loss_function(y_pre, y)
@@ -185,7 +186,7 @@ def train():
                 optimizer.step()
                 optimizer.zero_grad()
             if 1 % 100_000 == 0:
-                print('test')
+                
                 infer(dataloader=test_dataloader, net=net)
             # [Log Evaluation Metrics]
             wandb.log({'Loss': loss})
