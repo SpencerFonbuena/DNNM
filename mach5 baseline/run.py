@@ -198,6 +198,7 @@ def train():
                 ax.plot(ys, label ='actual')
                 plt.legend()
                 wandb.log({'train plots': wandb.Image(fig)})
+                plt.close()
 
         # [Save the model]
         path = '/root/DNNM/model_3.pth'
@@ -232,7 +233,7 @@ def infer(dataloader, net):
                 ax.plot(pre, label='prediction')
                 plt.legend()
                 wandb.log({"test plot": wandb.Image(fig)})
-
+                plt.close()
         
 
 # [End Save Model]
