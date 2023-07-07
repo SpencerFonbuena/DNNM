@@ -9,7 +9,7 @@ class HyperParameters:
     d_model = 512
     d_hidden = 2048
     heads = 64 
-    stack = 12
+    stack = 8
     dropout = 0.7
     split = .85
     clip = .9
