@@ -32,7 +32,7 @@ class Create_Dataset(Dataset):
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
   
         #Create the training data
-        rawtrainingdata = pd.DataFrame().to_numpy()
+        rawtrainingdata = pd.DataFrame(df).to_numpy()
         rawtrainingdata = pd.DataFrame(scaler.fit_transform(rawtrainingdata)).to_numpy()
 
         #create the labels
@@ -118,7 +118,7 @@ class Create_Dataset(Dataset):
         self.training_len = self.trainingdata.shape[0] # Number of samples in the training set
         self.input_len = window_size# number of time parts
         self.channel_len = self.trainingdata.shape[2]# Number of features (Channels)
-        
+
         self.output_len = 4 # classification category
         self.test_len = self.valdata.shape[0]
 
