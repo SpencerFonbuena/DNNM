@@ -3,7 +3,7 @@ from sklearn.preprocessing import StandardScaler
 class HyperParameters:
     # hyperparameter settings
     EPOCH = 5
-    batch_size = 64
+    batch_size = 512
     window_size = 120
     LR = .00001 #.00001,.00003,.00005,.00007,.00009
     d_model = 512
@@ -11,7 +11,7 @@ class HyperParameters:
     queries = 8 # Queries
     values = 8 # Values
     heads = 64 # Heads
-    stack = 12 # multi head attention layers
+    stack = 8 # multi head attention layers
     dropout = 0.9
     split = .95
     optimizer_name = 'AdamW'
