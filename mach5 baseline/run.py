@@ -210,32 +210,26 @@ def train():
 # test function
 def infer(dataloader, net):
         
+    net.eval()
+    with torch.no_grad():
+        for x, _ in dataloader:
+            x = x.to(DEVICE)
+            predictions = run_encoder_decoder_inference(model=net, 
+                                                        src=x,
+                                                        forecast_window = hp.pred_size,
+                                                        batch_size = hp.batch_size,
+                                                        scaler=hp.scaler
+                                                        )
     
-        
-        # [Load Model]
-        net.load_state_dict(torch.load('DNNM/model_3.pth') ) # , map_location=torch.device('cpu')
+    predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
+    
+    # [Log Graph]
+    pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
+    fig, ax = plt.subplots()
 
-
-        net.eval()
-        with torch.no_grad():
-            for x, _ in dataloader:
-                x = x.to(DEVICE)
-                predictions = run_encoder_decoder_inference(model=net, 
-                                                            src=x,
-                                                            forecast_window = hp.pred_size,
-                                                            batch_size = hp.batch_size,
-                                                            scaler=hp.scaler
-                                                            )
-        
-        predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
-        
-        # [Log Graph]
-        pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
-        fig, ax = plt.subplots()
-
-        ax.plot(pre, label='prediction')
-        plt.legend()
-        wandb.log({"test plot": wandb.Image(fig)})
+    ax.plot(pre, label='prediction')
+    plt.legend()
+    wandb.log({"test plot": wandb.Image(fig)})
 
         
 
