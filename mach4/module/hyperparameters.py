@@ -3,7 +3,7 @@ from sklearn.preprocessing import StandardScaler
 class HyperParameters:
     # hyperparameter settings
     EPOCH = 10
-    batch_size = 512
+    batch_size = 5
     window_size = 120
     LR = .00001
     d_model = 512
