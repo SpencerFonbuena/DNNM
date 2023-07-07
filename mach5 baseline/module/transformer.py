@@ -31,7 +31,9 @@ class Model(nn.Module):
         self.stack = stack
 
 
-        self.embedding = Embedding(channel_in=channel_in, window_size=window_size)
+        self.sourceembedding = Embedding(channel_in=channel_in, window_size=window_size)
+        self.tgtembedding = Embedding(channel_in=1, window_size=window_size)
+
 
         # [Encoder]
         
@@ -66,8 +68,8 @@ class Model(nn.Module):
 
     def forward(self, x, tgt, mask):
         
-        memory = self.embedding(x, input='source')
-        tgt = self.embedding(tgt, input='target')
+        memory = self.sourceembedding(x, input='source')
+        tgt = self.tgtembedding(tgt, input='target')
 
         for i, encoder in enumerate(self.encoder_tower):
             memory = std(memory, (i/self.stack) * hp.p, 'batch')
