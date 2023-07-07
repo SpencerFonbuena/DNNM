@@ -148,6 +148,7 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
 
     return net
 
+print('nokill')
 
 def train():
     # [Define Pipeline]
