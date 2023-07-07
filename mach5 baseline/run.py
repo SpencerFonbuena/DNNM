@@ -189,7 +189,7 @@ def train():
             wandb.log({'index': index})
         
             # [Logging the graph]
-            if i % 200 == 0:
+            if i % 20000 == 0:
                 pre = y_pre.cpu().detach().numpy()[0]
                 ys = y.cpu().detach().numpy()[0]
                 fig, ax = plt.subplots()
@@ -222,7 +222,7 @@ def infer(dataloader, net):
                                                         scaler=hp.scaler
                                                         )
     
-            if i % 1000 == 0:
+            if i % 10000 == 0:
                 #predictions = hp.scaler.inverse_transform(predictions.cpu())
                 
                 # [Log Graph]
