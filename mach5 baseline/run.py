@@ -18,6 +18,7 @@ from module.transformer import Model
 from module.loss import Myloss
 from module.layers import run_encoder_decoder_inference
 from sklearn.preprocessing import StandardScaler
+from module.layers import mask
 
 
 '''-----------------------------------------------------------------------------------------------------'''
@@ -168,6 +169,8 @@ def train():
     # [Define Optimizer]
     optimizer = optim.AdamW(net.parameters(), lr=hp.LR)
 
+    train_mask = mask(hp.pred_size, hp.pred_size).to(DEVICE)
+
     # [Training function]
     net.train()
     wandb.watch(net, log='all')
@@ -175,7 +178,7 @@ def train():
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
-            y_pre = net(x, y)
+            y_pre = net(x, y, train_mask)
             loss = loss_function(y_pre, y)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
@@ -201,31 +204,38 @@ def train():
         torch.save(net.state_dict(), path)
         
         # [Validate Model]
-        test(dataloader=test_dataloader, net=net)
+        infer(dataloader=test_dataloader, net=net)
 
 
 # test function
-def test(dataloader, net):
+def infer(dataloader, net):
+        
     
-    
-    net.eval()
-    with torch.no_grad():
-        for i, (x, y) in enumerate(dataloader):
-            x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x, y)
-            
-            # [Logging the Graph]
-            if i % 500 == 0:
-                pre = torch.tensor(y_pre).cpu().detach().numpy()[0].squeeze()
-                act = torch.tensor(y).cpu().detach().numpy()[0].squeeze()
+        
+        # [Load Model]
+        net.load_state_dict(torch.load('DNNM/model_3.pth') ) # , map_location=torch.device('cpu')
 
-                fig, ax = plt.subplots()
-                ax.plot(pre, label='prediction')
-                ax.plot(act, label='actual')
-                
-                plt.legend()
-                plt.close()
-                wandb.log({"test plot": wandb.Image(fig)})
+
+        net.eval()
+        with torch.no_grad():
+            for x, _ in dataloader:
+                x = x.to(DEVICE)
+                predictions = run_encoder_decoder_inference(model=net, 
+                                                            src=x,
+                                                            forecast_window = hp.pred_size,
+                                                            batch_size = hp.batch_size,
+                                                            scaler=hp.scaler
+                                                            )
+        
+        predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
+        
+        # [Log Graph]
+        pre = torch.tensor(predictions).cpu().detach().numpy()[0].squeeze()
+        fig, ax = plt.subplots()
+
+        ax.plot(pre, label='prediction')
+        plt.legend()
+        wandb.log({"test plot": wandb.Image(fig)})
 
         
 

@@ -103,13 +103,9 @@ class Create_Dataset(Dataset):
         #create the validation data and labels
         self.valdata = torch.tensor(trainingdata[self.split:]).to(torch.float32)
         self.vallabels = torch.tensor(labeldata[self.split:]).to(torch.float32)
-
         #[end of creating validation data and labels]
         
-        # [Inference Data]
-        self.inference_data = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32)
-        self.inference_labels = torch.tensor(rawtrainingdata[len(rawtrainingdata)-window_size -1000: -1000].reshape(1,window_size,1)).to(torch.float32) # This is really a throw away, we just need it for the dataloaders sake
-        demo = torch.tensor(rawtrainingdata[-1001: -941])
+        
 
 
         '''fig, ax = plt.subplots()
@@ -135,15 +131,12 @@ class Create_Dataset(Dataset):
             return self.trainingdata[index], self.traininglabels[index]
         elif self.mode == 'test':
             return self.valdata[index], self.vallabels[index]
-        elif self.mode == 'inference':
-            return self.inference_data[index], self.inference_labels[index]
     
     def __len__(self):
         if self.mode == 'train':
             return len(self.trainingdata)
         if self.mode == 'test':
             return len(self.vallabels)
-        if self.mode == 'inference':
-            return len(self.inference_data)
+
         
         

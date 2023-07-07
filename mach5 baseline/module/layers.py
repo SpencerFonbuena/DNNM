@@ -208,7 +208,7 @@ def run_encoder_decoder_inference(
 
         # Make prediction
 
-        prediction = model(src, tgt, torch.zeros_like(tgt_mask))
+        prediction = model(src, tgt, tgt_mask)
         
          
         # If statement simply makes sure that the predicted value is 
