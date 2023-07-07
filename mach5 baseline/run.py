@@ -210,7 +210,7 @@ def train():
 
 # test function
 def infer(dataloader, net):
-        
+    print('inference')
     net.eval()
     with torch.no_grad():
         for i, (x, _) in enumerate(dataloader):
