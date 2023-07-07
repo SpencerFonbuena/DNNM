@@ -100,9 +100,9 @@ def pipeline(batch_size, window_size,  pred_size, scaler):
     inference_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, scaler=scaler, mode='inference', pred_size=pred_size)
 
     # [Load the data]
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=18,pin_memory=True,  drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=18,pin_memory=True)
-    inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=18,pin_memory=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=12,pin_memory=True,  drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True)
+    inference_dataloader = DataLoader(dataset=inference_dataset, batch_size=1, shuffle=False, num_workers=12,pin_memory=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -185,6 +185,7 @@ def train():
                 optimizer.step()
                 optimizer.zero_grad()
             if 1 % 100_000 == 0:
+                print('test')
                 infer(dataloader=test_dataloader, net=net)
             # [Log Evaluation Metrics]
             wandb.log({'Loss': loss})
