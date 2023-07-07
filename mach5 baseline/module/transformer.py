@@ -5,6 +5,8 @@ from module.layers import Projector, Ns_Transformer
 import torchvision.ops.stochastic_depth as std
 from module.embedding import Embedding
 from sklearn.preprocessing import StandardScaler
+import torchvision.ops.stochastic_depth as std
+from module.hyperparameters import HyperParameters as hp
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -26,14 +28,23 @@ class Model(nn.Module):
                  ):
         super(Model, self).__init__()
         
+        self.stack = stack
 
 
         self.embedding = Embedding(channel_in=channel_in, window_size=window_size)
 
         # [Encoder]
-        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu',batch_first=True, norm_first=True,)
-        self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
         
+        self.encoder_tower = nn.ModuleList([nn.TransformerEncoderLayer(
+            d_model=d_model, 
+            nhead=heads, 
+            dim_feedforward=dim_feedforward, 
+            dropout=dropout, 
+            activation='gelu',
+            batch_first=True, 
+            norm_first=True,) for _ in range(stack)
+
+        ])
 
         # [Decoder]
         decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
@@ -44,10 +55,20 @@ class Model(nn.Module):
 
     def forward(self, x, tgt, mask):
         
-        x = self.embedding(x, input='source')
+        memory = self.embedding(x, input='source')
         tgt = self.embedding(tgt, input='target')
-        memory = self.encoder(x)
+
+        for i, encoder in enumerate(self.encoder_tower):
+            memory = std(memory, (i/self.stack) * hp.p, 'batch')
+            memory = encoder(memory)
+        
         out = self.decoder(tgt, memory, mask)
+        
+        '''
+        for i, decoder in enumerate(self.decoder_tower):
+            tgt = std(tgt, (i/self.stack) * hp.p, 'batch')
+            tgt = encoder(tgt, memory, mask)
+        '''
         out = self.out(out)
 
         return out
