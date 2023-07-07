@@ -193,12 +193,12 @@ def run_encoder_decoder_inference(
         tgt = tgt.unsqueeze(0).unsqueeze(-1)
     # [I don't think this pertains to me]
     tgt = tgt.unsqueeze(0).unsqueeze(0)
-    
+    tgt = tgt.reshape(tgt.shape[2],1,-1)
     # Iteratively concatenate tgt with the first element in the prediction
     for _ in range(forecast_window-1):
         
         # Create masks
-        dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
+        dim_a = tgt.shape[1] #if batch_first == True else tgt.shape[0]
 
         tgt_mask = mask(
             dim1=dim_a,
@@ -207,7 +207,6 @@ def run_encoder_decoder_inference(
 
 
         # Make prediction
-
         prediction = model(src, tgt, tgt_mask)
         
          
@@ -234,10 +233,9 @@ def run_encoder_decoder_inference(
         # Detach the predicted element from the graph and concatenate with 
         # tgt in dimension 1 or 0
         tgt = torch.cat((tgt, last_predicted_value.detach()), target_seq_dim)
-        print(tgt)
 
 
-    dim_a = tgt.shape[1] if batch_first == True else tgt.shape[0]
+    dim_a = tgt.shape[1]
 
 
 

@@ -44,8 +44,8 @@ class Model(nn.Module):
 
     def forward(self, x, tgt, mask):
         
-        x = self.embedding(x)
-        tgt = self.embedding(tgt)
+        x = self.embedding(x, input='source')
+        tgt = self.embedding(tgt, input='target')
         memory = self.encoder(x)
         out = self.decoder(tgt, memory, mask)
         out = self.out(out)

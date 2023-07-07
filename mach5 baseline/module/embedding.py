@@ -22,9 +22,9 @@ class Embedding(Module):
     def __init__(self,
                  channel_in = int,
                  d_model = int,
-                 window_size = int,):
+                 window_size = int):
         super(Embedding, self).__init__()
-
+        
         # [Making init variables class-wide available]
         self.d_model = d_model
         self.window_size = window_size
@@ -42,9 +42,10 @@ class Embedding(Module):
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
     
-    def forward(self, x):
+    def forward(self, x, input):
         x = self.ffchannelembedding(x)#(16,120,512)
-        x = positional_encoding(x)
+        if input == 'source':
+            x = positional_encoding(x)
         return x
     
 '''-----------------------------------------------------------------------------------------------------'''

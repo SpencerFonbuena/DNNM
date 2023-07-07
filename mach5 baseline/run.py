@@ -212,7 +212,7 @@ def infer(dataloader, net):
         
     net.eval()
     with torch.no_grad():
-        for x, _ in dataloader:
+        for i, (x, _) in enumerate(dataloader):
             x = x.to(DEVICE)
             predictions = run_encoder_decoder_inference(model=net, 
                                                         src=x,
@@ -221,15 +221,17 @@ def infer(dataloader, net):
                                                         scaler=hp.scaler
                                                         )
     
-    predictions = hp.scaler.inverse_transform(predictions.reshape(1, hp.pred_size).cpu())
-    
-    # [Log Graph]
-    pre = torch.tensor(predictions[0]).cpu().detach().numpy()[0].squeeze()
-    fig, ax = plt.subplots()
+            if i % 1000 == 0:
+                #predictions = hp.scaler.inverse_transform(predictions.cpu())
+                
+                # [Log Graph]
+                print(predictions[0].shape)
+                pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
+                fig, ax = plt.subplots()
 
-    ax.plot(pre, label='prediction')
-    plt.legend()
-    wandb.log({"test plot": wandb.Image(fig)})
+                ax.plot(pre, label='prediction')
+                plt.legend()
+                wandb.log({"test plot": wandb.Image(fig)})
 
         
 

@@ -4,7 +4,7 @@ class HyperParameters:
     # hyperparameter settings
     EPOCH = 5
     batch_size = 64
-    window_size = 240
+    window_size = 120
     LR = .00001 #.00001,.00003,.00005,.00007,.00009
     d_model = 512
     d_hidden = 2048
@@ -13,7 +13,7 @@ class HyperParameters:
     heads = 64 # Heads
     stack = 12 # multi head attention layers
     dropout = 0.9
-    split = .85
+    split = .95
     optimizer_name = 'AdamW'
     clip = .9
     p = 0.3
