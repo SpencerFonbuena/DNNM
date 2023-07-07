@@ -50,6 +50,17 @@ class Model(nn.Module):
         decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
         self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
 
+        '''self.decoder_tower = nn.ModuleList([
+            nn.TransformerDecoderLayer(d_model=d_model,
+            nhead=heads,
+            dim_feedforward=dim_feedforward,
+            dropout=dropout,
+            activation='gelu',
+            batch_first=True,
+            norm_first=True,
+            ) for _ in range(stack)
+        ])'''
+
         self.out = nn.Linear(d_model, 1)
 
 
