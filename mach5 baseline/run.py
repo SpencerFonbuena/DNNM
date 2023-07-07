@@ -148,12 +148,12 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
 
     return net
 
-print('nokill')
 
 def train():
     # [Define Pipeline]
+    print('1')
     train_dataloader, test_dataloader, _, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
-    
+    print('2')
     # [Define Model]
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
