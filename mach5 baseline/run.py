@@ -185,7 +185,7 @@ def train():
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
                 optimizer.zero_grad()
-            if i + 1 % 1000 == 0:
+            if (i + 1) % 1000 == 0:
                 infer(dataloader=test_dataloader, net=net)
             # [Log Evaluation Metrics]
             wandb.log({'Loss': loss})
@@ -226,10 +226,11 @@ def infer(dataloader, net):
                                                         )
     
             
-                #predictions = hp.scaler.inverse_transform(predictions.cpu())
+            #predictions = hp.scaler.inverse_transform(predictions.cpu())
                 
             # [Log Graph]
-            print(predictions[0].shape)
+            print(predictions[0])
+            print(y[0])
             pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
             act = torch.tensor(y[0]).cpu().detach().numpy()[0].squeeze()
             fig, ax = plt.subplots()

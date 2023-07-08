@@ -13,11 +13,11 @@ import wandb
 import random
 import pandas as pd
 from torcheval.metrics import  MulticlassAccuracy, MulticlassPrecision, MulticlassRecall
+from module.layers import mask
 
 
 
-
-from module.transformer import Transformer
+from module.transformer import Model
 from module.loss import Myloss
 from module.hyperparameters import HyperParameters as hp
 
@@ -60,13 +60,11 @@ def pipeline(batch_size, window_size):
     train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=hp.pred_size)
     test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=hp.pred_size)
 
-    #create the samplers
-    samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
-    samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
+
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True ,sampler=samplertrain, drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,sampler=samplertest, drop_last=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True , drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True, drop_last=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -86,19 +84,30 @@ def pipeline(batch_size, window_size):
 
 '''-----------------------------------------------------------------------------------------------------'''
 '''====================================================================================================='''
+'''
+self,
+                 d_model = int,
+                 heads = int,
+                 dropout = float,
+                 dim_feedforward = int,
+                 stack = int, 
+ 
+                 # [Embedding]
+                 channel_in = int,
+                 window_size = int,
+                 pred_size = int'''
 
+def network( d_channel, window_size, heads, d_model, dropout, stack, pred_size, d_hidden):
+    net = Model(
+        d_model=d_model,
+        heads=heads,
+        dropout=dropout,
+        dim_feedforward=d_hidden,
+        stack=stack,
+        channel_in=d_channel,
+        window_size=window_size,
+        pred_size=pred_size
 
-def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, stack, p, d_hidden):
-    net = Transformer(window_size=window_size, 
-                    timestep_in=d_input, 
-                    channel_in=d_channel,
-                    heads=heads,
-                    d_model=d_model,
-                    device=DEVICE,
-                    dropout = dropout,
-                    class_num=d_output, 
-                    stack=stack, 
-                    p=p, 
                     ).to(DEVICE)
 
     def hiddenPrints():
@@ -121,33 +130,36 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
 
 def train():
 
-
+    # [Init Pipeline]
     train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=hp.batch_size, window_size=hp.window_size)
-    net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=hp.window_size, heads=hp.heads, d_model=hp.d_model, 
-                    dropout=hp.dropout, stack=hp.stack, p=hp.stoch_p, d_hidden=hp.d_hidden).to(DEVICE)
-    # Create a loss function here using cross entropy loss
+    
+    # [Init Model]
+    net = network(d_channel=d_channel, window_size=hp.window_size, heads=hp.heads, d_model=hp.d_model,
+                  dropout=hp.dropout, stack=hp.stack, pred_size=hp.pred_size, d_hidden=hp.d_hidden).to(DEVICE)
+    
+    # Init Loss Function
     loss_function = Myloss()
 
-    #Select optimizer in an un-optimized way
-    if hp.optimizer_name == 'AdamW':
-        optimizer = optim.AdamW(net.parameters(), lr=hp.learning_rate)
+    #Select optimizer
+    optimizer = optim.AdamW(net.parameters(), lr=hp.learning_rate)
 
-    # training function
+    # Metrics
     trainmetricaccuracy = MulticlassAccuracy().to(DEVICE)
     specacc = MulticlassAccuracy(average=None, num_classes=3).to(DEVICE)
     trainprecision = MulticlassPrecision(average=None, num_classes=3).to(DEVICE)
     trainrecall = MulticlassRecall(average=None, num_classes=3).to(DEVICE)
     
+    # [Create Mask]
+    dec_mask = mask(hp.pred_size, hp.pred_size)
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
-            y_pre = net(x, True)
+            y_pre = net(x, y, dec_mask)
             loss = loss_function(y_pre, y)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
             optimizer.step()
 
             trainmetricaccuracy.update(y_pre, y)

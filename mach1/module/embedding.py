@@ -20,44 +20,32 @@ torch.manual_seed(seed)
 
 class Embedding(Module):
     def __init__(self,
-                 channel_in = str,
-                 timestep_in = str,
-                 d_model = str,
-                 window_size = int,
-                 tower = str):
+                 channel_in = int,
+                 d_model = int,
+                 window_size = int):
         super(Embedding, self).__init__()
-
+        
         # [Making init variables class-wide available]
         self.d_model = d_model
         self.window_size = window_size
-        self.tower = tower
+
         # [End availability]
 
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
 
         # [Init layers]
-        self.ffchannelembedding = nn.Linear(channel_in, d_model)
-        self.fftimestepembedding = nn.Linear(timestep_in, d_model)
+        self.embedding = nn.Linear(channel_in, 512)
         # positional encoding of some sort
         # [End Init]
     
         '''-----------------------------------------------------------------------------------------------------'''
         '''====================================================================================================='''
     
-    def forward(self, x):
-
-        if self.tower == 'channel':
-            #plt.hist(x.view(-1).tolist(), 50)
-            x = self.ffchannelembedding(x)#(16,120,512)
-            #plt.hist(x.view(-1).tolist(), 50)
-        if self.tower == 'timestep':
-            x = x.transpose(-1,-2)
-            x = self.fftimestepembedding(x) # (16,9,512)
-            #plt.hist(x.view(-1).tolist(), 50)
+    def forward(self, x, input):
+        x = self.embedding(x)#(16,120,512)
+        if input == 'source':
             x = positional_encoding(x)
-            #plt.hist(x.view(-1).tolist(), 50)
-            #plt.show()
         return x
     
 '''-----------------------------------------------------------------------------------------------------'''

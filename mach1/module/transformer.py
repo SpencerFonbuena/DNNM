@@ -1,141 +1,88 @@
-from torch.nn import Module
-from torch.nn import ModuleList
-
-
 import torch
-import math
-import random
-import torch.nn.functional as F
-import torchvision.ops.stochastic_depth as std
-import matplotlib.pyplot as plt
-import numpy as np
 import torch.nn as nn
-import torch.nn.functional as F
-
-from module.hyperparameters import HyperParameters as hp
 from module.embedding import Embedding
-from torch.nn import TransformerEncoderLayer
-from module.fcnlayer import ResBlock
+from module.layers import Projector, Ns_Transformer
+import torchvision.ops.stochastic_depth as std
+from module.embedding import Embedding
+from sklearn.preprocessing import StandardScaler
+import torchvision.ops.stochastic_depth as std
+from module.hyperparameters import HyperParameters as hp
 
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# [Maintain random seed]
-seed = 10
-np.random.seed(seed)
-random.seed(seed)
-torch.manual_seed(seed)
-# [End maintenance]
-
-
-
-'''-----------------------------------------------------------------------------------------------------'''
-'''====================================================================================================='''
-
-
-class Transformer(Module):
+class Model(nn.Module):
+    """
+    Non-stationary Transformer
+    """
     def __init__(self,
-                 
-                 #Embedding Variables
-                 window_size = int,
-                 timestep_in = str,
-                 channel_in = str,
-
-                 #MHA Variables
-                 heads = int,
                  d_model = int,
-                 device = str,
-                 stack = int,
+                 heads = int,
                  dropout = float,
-                 
-                 #FCN Variables
-                 class_num = int,
-                 p = float,
+                 dim_feedforward = int,
+                 stack = int, 
+ 
+                 # [Embedding]
+                 channel_in = int,
+                 window_size = int,
+                 pred_size = int
                  ):
+        super(Model, self).__init__()
         
-        super(Transformer, self).__init__()
-
-        self.p = p
-        self.stack = stack  
+        self.stack = stack
 
 
-        self.channel_embedding = Embedding(
-                        channel_in = channel_in,
-                        timestep_in = timestep_in,
-                        d_model = d_model,
-                        window_size = window_size,
-                        tower='channel')
+        self.sourceembedding = Embedding(channel_in=channel_in, window_size=window_size)
+
+
+        # [Encoder]
         
-        #Timestep embedding Init
-        self.timestep_embedding = Embedding(
-                 channel_in = channel_in,
-                 timestep_in = timestep_in,
-                 d_model = d_model,
-                 window_size = window_size,
-                 tower='timestep')
+        self.encoder_tower = nn.ModuleList([nn.TransformerEncoderLayer(
+            d_model=d_model, 
+            nhead=heads, 
+            dim_feedforward=dim_feedforward, 
+            dropout=dropout, 
+            activation='gelu',
+            batch_first=True, 
+            norm_first=True,) for _ in range(stack)
+
+        ])
+
+        # [Decoder]
+        decoder_layer = nn.TransformerDecoderLayer(d_model=d_model, nhead=heads, dim_feedforward=dim_feedforward, dropout=dropout, activation='gelu', batch_first=True, norm_first=True,)
+        self.decoder = nn.TransformerDecoder(decoder_layer=decoder_layer, num_layers=stack, norm=nn.LayerNorm(d_model))
+
+        '''self.decoder_tower = nn.ModuleList([
+            nn.TransformerDecoderLayer(d_model=d_model,
+            nhead=heads,
+            dim_feedforward=dim_feedforward,
+            dropout=dropout,
+            activation='gelu',
+            batch_first=True,
+            norm_first=True,
+            ) for _ in range(stack)
+        ])'''
+
+        self.out = nn.Linear(d_model, 3)
+
+
+    def forward(self, x, tgt, mask):
+        
+        memory = self.sourceembedding(x, input='source')
         
 
-
-        # [Initialize Towers]
-        #Channel Init
-        self.channel_tower = TransformerEncoderLayer(
-                 d_model=d_model,
-                 nhead=heads,
-                 dim_feedforward=4 * d_model,
-                 dropout=dropout,
-                 activation=F.gelu,
-                 batch_first=True,
-                 norm_first=True,
-                 device=device
-            ) 
+        for i, encoder in enumerate(self.encoder_tower):
+            memory = std(memory, (i/self.stack) * hp.stoch_p, 'batch')
+            memory = encoder(memory)
         
-        self.channel_encoder = nn.TransformerEncoder(
-            encoder_layer=self.channel_tower,
-            num_layers=stack,
-            norm=nn.LayerNorm(d_model)
-            
-        )
+        out = self.decoder(tgt, memory, mask)
         
-        #Timestep Init
-        self.timestep_tower = TransformerEncoderLayer(
-                 d_model=d_model,
-                 nhead=heads,
-                 dim_feedforward=4 * d_model,
-                 dropout=dropout,
-                 activation=F.gelu,
-                 batch_first=True,
-                 norm_first=True,
-                 device=device
-            )
-        
-        self.timestep_encoder = nn.TransformerEncoder(
-            encoder_layer=self.timestep_tower,
-            num_layers=stack,
-            norm=nn.LayerNorm(d_model)
-            
-        )
-        # [End Towers]
-
-        self.gate = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model, out_features=2)
-        self.linear_out = torch.nn.Linear(in_features=timestep_in * d_model + channel_in * d_model,
-                                          out_features=class_num)
-
-    def forward(self, x, stage):
-        #Embed channel and timestep
-        x_channel = self.channel_embedding(x).to(torch.float32) # (16,window,512)
-        x_timestep = self.timestep_embedding(x).to(torch.float32) # (16,channel,512)
-
-        '''-----------------------------------------------------------------------------------------------------'''
-        '''====================================================================================================='''
-        
-        x_channel = self.channel_encoder(x_channel)
-        x_timestep = self.timestep_encoder(x_timestep)
-
-
-        x_timestep = x_timestep.reshape(x_timestep.shape[0], -1)
-        x_channel = x_channel.reshape(x_channel.shape[0], -1)
-        gate = torch.nn.functional.softmax(self.gate(torch.cat([x_channel, x_timestep], dim=-1)), dim=-1)
-        gate_out = torch.cat([x_timestep * gate[:, 0:1], x_channel * gate[:, 1:2]], dim=-1)
-        out = self.linear_out(gate_out)
-
-
+        '''
+        for i, decoder in enumerate(self.decoder_tower):
+            tgt = std(tgt, (i/self.stack) * hp.p, 'batch')
+            tgt = encoder(tgt, memory, mask)
+        '''
+        out = self.out(out)
+        print(out[0])
         return out
-
+    
+    

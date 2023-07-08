@@ -85,12 +85,6 @@ class Create_Dataset(Dataset):
         #can't call the iterate through a torch, so this is to create all of the weights
         self.normtraininglabels = labeldata[:self.split]
 
-        #Find the distributions of each label in the training set
-        self.distlabel = 1 / (pd.DataFrame(labeldata).value_counts())
-        self.trainsampleweights = [self.distlabel[i] for i in self.normtraininglabels]
-        
-
-        #[end of creating training data and labels]
 
 
 
@@ -103,10 +97,6 @@ class Create_Dataset(Dataset):
         #can't call the iterate through a torch, so this is to create all of the weights
         self.normvallabels = labeldata[self.split:]
 
-        #Find the distributions of each label in the test set
-        self.testsampleweights = [self.distlabel[i] for i in self.normvallabels]
-
-        #[end of creating validation data and labels]
         
         
 
