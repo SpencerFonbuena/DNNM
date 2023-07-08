@@ -229,10 +229,8 @@ def infer(dataloader, net):
             #predictions = hp.scaler.inverse_transform(predictions.cpu())
                 
             # [Log Graph]
-            print(predictions[0])
-            print(y[0])
             pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
-            act = torch.tensor(y[0]).cpu().detach().numpy()[0].squeeze()
+            act = torch.tensor(torch.tensor(y[0]).reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
             fig, ax = plt.subplots()
 
             ax.plot(pre, label='prediction')

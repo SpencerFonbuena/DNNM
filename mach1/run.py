@@ -158,6 +158,8 @@ def train():
             x, y = x.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
             y_pre = net(x, y, dec_mask)
+            print(y_pre[0])
+            print(y[0])
             loss = loss_function(y_pre, y)
             loss.backward()
             optimizer.step()

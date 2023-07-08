@@ -26,7 +26,6 @@ class Embedding(Module):
         super(Embedding, self).__init__()
         
         # [Making init variables class-wide available]
-        self.d_model = d_model
         self.window_size = window_size
 
         # [End availability]
@@ -35,7 +34,7 @@ class Embedding(Module):
         '''====================================================================================================='''
 
         # [Init layers]
-        self.embedding = nn.Linear(channel_in, 512)
+        self.embedding = nn.Linear(channel_in, d_model)
         # positional encoding of some sort
         # [End Init]
     
