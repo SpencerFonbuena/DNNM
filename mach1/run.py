@@ -88,9 +88,9 @@ sweep_id = wandb.sweep(sweep_config, project='mach26 | 8 + reg')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_update.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
 else:
-    path = 'models/mach1/datasets/SPY_30mins_update.txt'
+    path = 'models/mach1/datasets/SPY_30mins_returns.txt'
 
 # [End General Init]
 

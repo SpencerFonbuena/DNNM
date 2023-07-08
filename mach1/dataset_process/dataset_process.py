@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import random
-
+from sklearn.preprocessing import StandardScaler
 seed = 10
 np.random.seed(seed)
 random.seed(seed)
@@ -17,6 +17,8 @@ torch.manual_seed(seed)
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 #print(f'Use device {DEVICE}')
 
+
+scaler = StandardScaler()
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
     def __init__(self, datafile, window_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
@@ -28,7 +30,7 @@ class Create_Dataset(Dataset):
         labeldata = df['Labels'].to_numpy()[window_size -1:]
         #normalize the data inputs
         #prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=['Labels', 'Date']).to_numpy()))
-        prerawtrain = torch.tensor(df.drop(columns=['Labels']).to_numpy())
+        prerawtrain = torch.tensor(scaler.fit_transform(df.drop(columns=['Labels'])).to_numpy())
         #recasting data as pandas dataframe. I couldn't find a way to normalize with pandas, so I cast it first to torch, then back to pandas.
         rawtrainingdata = pd.DataFrame(prerawtrain).to_numpy()
         
