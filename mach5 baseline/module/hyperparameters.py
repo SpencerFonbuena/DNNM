@@ -16,8 +16,8 @@ class HyperParameters:
     split = .999
     optimizer_name = 'AdamW'
     clip = .9
-    p = 0.6
+    p = 0.65
     fcnstack = 2
     logs = 5
-    pred_size = 60
+    pred_size = 30
     scaler = StandardScaler()

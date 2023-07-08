@@ -216,7 +216,7 @@ def infer(dataloader, net):
     print('inference')
     net.eval()
     with torch.no_grad():
-        for i, (x, _) in enumerate(dataloader):
+        for i, (x, y) in enumerate(dataloader):
             x = x.to(DEVICE)
             predictions = run_encoder_decoder_inference(model=net, 
                                                         src=x,
@@ -225,18 +225,20 @@ def infer(dataloader, net):
                                                         scaler=hp.scaler
                                                         )
     
-            if i % 10 == 0:
+            
                 #predictions = hp.scaler.inverse_transform(predictions.cpu())
                 
-                # [Log Graph]
-                print(predictions[0].shape)
-                pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
-                fig, ax = plt.subplots()
+            # [Log Graph]
+            print(predictions[0].shape)
+            pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
+            act = torch.tensor(y[0]).cpu().detach().numpy()[0].squeeze()
+            fig, ax = plt.subplots()
 
-                ax.plot(pre, label='prediction')
-                plt.legend()
-                wandb.log({"test plot": wandb.Image(fig)})
-                plt.close()
+            ax.plot(pre, label='prediction')
+            ax.plot(act, label='actual')
+            plt.legend()
+            wandb.log({"test plot": wandb.Image(fig)})
+            plt.close()
         
 
 # [End Save Model]
