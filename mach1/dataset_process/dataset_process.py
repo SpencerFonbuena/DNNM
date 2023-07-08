@@ -21,21 +21,19 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 scaler = StandardScaler()
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
-    def __init__(self, datafile, window_size, split, mode = str): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
+    def __init__(self, datafile, window_size, split, mode = str, pred_size = int): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
         # [Reading in and pre-processing data]
 
         df = pd.read_csv(datafile, delimiter=',', index_col=0)
         #Create the training and label datasets
-        labeldata = df['Labels'].to_numpy()[window_size -1:]
+        labeldata = df['Labels'].to_numpy()
         #normalize the data inputs
         #prerawtrain = torch.nn.functional.normalize(torch.tensor(df.drop(columns=['Labels', 'Date']).to_numpy()))
-        prerawtrain = torch.tensor(scaler.fit_transform(df.drop(columns=['Labels'])).to_numpy())
+        prerawtrain = torch.tensor(pd.DataFrame(scaler.fit_transform(df.drop(columns=['Labels']))).to_numpy())
         #recasting data as pandas dataframe. I couldn't find a way to normalize with pandas, so I cast it first to torch, then back to pandas.
         rawtrainingdata = pd.DataFrame(prerawtrain).to_numpy()
-        
         # [End pre-processing]
-
 
 
         # [General Functionalities]
@@ -57,7 +55,7 @@ class Create_Dataset(Dataset):
         #First array is a row vector, which broadcasts with dataset_array
         window_array = np.array([np.arange(window_size)])
         #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
-        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size + 1)).reshape(len(rawtrainingdata)-window_size + 1, 1)
+        dataset_array = np.array(np.arange(len(rawtrainingdata)-window_size - pred_size + 1)).reshape(len(rawtrainingdata)-window_size - pred_size + 1, 1)
         #broadcast the data together
         indexdata = window_array + dataset_array
         # Index into the raw training data with our preset windows to create datasets quickly
@@ -66,6 +64,17 @@ class Create_Dataset(Dataset):
         #[End windowing dataset]
 
 
+        # [Window the dataset]
+        
+        #First array is a row vector, which broadcasts with dataset_array
+        window_array = np.array([np.arange(pred_size)])
+        #This is a column vector (as shown by the reshape, to have a 1 in the column dimension) that broadcasts with window_array
+        dataset_array = np.array(np.arange(len(rawtrainingdata)- pred_size-window_size+ 1)).reshape(len(rawtrainingdata) - pred_size - window_size+ 1, 1)
+        #broadcast the data together
+        indexlabeldata = window_array + dataset_array + window_size
+        # Index into the raw training data with our preset windows to create datasets quickly
+        labeldata = labeldata[indexlabeldata]
+        #[End windowing dataset]''
 
 
         #[beginning of creating test data and labels]

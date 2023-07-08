@@ -38,59 +38,15 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 print(f'use device: {DEVICE}')
 
 
-
-# [Create WandB sweeps]
-
-sweep_config = {
-    'method': 'grid',
-
-
-    'metric': {
-        'goal': 'maximize',
-        'name': 'test_acc'
-    },
-
-
-    'parameters': {
-    # [training hp]
-    'learning_rate': {
-        'values': hp.LR},
-    'batch_size':{
-        'values': hp.BATCH_SIZE},
-    'window_size':{
-        'values': hp.WINDOW_SIZE},
-
-    # [architecture hp]
-    'd_model':{
-        'values': hp.d_model},
-    'd_hidden':{
-        'values': hp.d_hidden},
-    'heads':{
-        'values': hp.heads}, # Heads
-    'stack':{
-        'values': hp.N}, # multi head attention layers
-    'stoch_p':{
-    'values': hp.p}, # multi head attention layers
-    'fcnstack':{
-    'values': hp.fcnstack}, # multi head attention layers
-
-    # [Regularizers]
-    'dropout':{
-        'values': hp.dropout},
-    }
-}
-
-# [End Sweeps]
-
 # Log on Weights and Biases
 
-sweep_id = wandb.sweep(sweep_config, project='mach26 | 8 + reg')
+wandb.init(project='mach46', name='01')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_class_returns.txt'
 else:
-    path = 'models/mach1/datasets/SPY_30mins_returns.txt'
+    path = 'DNNM/mach1/datasets/SPY_30mins_class_returns.txt'
 
 # [End General Init]
 
@@ -101,16 +57,16 @@ else:
 #[Create and load the dataset]
 def pipeline(batch_size, window_size):
     #create the datasets to be loaded
-    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train')
-    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test')
+    train_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='train', pred_size=hp.pred_size)
+    test_dataset = Create_Dataset(datafile=path, window_size=window_size, split=hp.split, mode='test', pred_size=hp.pred_size)
 
     #create the samplers
     samplertrain = wrs(weights=train_dataset.trainsampleweights, num_samples=len(train_dataset), replacement=True)
     samplertest = wrs(weights=test_dataset.testsampleweights, num_samples=len(test_dataset), replacement=True)
 
     #Load the data
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True ,sampler=samplertrain, drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=12,pin_memory=True,sampler=samplertest, drop_last=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True ,sampler=samplertrain, drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=1,pin_memory=True,sampler=samplertest, drop_last=True)
 
     DATA_LEN = train_dataset.training_len # Number of samples in the training set
     d_input = train_dataset.input_len # number of time parts
@@ -163,58 +119,56 @@ def network(d_input, d_channel, d_output, window_size, heads, d_model, dropout, 
     # [Place computational graph code here if desired]
 
 
-def train(config=None):
-
-    with wandb.init(config=config):
-
-        config = wandb.config
-
-        train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=config.batch_size, window_size=config.window_size)
-        net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=config.window_size, heads=config.heads, d_model=config.d_model, 
-                      dropout=config.dropout, stack=config.stack, p=config.stoch_p, d_hidden=config.d_hidden).to(DEVICE)
-        # Create a loss function here using cross entropy loss
-        loss_function = Myloss()
-
-        #Select optimizer in an un-optimized way
-        if hp.optimizer_name == 'AdamW':
-            optimizer = optim.AdamW(net.parameters(), lr=config.learning_rate)
-
-        # training function
-        trainmetricaccuracy = MulticlassAccuracy().to(DEVICE)
-        specacc = MulticlassAccuracy(average=None, num_classes=3).to(DEVICE)
-        trainprecision = MulticlassPrecision(average=None, num_classes=3).to(DEVICE)
-        trainrecall = MulticlassRecall(average=None, num_classes=3).to(DEVICE)
-        net.train()
-        wandb.watch(net, log='all')
-        for index in tqdm(range(hp.EPOCH)):
-            for i, (x, y) in enumerate(train_dataloader):
-                x, y = x.to(DEVICE), y.to(DEVICE)
-                optimizer.zero_grad()
-                y_pre = net(x, True)
-                loss = loss_function(y_pre, y)
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
-                optimizer.step()
-
-                trainmetricaccuracy.update(y_pre, y)
-                specacc.update(y_pre.to(torch.int64), y.to(torch.int64))
-                trainprecision.update(y_pre.to(torch.int64), y.to(torch.int64))
-                trainrecall.update(y_pre.to(torch.int64), y.to(torch.int64))
+def train():
 
 
-                wandb.log({'Loss': loss})
-                wandb.log({'index': index})
+    train_dataloader, test_dataloader, d_input, d_channel, d_output = pipeline(batch_size=hp.batch_size, window_size=hp.window_size)
+    net = network(d_input=d_input, d_channel=d_channel, d_output=d_output, window_size=hp.window_size, heads=hp.heads, d_model=hp.d_model, 
+                    dropout=hp.dropout, stack=hp.stack, p=hp.stoch_p, d_hidden=hp.d_hidden).to(DEVICE)
+    # Create a loss function here using cross entropy loss
+    loss_function = Myloss()
 
-            
-            trainaccuracy = trainmetricaccuracy.compute()
-            print('TrainAcc',specacc.compute())
-            print('TrainPrecision',trainprecision.compute())
-            print('TrainRecall ',trainrecall.compute())
+    #Select optimizer in an un-optimized way
+    if hp.optimizer_name == 'AdamW':
+        optimizer = optim.AdamW(net.parameters(), lr=hp.learning_rate)
+
+    # training function
+    trainmetricaccuracy = MulticlassAccuracy().to(DEVICE)
+    specacc = MulticlassAccuracy(average=None, num_classes=3).to(DEVICE)
+    trainprecision = MulticlassPrecision(average=None, num_classes=3).to(DEVICE)
+    trainrecall = MulticlassRecall(average=None, num_classes=3).to(DEVICE)
+    
+    net.train()
+    wandb.watch(net, log='all')
+    for index in tqdm(range(hp.EPOCH)):
+        for i, (x, y) in enumerate(train_dataloader):
+            x, y = x.to(DEVICE), y.to(DEVICE)
+            optimizer.zero_grad()
+            y_pre = net(x, True)
+            loss = loss_function(y_pre, y)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
+            optimizer.step()
+
+            trainmetricaccuracy.update(y_pre, y)
+            specacc.update(y_pre.to(torch.int64), y.to(torch.int64))
+            trainprecision.update(y_pre.to(torch.int64), y.to(torch.int64))
+            trainrecall.update(y_pre.to(torch.int64), y.to(torch.int64))
 
 
-            wandb.log({"train_acc": trainaccuracy})
-            
-            test(dataloader=test_dataloader, net=net, loss_function=loss_function)
+            wandb.log({'Loss': loss})
+            wandb.log({'index': index})
+
+        
+        trainaccuracy = trainmetricaccuracy.compute()
+        print('TrainAcc',specacc.compute())
+        print('TrainPrecision',trainprecision.compute())
+        print('TrainRecall ',trainrecall.compute())
+
+
+        wandb.log({"train_acc": trainaccuracy})
+        
+        test(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
 
 # test function
@@ -246,5 +200,5 @@ def test(dataloader, net, loss_function):
 
 # [Run the model]
 if __name__ == '__main__':
-    wandb.agent(sweep_id, train, count=6)
+    train()
 # [End experiment]
