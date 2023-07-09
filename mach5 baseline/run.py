@@ -78,7 +78,7 @@ print(f'use device: {DEVICE}')
 # [End Sweeps]
 
 # Log on Weights and Biases
-wandb.init(project='mach45', name='01')
+wandb.init(project='mach46', name='01')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -151,9 +151,7 @@ def network( heads, d_model, dropout, stack, d_hidden, channel_in, window_size, 
 
 def train():
     # [Define Pipeline]
-    print('1')
     train_dataloader, test_dataloader, _, d_channel = pipeline(batch_size=hp.batch_size, window_size=hp.window_size, pred_size=hp.pred_size, scaler=hp.scaler)
-    print('2')
     # [Define Model]
     net = network(d_model=hp.d_model,
                     heads=hp.heads,
@@ -176,6 +174,8 @@ def train():
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
+        infer(dataloader=test_dataloader, net=net)
+        print(index)
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pre = net(x, y, train_mask)
@@ -208,7 +208,7 @@ def train():
         torch.save(net.state_dict(), path)'''
         
         # [Validate Model]
-        infer(dataloader=test_dataloader, net=net)
+        
 
 
 # test function
