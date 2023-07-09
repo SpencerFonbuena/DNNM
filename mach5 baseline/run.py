@@ -185,7 +185,7 @@ def train():
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
                 optimizer.zero_grad()
-            if (i + 1) % 1000 == 0:
+            if (i + 1) % 10_000 == 0:
                 infer(dataloader=test_dataloader, net=net)
             # [Log Evaluation Metrics]
             wandb.log({'Loss': loss})
