@@ -174,7 +174,6 @@ def train():
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
-        infer(dataloader=test_dataloader, net=net, loss_function=loss_function)
         print(index)
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
@@ -193,18 +192,18 @@ def train():
             # [Log Evaluation Metrics]
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
-        
+        infer(dataloader=test_dataloader, net=net, loss_function=loss_function)
             # [Logging the graph]
-            '''if i % 1000 == 0:
-                pre = y_pre.cpu().detach().numpy()[0]
-                ys = y.cpu().detach().numpy()[0]
-                fig, ax = plt.subplots()
+        '''if i % 1000 == 0:
+            pre = y_pre.cpu().detach().numpy()[0]
+            ys = y.cpu().detach().numpy()[0]
+            fig, ax = plt.subplots()
 
-                ax.plot(pre, label='predictions')
-                ax.plot(ys, label ='actual')
-                plt.legend()
-                wandb.log({'train plots': wandb.Image(fig)})
-                plt.close()'''
+            ax.plot(pre, label='predictions')
+            ax.plot(ys, label ='actual')
+            plt.legend()
+            wandb.log({'train plots': wandb.Image(fig)})
+            plt.close()'''
 
         # [Save the model]
         '''path = '/root/DNNM/model_3.pth'
