@@ -155,11 +155,11 @@ def train():
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
         for i, (x, y) in enumerate(train_dataloader):
-            x, y = x.to(DEVICE), y.to(DEVICE)
+            x, y = x.to(DEVICE), y.reshape(hp.batch_size, hp.pred_size, 1).to(DEVICE)
             optimizer.zero_grad()
             y_pre = net(x, y, dec_mask)
-            print(y_pre[0])
-            print(y[0])
+            print(y_pre.shape)
+            print(y.shape)
             loss = loss_function(y_pre, y)
             loss.backward()
             optimizer.step()

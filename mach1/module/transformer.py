@@ -32,6 +32,7 @@ class Model(nn.Module):
 
 
         self.sourceembedding = Embedding(channel_in=channel_in, window_size=window_size, d_model=d_model)
+        self.tgtembedding = Embedding(channel_in=1, window_size=window_size, d_model=d_model)
 
 
         # [Encoder]
@@ -62,14 +63,15 @@ class Model(nn.Module):
             ) for _ in range(stack)
         ])'''
 
-        self.out = nn.Linear(d_model, 3)
+        self.out = nn.Linear(d_model, 1)
 
 
     def forward(self, x, tgt, mask):
         
         memory = self.sourceembedding(x, input='source')
-        tgt = tgt.reshape(hp.batch_size, hp.pred_size,1)
-        tgt = self.tgte
+        tgt = self.tgtembedding(tgt, input='tgt')
+
+
         for i, encoder in enumerate(self.encoder_tower):
             memory = std(memory, (i/self.stack) * hp.stoch_p, 'batch')
             memory = encoder(memory)
