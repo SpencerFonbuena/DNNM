@@ -78,7 +78,7 @@ print(f'use device: {DEVICE}')
 # [End Sweeps]
 
 # Log on Weights and Biases
-wandb.init(project='mach47', name='01')
+wandb.init(project='mach47', name='03')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -174,7 +174,7 @@ def train():
     net.train()
     wandb.watch(net, log='all')
     for index in tqdm(range(hp.EPOCH)):
-        infer(dataloader=test_dataloader, net=net)
+        infer(dataloader=test_dataloader, net=net, loss_function=loss_function)
         print(index)
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
@@ -210,7 +210,7 @@ def train():
 
 
 # test function
-def infer(dataloader, net):
+def infer(dataloader, net, loss_function):
     print('inference')
     net.eval()
     with torch.no_grad():
@@ -222,8 +222,9 @@ def infer(dataloader, net):
                                                         batch_size = hp.batch_size,
                                                         scaler=hp.scaler
                                                         )
-    
-            
+
+            testloss = loss_function(predictions, y)
+            wandb.log({'Test Loss': testloss})
             #predictions = hp.scaler.inverse_transform(predictions.cpu())
                 
             # [Log Graph]
