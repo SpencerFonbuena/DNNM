@@ -185,7 +185,7 @@ def train():
                                                         )
             loss = loss_function(predictions, y)
             loss.backward()
-            if (i + 1) % 4 == 0:
+            if i % 4 == 1:
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
                 optimizer.zero_grad()
@@ -194,7 +194,7 @@ def train():
             wandb.log({'index': index})
         
             # [Logging the graph]
-        if i % 1000 == 0:
+        if i % 100 == 0:
             pre = predictions.cpu().detach().numpy()[0]
             ys = y.cpu().detach().numpy()[0]
             fig, ax = plt.subplots()
@@ -204,7 +204,7 @@ def train():
             plt.legend()
             wandb.log({'train plots': wandb.Image(fig)})
             plt.close()
-            
+
         infer(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
         # [Save the model]
