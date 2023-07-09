@@ -185,14 +185,12 @@ def train():
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
                 optimizer.step()
                 optimizer.zero_grad()
-            if (i + 1) % 1_000 == 0:
-                infer(dataloader=test_dataloader, net=net)
             # [Log Evaluation Metrics]
             wandb.log({'Loss': loss})
             wandb.log({'index': index})
         
             # [Logging the graph]
-            if i % 100 == 0:
+            '''if i % 1000 == 0:
                 pre = y_pre.cpu().detach().numpy()[0]
                 ys = y.cpu().detach().numpy()[0]
                 fig, ax = plt.subplots()
@@ -201,7 +199,7 @@ def train():
                 ax.plot(ys, label ='actual')
                 plt.legend()
                 wandb.log({'train plots': wandb.Image(fig)})
-                plt.close()
+                plt.close()'''
 
         # [Save the model]
         '''path = '/root/DNNM/model_3.pth'
