@@ -178,8 +178,13 @@ def train():
         print(index)
         for i, (x, y) in enumerate(train_dataloader):
             x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pre = net(x, y, train_mask)
-            loss = loss_function(y_pre, y)
+            predictions = run_encoder_decoder_inference(model=net, 
+                                                        src=x,
+                                                        forecast_window = hp.pred_size,
+                                                        batch_size = hp.batch_size,
+                                                        scaler=hp.scaler
+                                                        )
+            loss = loss_function(predictions, y)
             loss.backward()
             if (i + 1) % 4 == 0:
                 torch.nn.utils.clip_grad_norm_(net.parameters(), .5)
