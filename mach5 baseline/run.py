@@ -227,7 +227,7 @@ def infer(dataloader, net):
             #predictions = hp.scaler.inverse_transform(predictions.cpu())
                 
             # [Log Graph]
-            if i % 500 == 0:
+            if i % 10 == 0:
                 pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
                 act = torch.tensor(torch.tensor(y[0]).reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
                 fig, ax = plt.subplots()
