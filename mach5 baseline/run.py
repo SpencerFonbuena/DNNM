@@ -82,7 +82,7 @@ wandb.init(project='mach46', name='01')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
-    path = '/root/DNNM/mach1/datasets/ES_1min_returns.txt'
+    path = '/root/DNNM/mach1/datasets/SPY_30mins_returns.txt'
 else:
     path = 'DNNM/mach1/datasets/SPY_30mins_returns.txt'
 
@@ -229,15 +229,16 @@ def infer(dataloader, net):
             #predictions = hp.scaler.inverse_transform(predictions.cpu())
                 
             # [Log Graph]
-            pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
-            act = torch.tensor(torch.tensor(y[0]).reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
-            fig, ax = plt.subplots()
+            if (i + 1) % 200 == 0:
+                pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
+                act = torch.tensor(torch.tensor(y[0]).reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
+                fig, ax = plt.subplots()
 
-            ax.plot(pre, label='prediction')
-            ax.plot(act, label='actual')
-            plt.legend()
-            wandb.log({"test plot": wandb.Image(fig)})
-            plt.close()
+                ax.plot(pre, label='prediction')
+                ax.plot(act, label='actual')
+                plt.legend()
+                wandb.log({"test plot": wandb.Image(fig)})
+                plt.close()
         
 
 # [End Save Model]
