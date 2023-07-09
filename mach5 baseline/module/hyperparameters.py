@@ -19,5 +19,5 @@ class HyperParameters:
     p = 0.8
     fcnstack = 2
     logs = 5
-    pred_size = 30
+    pred_size = 2
     scaler = StandardScaler()
