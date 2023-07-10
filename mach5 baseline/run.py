@@ -194,16 +194,16 @@ def train():
             wandb.log({'index': index})
         
             # [Logging the graph]
-        if i % 100 == 0:
-            pre = predictions.cpu().detach().numpy()[0]
-            ys = y.cpu().detach().numpy()[0]
-            fig, ax = plt.subplots()
+        #if i % 10 == 0:
+        pre = predictions.cpu().detach().numpy()[0]
+        ys = y.cpu().detach().numpy()[0]
+        fig, ax = plt.subplots()
 
-            ax.plot(pre, label='predictions')
-            ax.plot(ys, label ='actual')
-            plt.legend()
-            wandb.log({'train plots': wandb.Image(fig)})
-            plt.close()
+        ax.plot(pre, label='predictions')
+        ax.plot(ys, label ='actual')
+        plt.legend()
+        wandb.log({'train plots': wandb.Image(fig)})
+        plt.close()
 
         infer(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
