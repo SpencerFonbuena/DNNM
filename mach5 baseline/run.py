@@ -78,7 +78,7 @@ print(f'use device: {DEVICE}')
 # [End Sweeps]
 
 # Log on Weights and Biases
-wandb.init(project='mach47', name='03')
+wandb.init(project='mach48', name='03')
 
 #switch datasets depending on local or virtual run
 if torch.cuda.is_available():
@@ -194,16 +194,16 @@ def train():
             wandb.log({'index': index})
         
             # [Logging the graph]
-        #if i % 10 == 0:
-        pre = predictions.cpu().detach().numpy()[0]
-        ys = y.cpu().detach().numpy()[0]
-        fig, ax = plt.subplots()
+            if i % 500 == 0:
+                pre = torch.tensor(predictions[0].reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
+                act = torch.tensor(torch.tensor(y[0]).reshape(1,-1)).cpu().detach().numpy()[0].squeeze()
+                fig, ax = plt.subplots()
 
-        ax.plot(pre, label='predictions')
-        ax.plot(ys, label ='actual')
-        plt.legend()
-        wandb.log({'train plots': wandb.Image(fig)})
-        plt.close()
+                ax.plot(pre, label='prediction')
+                ax.plot(act, label='actual')
+                plt.legend()
+                wandb.log({'train plots': wandb.Image(fig)})
+                plt.close()
 
         infer(dataloader=test_dataloader, net=net, loss_function=loss_function)
 
