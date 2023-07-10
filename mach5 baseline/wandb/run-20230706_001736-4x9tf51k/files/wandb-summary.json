@@ -1,1 +1,0 @@
-{"mock plot": {"_type": "image-file", "sha256": "cc61f33a8cb58baacd0bf0a86b5e74da7ee5cf77784470b1b9dda2e2fc232131", "size": 33911, "path": "media/images/mock plot_2_cc61f33a8cb58baacd0b.png", "format": "png", "width": 640, "height": 480}, "_timestamp": 1688602659.7828207, "_runtime": 2.912259817123413, "_step": 2, "_wandb": {"runtime": 5}}
