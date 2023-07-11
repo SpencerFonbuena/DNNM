@@ -28,8 +28,8 @@ else:
     path1 = 'CF/datasets/SPY_30mins_returns.txt'
 scaler = StandardScaler()
 def pipeline():
-    train_dataset = Create_Dataset(datafile=path1, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
-    test_dataset = Create_Dataset(datafile=path1, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+    train_dataset = Create_Dataset(datafile=path, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+    test_dataset = Create_Dataset(datafile=path, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
 
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.batch_size, shuffle=True, num_workers=hp.num_workers,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.batch_size, shuffle=False, num_workers=hp.num_workers,pin_memory=True)
