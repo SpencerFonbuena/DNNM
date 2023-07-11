@@ -30,10 +30,14 @@ class SegMerging(nn.Module):
             pad_num = self.win_size - pad_num
             x = torch.cat((x, x[:, :, -pad_num:, :]), dim = -2)
 
-        seg_to_merge = []
+        '''seg_to_merge = []
         for i in range(self.win_size):
             seg_to_merge.append(x[:, :, i::self.win_size, :])
-        x = torch.cat(seg_to_merge, -1)  # [B, ts_d, seg_num/win_size, win_size*d_model]
+        x = torch.cat(seg_to_merge, -1)  # [B, ts_d, seg_num/win_size, win_size*d_model]'''
+
+        # [EDIT]
+        x = x.reshape(batch_size, ts_d, int(seg_num/self.win_size),d_model*self.win_size)
+        # [EDIT]
 
         x = self.norm(x)
         x = self.linear_trans(x)
