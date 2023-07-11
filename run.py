@@ -2,6 +2,7 @@ import torch
 import matplotlib.pyplot as plt
 import torch.optim as optim
 import numpy as np
+import wandb
 
 from torch.utils.data import DataLoader
 from modules.data_process import Create_Dataset
@@ -17,6 +18,8 @@ print(f'use device: {DEVICE}')
 '''
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
+
+wandb.init(project='mark L', name="01")
 
 path = 'CF/datasets/ETTh1.csv'
 path1 = 'CF/datasets/SPY_30mins_returns.txt'
@@ -61,16 +64,16 @@ def train():
             print(loss)
             loss.backward()
             optimizer.step()
-
-            
-        print(epochs)
+            wandb.log({'Loss': loss})
+            wandb.log({'Epoch': epochs})
+        
         pre = y_pred.cpu().detach().numpy()[0]
         ys = y.cpu().detach().numpy()[0]
         fig, ax = plt.subplots()
-
         ax.plot(pre, label='predictions')
         ax.plot(ys, label ='actual')
         plt.legend()
+        wandb.log({'train plot': wandb.Image(fig)})
 
 
 if __name__ == '__main__':
