@@ -70,15 +70,16 @@ def train():
             optimizer.step()
             wandb.log({'Loss': loss})
             wandb.log({'Epoch': epochs})
- 
-        pre = y_pred.cpu().detach().numpy()[0,:,0]
-        ys = y.cpu().detach().numpy()[0,:,0]
-        fig, ax = plt.subplots()
-        ax.plot(pre, label='predictions')
-        ax.plot(ys, label ='actual')
-        plt.legend()
-        wandb.log({'train plot': wandb.Image(fig)})
-        plt.close()
+
+            if i % 50 == 0:
+                pre = y_pred.cpu().detach().numpy()[0,:,0]
+                ys = y.cpu().detach().numpy()[0,:,0]
+                fig, ax = plt.subplots()
+                ax.plot(pre, label='predictions')
+                ax.plot(ys, label ='actual')
+                plt.legend()
+                wandb.log({'train plot': wandb.Image(fig)})
+                plt.close()
 
         test(net=net, dataloader=train_dataloader, optimizer=optimizer, loss_function=loss_function)
 
