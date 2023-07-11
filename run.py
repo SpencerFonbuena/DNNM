@@ -28,8 +28,8 @@ else:
     path1 = 'CF/datasets/SPY_30mins_returns.txt'
 scaler = StandardScaler()
 def pipeline():
-    train_dataset = Create_Dataset(datafile=path, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
-    test_dataset = Create_Dataset(datafile=path, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+    train_dataset = Create_Dataset(datafile=path1, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+    test_dataset = Create_Dataset(datafile=path1, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
 
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.batch_size, shuffle=True, num_workers=hp.num_workers,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.batch_size, shuffle=False, num_workers=hp.num_workers,pin_memory=True)
@@ -80,16 +80,17 @@ def train():
         wandb.log({'train plot': wandb.Image(fig)})
         plt.close()
 
-        test(net=net, dataloader=train_dataloader, optimizer=optimizer)
+        test(net=net, dataloader=train_dataloader, optimizer=optimizer, loss_function=loss_function)
 
-def test(net, dataloader, optimizer):
+def test(net, dataloader, optimizer, loss_function):
     net.eval()
     for epochs in range(10):
         for i, (x,y) in enumerate(dataloader):
             optimizer.zero_grad()
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pred = net(x)
-            
+            loss = loss_function(y_pred, y)
+            wandb.log({'test loss': loss})
             if i % 20 == 0:
                 pre = y_pred.cpu().detach().numpy()[0,:,0]
                 ys = y.cpu().detach().numpy()[0,:,0]
