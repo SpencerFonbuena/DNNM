@@ -1,12 +1,14 @@
 import torch
 import matplotlib.pyplot as plt
 import torch.optim as optim
+import numpy as np
 
 from torch.utils.data import DataLoader
 from modules.data_process import Create_Dataset
 from modules.crossformer import Crossformer
 from sklearn.preprocessing import StandardScaler
 from modules.loss import Myloss
+from modules.hyperparameters import Hyperparameters as hp
 
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
@@ -20,11 +22,12 @@ path = 'CF/datasets/ETTh1.csv'
 path1 = 'CF/datasets/SPY_30mins_returns.txt'
 scaler = StandardScaler()
 def pipeline():
-    train_dataset = Create_Dataset(datafile=path, window_size=120, pred_size=10, split=.7, scaler=scaler, mode='train')
-    test_dataset = Create_Dataset(datafile=path, window_size=120, pred_size=10, split=.7, scaler=scaler, mode='train')
+    train_dataset = Create_Dataset(datafile=path, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+    test_dataset = Create_Dataset(datafile=path, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
 
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True, num_workers=1,pin_memory=True,  drop_last=True)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=2, shuffle=False, num_workers=1,pin_memory=True)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.batch_size, shuffle=True, num_workers=hp.num_workers,pin_memory=True,  drop_last=True)
+    test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.batch_size, shuffle=False, num_workers=hp.num_workers,pin_memory=True)
+
 
     return train_dataloader, test_dataloader
 
@@ -35,7 +38,7 @@ data_dim, in_len, out_len, seg_len, win_size = 4,
                 dropout=0.0, baseline = False, device=torch.device('cuda:0')):
 '''
 def model():
-    net = Crossformer(data_dim=7, in_len=10, out_len=10, seg_len=10)
+    net = Crossformer(data_dim=hp.data_dim, in_len=hp.lookback, out_len=hp.pred_size, seg_len=hp.seg_len)
     return net
 
 def train():
@@ -46,19 +49,29 @@ def train():
 
     loss_function = Myloss()
 
-    optimizer = optim.AdamW(net.parameters(), lr = .0001)
+    optimizer = optim.AdamW(net.parameters(), lr = hp.learning_rate)
     
     net.train()
     for epochs in range(10):
         for i, (x,y) in enumerate(train_dataloader):
             optimizer.zero_grad()
             x, y = x.to(DEVICE), y.to(DEVICE)
-
-            print(x.shape, y.shape)
             y_pred = net(x)
             loss = loss_function(y_pred, y)
+            print(loss)
             loss.backward()
             optimizer.step()
+
+            
+        print(epochs)
+        pre = y_pred.cpu().detach().numpy()[0]
+        ys = y.cpu().detach().numpy()[0]
+        fig, ax = plt.subplots()
+
+        ax.plot(pre, label='predictions')
+        ax.plot(ys, label ='actual')
+        plt.legend()
+
 
 if __name__ == '__main__':
     train()
