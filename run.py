@@ -46,7 +46,7 @@ d_ff, n_heads, e_layers,
 def model():
     net = Crossformer(data_dim=hp.data_dim, in_len=hp.lookback, out_len=hp.pred_size, seg_len=hp.seg_len,
                       win_size=hp.win_size, d_model=hp.d_model, baseline=hp.baseline, d_ff=hp.d_ff, n_heads=hp.n_heads, 
-                      e_layers=hp.e_layers, dropout=hp.dropout, factor=hp.factor, device=DEVICE)
+                      e_layers=hp.e_layers, dropout=hp.dropout, factor=hp.factor, device=DEVICE).to(DEVICE)
     return net
 
 def train():
