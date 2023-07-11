@@ -97,7 +97,7 @@ def test(net, dataloader, optimizer):
             ax.plot(pre, label='predictions')
             ax.plot(ys, label ='actual')
             plt.legend()
-            wandb.log({'train plot': wandb.Image(fig)})
+            wandb.log({'test plot': wandb.Image(fig)})
             plt.close()
 
 if __name__ == '__main__':
