@@ -19,10 +19,13 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-wandb.init(project='mark L', name="01")
-
-path = 'CF/datasets/ETTh1.csv'
-path1 = 'CF/datasets/SPY_30mins_returns.txt'
+wandb.init(project='mark LI', name="01")
+if torch.cuda.is_available():
+    path = '/root/DNNM/datasets/ETTh1.csv'
+    path1 = '/root/DNNM/datasets/SPY_30mins_returns.txt'
+else:
+    path = 'CF/datasets/ETTh1.csv'
+    path1 = 'CF/datasets/SPY_30mins_returns.txt'
 scaler = StandardScaler()
 def pipeline():
     train_dataset = Create_Dataset(datafile=path, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
