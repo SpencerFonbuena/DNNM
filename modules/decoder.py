@@ -8,7 +8,7 @@ class DecoderLayer(nn.Module):
     '''
     The decoder layer of Crossformer, each layer will make a prediction at its scale
     '''
-    def __init__(self, seg_len, d_model, n_heads, d_ff=None, dropout=0.1, out_seg_num = 10, factor = 10):
+    def __init__(self, seg_len, d_model, n_heads, d_ff, dropout, out_seg_num, factor):
         super(DecoderLayer, self).__init__()
         self.self_attention = TwoStageAttentionLayer(out_seg_num, factor, d_model, n_heads, \
                                 d_ff, dropout)    
@@ -26,7 +26,6 @@ class DecoderLayer(nn.Module):
         x: the output of last decoder layer
         cross: the output of the corresponding encoder layer
         '''
-
         batch = x.shape[0]
         x = self.self_attention(x)
         x = rearrange(x, 'b ts_d out_seg_num d_model -> (b ts_d) out_seg_num d_model')
@@ -51,7 +50,7 @@ class Decoder(nn.Module):
     The decoder of Crossformer, making the final prediction by adding up predictions at each scale
     '''
     def __init__(self, seg_len, d_layers, d_model, n_heads, d_ff, dropout,\
-                router=False, out_seg_num = 10, factor=10):
+                out_seg_num, factor, router=False):
         super(Decoder, self).__init__()
 
         self.router = router
@@ -63,7 +62,6 @@ class Decoder(nn.Module):
     def forward(self, x, cross):
         final_predict = None
         i = 0
-
         ts_d = x.shape[1]
         for layer in self.decode_layers:
             cross_enc = cross[i]

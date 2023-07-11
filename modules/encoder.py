@@ -77,7 +77,7 @@ class Encoder(nn.Module):
     The Encoder of Crossformer.
     '''
     def __init__(self, e_blocks, win_size, d_model, n_heads, d_ff, block_depth, dropout,
-                in_seg_num = 10, factor=10):
+                in_seg_num, factor):
         super(Encoder, self).__init__()
         self.encode_blocks = nn.ModuleList()
 
@@ -94,5 +94,4 @@ class Encoder(nn.Module):
         for block in self.encode_blocks:
             x = block(x)
             encode_x.append(x)
-
         return encode_x

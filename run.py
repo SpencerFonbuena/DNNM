@@ -19,7 +19,7 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-wandb.init(project='mark L', name="01")
+#wandb.init(project='mark L', name="01")
 
 path = 'CF/datasets/ETTh1.csv'
 path1 = 'CF/datasets/SPY_30mins_returns.txt'
@@ -34,14 +34,16 @@ def pipeline():
 
     return train_dataloader, test_dataloader
 
+'''
+d_ff, n_heads, e_layers, 
+                dropout, baseline, device):
 
 '''
-data_dim, in_len, out_len, seg_len, win_size = 4,
-                factor=10, d_model=512, d_ff = 1024, n_heads=8, e_layers=3, 
-                dropout=0.0, baseline = False, device=torch.device('cuda:0')):
-'''
+
 def model():
-    net = Crossformer(data_dim=hp.data_dim, in_len=hp.lookback, out_len=hp.pred_size, seg_len=hp.seg_len)
+    net = Crossformer(data_dim=hp.data_dim, in_len=hp.lookback, out_len=hp.pred_size, seg_len=hp.seg_len,
+                      win_size=hp.win_size, d_model=hp.d_model, baseline=hp.baseline, d_ff=hp.d_ff, n_heads=hp.n_heads, 
+                      e_layers=hp.e_layers, dropout=hp.dropout, factor=hp.factor, device=DEVICE)
     return net
 
 def train():
@@ -63,8 +65,8 @@ def train():
             loss = loss_function(y_pred, y)
             loss.backward()
             optimizer.step()
-            wandb.log({'Loss': loss})
-            wandb.log({'Epoch': epochs})
+            #wandb.log({'Loss': loss})
+            #wandb.log({'Epoch': epochs})
  
         pre = y_pred.cpu().detach().numpy()[0,:,0]
         ys = y.cpu().detach().numpy()[0,:,0]
@@ -72,7 +74,7 @@ def train():
         ax.plot(pre, label='predictions')
         ax.plot(ys, label ='actual')
         plt.legend()
-        wandb.log({'train plot': wandb.Image(fig)})
+        #wandb.log({'train plot': #wandb.Image(fig)})
         plt.close()
 
         test(net=net, dataloader=train_dataloader, optimizer=optimizer)
@@ -92,7 +94,7 @@ def test(net, dataloader, optimizer):
             ax.plot(pre, label='predictions')
             ax.plot(ys, label ='actual')
             plt.legend()
-            wandb.log({'train plot': wandb.Image(fig)})
+            #wandb.log({'train plot': wandb.Image(fig)})
             plt.close()
 
 if __name__ == '__main__':

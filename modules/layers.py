@@ -67,9 +67,9 @@ class TwoStageAttentionLayer(nn.Module):
     The Two Stage Attention (TSA) Layer
     input/output shape: [batch_size, Data_dim(D), Seg_num(L), d_model]
     '''
-    def __init__(self, seg_num, factor, d_model, n_heads, d_ff = None, dropout=0.1):
+    def __init__(self, seg_num, factor, d_model, n_heads, d_ff, dropout):
         super(TwoStageAttentionLayer, self).__init__()
-        d_ff = d_ff or 4*d_model
+        d_ff = 4 * d_model
         self.time_attention = AttentionLayer(d_model, n_heads, dropout = dropout)
         self.dim_sender = AttentionLayer(d_model, n_heads, dropout = dropout)
         self.dim_receiver = AttentionLayer(d_model, n_heads, dropout = dropout)
