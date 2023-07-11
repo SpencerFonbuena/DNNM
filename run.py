@@ -19,7 +19,7 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-wandb.init(project='mark LI', name="01")
+wandb.init(project='mark LII', name="01")
 if torch.cuda.is_available():
     path = '/root/DNNM/datasets/ETTh1.csv'
     path1 = '/root/DNNM/datasets/ETTm1.csv'
