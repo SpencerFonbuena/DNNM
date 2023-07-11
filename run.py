@@ -61,20 +61,39 @@ def train():
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pred = net(x)
             loss = loss_function(y_pred, y)
-            print(loss)
             loss.backward()
             optimizer.step()
             wandb.log({'Loss': loss})
             wandb.log({'Epoch': epochs})
-        
-        pre = y_pred.cpu().detach().numpy()[0]
-        ys = y.cpu().detach().numpy()[0]
+ 
+        pre = y_pred.cpu().detach().numpy()[0,:,0]
+        ys = y.cpu().detach().numpy()[0,:,0]
         fig, ax = plt.subplots()
         ax.plot(pre, label='predictions')
         ax.plot(ys, label ='actual')
         plt.legend()
         wandb.log({'train plot': wandb.Image(fig)})
+        plt.close()
 
+        test(net=net, dataloader=train_dataloader, optimizer=optimizer)
+
+def test(net, dataloader, optimizer):
+    net.eval()
+    for epochs in range(10):
+        for i, (x,y) in enumerate(dataloader):
+            optimizer.zero_grad()
+            x, y = x.to(DEVICE), y.to(DEVICE)
+            y_pred = net(x)
+            
+            
+            pre = y_pred.cpu().detach().numpy()[0,:,0]
+            ys = y.cpu().detach().numpy()[0,:,0]
+            fig, ax = plt.subplots()
+            ax.plot(pre, label='predictions')
+            ax.plot(ys, label ='actual')
+            plt.legend()
+            wandb.log({'train plot': wandb.Image(fig)})
+            plt.close()
 
 if __name__ == '__main__':
     train()
