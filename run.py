@@ -90,15 +90,15 @@ def test(net, dataloader, optimizer):
             x, y = x.to(DEVICE), y.to(DEVICE)
             y_pred = net(x)
             
-            
-            pre = y_pred.cpu().detach().numpy()[0,:,0]
-            ys = y.cpu().detach().numpy()[0,:,0]
-            fig, ax = plt.subplots()
-            ax.plot(pre, label='predictions')
-            ax.plot(ys, label ='actual')
-            plt.legend()
-            wandb.log({'test plot': wandb.Image(fig)})
-            plt.close()
+            if i % 20 == 0:
+                pre = y_pred.cpu().detach().numpy()[0,:,0]
+                ys = y.cpu().detach().numpy()[0,:,0]
+                fig, ax = plt.subplots()
+                ax.plot(pre, label='predictions')
+                ax.plot(ys, label ='actual')
+                plt.legend()
+                wandb.log({'test plot': wandb.Image(fig)})
+                plt.close()
 
 if __name__ == '__main__':
     train()
