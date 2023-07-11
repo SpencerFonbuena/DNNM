@@ -19,7 +19,7 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-#wandb.init(project='mark L', name="01")
+wandb.init(project='mark L', name="01")
 
 path = 'CF/datasets/ETTh1.csv'
 path1 = 'CF/datasets/SPY_30mins_returns.txt'
@@ -65,8 +65,8 @@ def train():
             loss = loss_function(y_pred, y)
             loss.backward()
             optimizer.step()
-            #wandb.log({'Loss': loss})
-            #wandb.log({'Epoch': epochs})
+            wandb.log({'Loss': loss})
+            wandb.log({'Epoch': epochs})
  
         pre = y_pred.cpu().detach().numpy()[0,:,0]
         ys = y.cpu().detach().numpy()[0,:,0]
@@ -74,7 +74,7 @@ def train():
         ax.plot(pre, label='predictions')
         ax.plot(ys, label ='actual')
         plt.legend()
-        #wandb.log({'train plot': #wandb.Image(fig)})
+        wandb.log({'train plot': wandb.Image(fig)})
         plt.close()
 
         test(net=net, dataloader=train_dataloader, optimizer=optimizer)
@@ -94,7 +94,7 @@ def test(net, dataloader, optimizer):
             ax.plot(pre, label='predictions')
             ax.plot(ys, label ='actual')
             plt.legend()
-            #wandb.log({'train plot': wandb.Image(fig)})
+            wandb.log({'train plot': wandb.Image(fig)})
             plt.close()
 
 if __name__ == '__main__':
