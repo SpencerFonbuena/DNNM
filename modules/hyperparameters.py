@@ -1,7 +1,5 @@
 import torch
 class Hyperparameters:
-
-    
     pred_size = 24
     lookback = 168
     seg_len = 6
@@ -11,7 +9,7 @@ class Hyperparameters:
         num_workers = 2
     else:
         num_workers = 1
-    data_dim = 7
+    data_dim = 8
     learning_rate = .0003
     win_size = 2
     factor = 10
