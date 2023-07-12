@@ -23,6 +23,7 @@ wandb.init(project='mark LIII', name="01")
 if torch.cuda.is_available():
     path = '/root/DNNM/datasets/ETTh1.csv'
     path1 = '/root/DNNM/datasets/ETTm1.csv'
+    path3 = '/root/DNNM/datasets/ES_1min_returns.txt'
 else:
     path = 'CF/datasets/ETTh1.csv'
     path1 = 'CF/datasets/SPY_30mins_returns.txt'
