@@ -1,8 +1,11 @@
 import torch
+import wandb
+import glob
+import os
 import matplotlib.pyplot as plt
 import torch.optim as optim
 import numpy as np
-import wandb
+import pandas as pd
 
 from torch.utils.data import DataLoader
 from modules.data_process import Create_Dataset
@@ -27,10 +30,11 @@ if torch.cuda.is_available():
 else:
     path = 'CF/datasets/ETTh1.csv'
     path1 = 'CF/datasets/SPY_30mins_returns.txt'
+    path3 = '/Users/spencerfonbuena/Documents/Python/Trading Models/CF/dataset'
 scaler = StandardScaler()
-def pipeline():
-    train_dataset = Create_Dataset(datafile=path3, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
-    test_dataset = Create_Dataset(datafile=path3, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+def pipeline(datafile):
+    train_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+    test_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
 
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.batch_size, shuffle=True, num_workers=hp.num_workers,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.batch_size, shuffle=False, num_workers=hp.num_workers,pin_memory=True)
@@ -50,39 +54,38 @@ def model():
                       e_layers=hp.e_layers, dropout=hp.dropout, factor=hp.factor, device=DEVICE).to(DEVICE)
     return net
 
-def train():
-
-    train_dataloader, test_dataloader = pipeline()
-
+def main():
     net = model()
-
     loss_function = Myloss()
-
     optimizer = optim.AdamW(net.parameters(), lr = hp.learning_rate)
     
     net.train()
     for epochs in range(10):
-        for i, (x,y) in enumerate(train_dataloader):
-            optimizer.zero_grad()
-            x, y = x.to(DEVICE), y.to(DEVICE)
-            y_pred = net(x)
-            loss = loss_function(y_pred, y)
-            loss.backward()
-            optimizer.step()
-            wandb.log({'Loss': loss})
-            wandb.log({'Epoch': epochs})
+        for datafile in glob.glob(os.path.join(path3, '*.txt')):
+            with open(os.path.join(os.getcwd(), datafile), 'r') as f:
+                df = pd.read_csv(datafile, delimiter=',', index_col=0)
+                train_dataloader, test_dataloader = pipeline(df)
+                for i, (x,y) in enumerate(train_dataloader):
+                    optimizer.zero_grad()
+                    x, y = x.to(DEVICE), y.to(DEVICE)
+                    y_pred = net(x)
+                    loss = loss_function(y_pred, y)
+                    loss.backward()
+                    optimizer.step()
+                    wandb.log({'Loss': loss})
+                    wandb.log({'Epoch': epochs})
 
-            if i % 50 == 0:
-                pre = y_pred.cpu().detach().numpy()[0,:,0]
-                ys = y.cpu().detach().numpy()[0,:,0]
-                fig, ax = plt.subplots()
-                ax.plot(pre, label='predictions')
-                ax.plot(ys, label ='actual')
-                plt.legend()
-                wandb.log({'train plot': wandb.Image(fig)})
-                plt.close()
+                    if i % 50 == 0:
+                        pre = y_pred.cpu().detach().numpy()[0,:,0]
+                        ys = y.cpu().detach().numpy()[0,:,0]
+                        fig, ax = plt.subplots()
+                        ax.plot(pre, label='predictions')
+                        ax.plot(ys, label ='actual')
+                        plt.legend()
+                        wandb.log({'train plot': wandb.Image(fig)})
+                        plt.close()
 
-        #test(net=net, dataloader=train_dataloader, optimizer=optimizer, loss_function=loss_function)
+        test(net=net, dataloader=test_dataloader, optimizer=optimizer, loss_function=loss_function)
 
 def test(net, dataloader, optimizer, loss_function):
     net.eval()
@@ -104,4 +107,4 @@ def test(net, dataloader, optimizer, loss_function):
                 plt.close()
 
 if __name__ == '__main__':
-    train()
+    main()

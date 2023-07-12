@@ -20,17 +20,14 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 class Create_Dataset(Dataset):
     def __init__(self, datafile, window_size, pred_size, split, scaler, mode = str ): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
-        # [Reading in and pre-processing data]
-
-        df = pd.read_csv(datafile, delimiter=',', index_col=0)
   
         #Create the training data
         
-        rawtrainingdata = pd.DataFrame(df).to_numpy()
+        rawtrainingdata = pd.DataFrame(datafile).to_numpy()
         rawtrainingdata = pd.DataFrame(scaler.fit_transform(rawtrainingdata)).to_numpy()
 
         #create the labels
-        rawtraininglabels = pd.DataFrame(df).to_numpy()
+        rawtraininglabels = pd.DataFrame(datafile).to_numpy()
         rawtraininglabels = pd.DataFrame(scaler.fit_transform(rawtraininglabels)).to_numpy()
         # [End pre-processing]
 
@@ -40,7 +37,7 @@ class Create_Dataset(Dataset):
         #The data we want will depend if we are in train, validate, or test mode.
         self.mode = mode
         #create a split value to separate validate from training
-        self.split = int(len(df) * split)
+        self.split = int(len(datafile) * split)
 
         # [End Functionalities]
 
