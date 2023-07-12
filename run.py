@@ -2,10 +2,12 @@ import torch
 import wandb
 import glob
 import os
+import colossalai
 import matplotlib.pyplot as plt
 import torch.optim as optim
 import numpy as np
 import pandas as pd
+
 
 from torch.utils.data import DataLoader
 from modules.data_process import Create_Dataset
@@ -22,16 +24,23 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-wandb.init(project='mark LIII', name="01")
+wandb.init(project='mark Garbage', name="01")
 if torch.cuda.is_available():
     path = '/root/DNNM/datasets/ETTh1.csv'
     path1 = '/root/DNNM/datasets/ETTm1.csv'
-    path3 = '/root/DNNM/datasets/SPY_30mins_returns.txt'
+    path3 = '/mnt/blockstorage/'
 else:
     path = 'CF/datasets/ETTh1.csv'
     path1 = 'CF/datasets/SPY_30mins_returns.txt'
     path3 = '/Users/spencerfonbuena/Documents/Python/Trading Models/CF/dataset'
 scaler = StandardScaler()
+
+
+'''colossalai.launch_from_torch(
+    config='DNNM/modules/hyperparameters.py',
+)'''
+
+
 def pipeline(datafile):
     train_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
     test_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
