@@ -82,7 +82,7 @@ def train():
                 wandb.log({'train plot': wandb.Image(fig)})
                 plt.close()
 
-        test(net=net, dataloader=train_dataloader, optimizer=optimizer, loss_function=loss_function)
+        #test(net=net, dataloader=train_dataloader, optimizer=optimizer, loss_function=loss_function)
 
 def test(net, dataloader, optimizer, loss_function):
     net.eval()
