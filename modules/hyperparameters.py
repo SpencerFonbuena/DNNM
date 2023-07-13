@@ -10,7 +10,7 @@ class Hyperparameters:
     else:
         num_workers = 1
     data_dim = 5
-    learning_rate = .005
+    learning_rate = .0005
     win_size = 2
     factor = 10
     d_model = 512
