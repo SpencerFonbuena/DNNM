@@ -73,7 +73,7 @@ def main():
     net = model()
     loss_function = Myloss()
     optimizer = optim.AdamW(net.parameters(), lr = hp.learning_rate)
-    scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='min', factor=0.1, patience=2, threshold=.0001, )
+    scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='min', factor=0.1, patience=20, threshold=.0001, )
     gradscaler = amp.GradScaler()
     net.train()
     for epochs in tqdm(range(10)):
@@ -107,7 +107,7 @@ def main():
                 wandb.log({'train plot': wandb.Image(fig)})
                 plt.close()
                 #test(net=net, dataloader=test_dataloader, optimizer=optimizer, loss_function=loss_function)
-        scheduler.step(loss.mean())
+                scheduler.step(loss.mean())
 def test(net, dataloader, optimizer, loss_function):
     net.eval()
     for epochs in range(10):
