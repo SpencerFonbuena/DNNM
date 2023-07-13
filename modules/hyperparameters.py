@@ -16,7 +16,7 @@ class Hyperparameters:
     d_model = 512
     d_ff = 4 * d_model
     n_heads = 32
-    e_layers = 10
+    e_layers = 20
     dropout = 0
     baseline = False
 
