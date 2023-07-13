@@ -97,5 +97,5 @@ def pre_process(datafile):
     df['Low'] = df['Low'].pct_change()
     df['Close'] = df['Close'].pct_change()
     df['Volume'] = df['Volume'].pct_change()
-
+    print(df.head())
     return df[1:]

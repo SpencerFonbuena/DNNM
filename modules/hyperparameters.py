@@ -3,14 +3,14 @@ class Hyperparameters:
     pred_size = 24
     lookback = 168
     seg_len = 6
-    batch_size = 64
-    split = .7
+    batch_size = 256
+    split = .95
     if torch.cuda.is_available():
-        num_workers = 2
+        num_workers = 12
     else:
         num_workers = 1
     data_dim = 8
-    learning_rate = .00005
+    learning_rate = .01
     win_size = 2
     factor = 10
     d_model = 512
