@@ -33,7 +33,7 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-wandb.init(project='mark garb', name="05")
+wandb.init(project='mark LIV', name="01")
 if torch.cuda.is_available():
     path = '/root/datasets/Stocks'
 else:
