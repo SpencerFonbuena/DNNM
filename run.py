@@ -2,6 +2,7 @@ import torch
 import wandb
 import glob
 import os
+from tqdm.auto import tqdm
 
 import matplotlib.pyplot as plt
 import torch.optim as optim
@@ -75,7 +76,7 @@ def main():
     scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='min', factor=0.1, patience=10, threshold=.0001, )
     gradscaler = amp.GradScaler()
     net.train()
-    for epochs in range(10):
+    for epochs in tqdm(range(10)):
         for datafolder in glob.glob(os.path.join(path, 'data*')):
             for datafile in glob.glob(os.path.join(datafolder, '*.txt')):
                 with open(os.path.join(os.getcwd(), datafile), 'r') as f:
