@@ -90,7 +90,7 @@ def main():
                             loss = loss_function(y_pred, y)
                         gradscaler.scale(loss).backward()
                         if i % 4 == 0:
-                            gradscaler.step()
+                            gradscaler.step(optimizer=optimizer)
                             gradscaler.update()
                             optimizer.zero_grad()
                         wandb.log({'Loss': loss})
