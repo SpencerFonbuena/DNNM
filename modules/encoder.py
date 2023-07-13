@@ -4,7 +4,12 @@ import torch.nn.functional as F
 from einops import rearrange, repeat
 from modules.layers import FullAttention, AttentionLayer, TwoStageAttentionLayer
 from math import ceil
-
+import random
+import numpy as np
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 class SegMerging(nn.Module):
     '''
     Segment Merging Layer.

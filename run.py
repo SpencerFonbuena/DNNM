@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import torch.optim as optim
 import numpy as np
 import pandas as pd
-
+import random
 
 from torch.utils.data import DataLoader
 from modules.data_process import Create_Dataset
@@ -16,6 +16,11 @@ from sklearn.preprocessing import StandardScaler
 from modules.loss import Myloss
 from modules.hyperparameters import Hyperparameters as hp
 
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
+scaler = StandardScaler()
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
@@ -27,13 +32,10 @@ datafile, window_size, pred_size, split, scaler, mode = str
 wandb.init(project='mark LIII', name="05")
 if torch.cuda.is_available():
     path = '/root/DNNM/datasets/ETTh1.csv'
-    path1 = '/root/DNNM/datasets/ETTm1.csv'
-    path3 = '/mnt/blockstorage/dataset'
 else:
     path = 'CF/datasets/ETTh1.csv'
-    path1 = 'CF/datasets/SPY_30mins_returns.txt'
-    path3 = '/Users/spencerfonbuena/Documents/Python/Trading Models/CF/dataset'
-scaler = StandardScaler()
+
+
 
 
 '''colossalai.launch_from_torch(
@@ -42,8 +44,8 @@ scaler = StandardScaler()
 
 
 def pipeline(datafile):
-    train_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
-    test_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, scaler=scaler, mode='train')
+    train_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, mode='train')
+    test_dataset = Create_Dataset(datafile=datafile, window_size=hp.lookback, pred_size=hp.pred_size, split=hp.split, mode='train')
 
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=hp.batch_size, shuffle=True, num_workers=hp.num_workers,pin_memory=True,  drop_last=True)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=hp.batch_size, shuffle=False, num_workers=hp.num_workers,pin_memory=True)
@@ -73,6 +75,7 @@ def main():
         for datafile in glob.glob(os.path.join(path3, '*.txt')):
             with open(os.path.join(os.getcwd(), datafile), 'r') as f:
                 df = pd.read_csv(datafile, delimiter=',', index_col=0)
+                df = scaler.fit_transform(df)
                 train_dataloader, test_dataloader = pipeline(df)
                 for i, (x,y) in enumerate(train_dataloader):
                     optimizer.zero_grad()

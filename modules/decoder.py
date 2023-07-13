@@ -3,7 +3,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange, repeat
 from modules.layers import FullAttention, AttentionLayer, TwoStageAttentionLayer
-
+import random
+import numpy as np
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 class DecoderLayer(nn.Module):
     '''
     The decoder layer of Crossformer, each layer will make a prediction at its scale

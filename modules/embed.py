@@ -3,7 +3,12 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange, repeat
-
+import random
+import numpy as np
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 '''
 Reshaping:
 Assuming that the data takes the form (Batch, Time Series Length, Time Series Dimension) -> (16,100,10)

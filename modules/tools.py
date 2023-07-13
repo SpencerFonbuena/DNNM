@@ -1,6 +1,14 @@
 import numpy as np
 import torch
 import json
+import random
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 
 def adjust_learning_rate(optimizer, epoch, args):
     if args.lradj=='type1':
@@ -80,3 +88,14 @@ def string_split(str_for_split):
     value_list = [eval(x) for x in str_split]
 
     return value_list
+
+def pre_process(datafile):
+    df = pd.read_csv(datafile, sep=',', index_col=0, header=None, names=["Date", 'Open', 'High', 'Low', 'Close', 'Volume'])
+
+    df['Open'] = df['Open'].pct_change()
+    df['High'] = df['High'].pct_change()
+    df['Low'] = df['Low'].pct_change()
+    df['Close'] = df['Close'].pct_change()
+    df['Volume'] = df['Volume'].pct_change()
+
+    return df[1:]

@@ -18,17 +18,15 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 #Create_Dataset class that inherits the attributes and methods of torch.utils.data.Dataset
 class Create_Dataset(Dataset):
-    def __init__(self, datafile, window_size, pred_size, split, scaler, mode = str ): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
+    def __init__(self, datafile, window_size, pred_size, split, mode = str ): # datafile -> csv file | window_size -> # of timesteps in each example | split -> The percent of data you want for training
         
   
         #Create the training data
         
         rawtrainingdata = pd.DataFrame(datafile).to_numpy()
-        rawtrainingdata = pd.DataFrame(scaler.fit_transform(rawtrainingdata)).to_numpy()
 
         #create the labels
         rawtraininglabels = pd.DataFrame(datafile).to_numpy()
-        rawtraininglabels = pd.DataFrame(scaler.fit_transform(rawtraininglabels)).to_numpy()
         # [End pre-processing]
 
 

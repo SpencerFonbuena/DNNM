@@ -5,7 +5,11 @@ from einops import rearrange, repeat
 import numpy as np
 
 from math import sqrt
-
+import random
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 class FullAttention(nn.Module):
     '''
     The Attention operation

@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 from einops import rearrange, repeat
 
 from modules.encoder import Encoder
@@ -9,7 +10,11 @@ from modules.layers import FullAttention, AttentionLayer, TwoStageAttentionLayer
 from modules.embed import DSW_embedding
 
 from math import ceil
-
+import random
+seed = 10
+np.random.seed(seed)
+random.seed(seed)
+torch.manual_seed(seed)
 class Crossformer(nn.Module):
     def __init__(self, data_dim, in_len, out_len, seg_len, win_size ,
                 factor, d_model, d_ff, n_heads, e_layers, 
