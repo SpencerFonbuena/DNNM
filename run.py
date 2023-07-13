@@ -34,7 +34,7 @@ datafile, window_size, pred_size, split, scaler, mode = str
 
 wandb.init(project='mark garb', name="05")
 if torch.cuda.is_available():
-    path = '/root/DNNM/datasets/ETTh1.csv'
+    path = '/root/datasets/Stocks'
 else:
     path = '/Users/spencerfonbuena/Documents/Stocks'
 
