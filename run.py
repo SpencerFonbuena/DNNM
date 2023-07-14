@@ -73,7 +73,7 @@ def main():
     net = model()
     loss_function = Myloss()
     optimizer = optim.AdamW(net.parameters(), lr = hp.learning_rate)
-    scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='min', factor=0.1, patience=2, threshold=.0001, )
+    scheduler = ReduceLROnPlateau(optimizer=optimizer, mode='min', factor=0.1, patience=1, threshold=.0001, )
     gradscaler = amp.GradScaler()
     net.train()
     for epochs in tqdm(range(10)):
