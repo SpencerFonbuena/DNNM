@@ -83,19 +83,20 @@ def main():
                     print(datafile)
                     df = pre_process(datafile=datafile)
                     df = scaler.fit_transform(df)
-                    train_dataloader, test_dataloader = pipeline(df)
-                    for i, (x,y) in enumerate(train_dataloader):
-                        x, y = x.to(DEVICE), y.to(DEVICE)
-                        with amp.autocast(dtype=torch.float16):
-                            y_pred = net(x)
-                            loss = loss_function(y_pred, y)
-                        gradscaler.scale(loss).backward()
-                        if i % 4 == 0:
-                            gradscaler.step(optimizer=optimizer)
-                            gradscaler.update()
-                            optimizer.zero_grad()
-                        wandb.log({'Loss': loss})
-                        wandb.log({'Epoch': epochs})
+                    if len(df) >= 1000:
+                        train_dataloader, test_dataloader = pipeline(df)
+                        for i, (x,y) in enumerate(train_dataloader):
+                            x, y = x.to(DEVICE), y.to(DEVICE)
+                            with amp.autocast(dtype=torch.float16):
+                                y_pred = net(x)
+                                loss = loss_function(y_pred, y)
+                            gradscaler.scale(loss).backward()
+                            if i % 4 == 0:
+                                gradscaler.step(optimizer=optimizer)
+                                gradscaler.update()
+                                optimizer.zero_grad()
+                            wandb.log({'Loss': loss})
+                            wandb.log({'Epoch': epochs})
 
  
                 pre = y_pred.cpu().detach().numpy()[0,:,0]
