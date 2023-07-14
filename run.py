@@ -86,6 +86,7 @@ def main():
                     train_dataloader, test_dataloader = pipeline(df)
                     for i, (x,y) in enumerate(train_dataloader):
                         x, y = x.to(DEVICE), y.to(DEVICE)
+                        print(x.shape, y.shape)
                         with amp.autocast(dtype=torch.float16):
                             y_pred = net(x)
                             loss = loss_function(y_pred, y)
