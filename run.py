@@ -80,7 +80,6 @@ def main():
         for datafolder in glob.glob(os.path.join(path, 'data*')):
             for datafile in glob.glob(os.path.join(datafolder, '*.txt')):
                 with open(os.path.join(os.getcwd(), datafile), 'r') as f:
-                    print(datafile)
                     df = pre_process(datafile=datafile)
                     df = scaler.fit_transform(df)
                     check = 0
@@ -110,6 +109,7 @@ def main():
                     wandb.log({'train plot': wandb.Image(fig)})
                     plt.close()
                     #test(net=net, dataloader=test_dataloader, optimizer=optimizer, loss_function=loss_function)
+            print(datafolder)
         scheduler.step(loss.mean())
         savepath = '/root/model_3.pth'
         torch.save(net.state_dict(), savepath)
