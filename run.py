@@ -25,6 +25,7 @@ np.random.seed(seed)
 random.seed(seed)
 torch.manual_seed(seed)
 scaler = StandardScaler()
+
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
@@ -32,7 +33,7 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-wandb.init(project='garb LIV', name="01")
+wandb.init(project='mark LIV', name="01")
 if torch.cuda.is_available():
     path = '/root/datasets/Stocks'
 else:
@@ -69,7 +70,6 @@ def model():
     return net
 
 def main():
-    check = 0
     net = model()
     loss_function = Myloss()
     optimizer = optim.AdamW(net.parameters(), lr = hp.learning_rate)
@@ -83,6 +83,7 @@ def main():
                     print(datafile)
                     df = pre_process(datafile=datafile)
                     df = scaler.fit_transform(df)
+                    check = 0
                     if len(df) >= 1000:
                         check = 1
                         train_dataloader, test_dataloader = pipeline(df)
@@ -96,8 +97,8 @@ def main():
                                 gradscaler.step(optimizer=optimizer)
                                 gradscaler.update()
                                 optimizer.zero_grad()
-                        wandb.log({'Loss': loss})
-                        wandb.log({'Epoch': epochs})
+                            wandb.log({'Loss': loss})
+                            wandb.log({'Epoch': epochs})
 
                 if check == 1:
                     pre = y_pred.cpu().detach().numpy()[0,:,0]
@@ -108,9 +109,8 @@ def main():
                     plt.legend()
                     wandb.log({'train plot': wandb.Image(fig)})
                     plt.close()
-                #test(net=net, dataloader=test_dataloader, optimizer=optimizer, loss_function=loss_function)
+                    #test(net=net, dataloader=test_dataloader, optimizer=optimizer, loss_function=loss_function)
         scheduler.step(loss.mean())
-        # [Save the model]
         savepath = '/root/model_3.pth'
         torch.save(net.state_dict(), savepath)
 def test(net, dataloader, optimizer, loss_function):
@@ -132,3 +132,6 @@ def test(net, dataloader, optimizer, loss_function):
 
 if __name__ == '__main__':
     main()
+
+
+    
