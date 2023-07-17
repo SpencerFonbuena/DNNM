@@ -22,11 +22,11 @@ class Create_Dataset(Dataset):
         
   
         #Create the training data
+        datafile = pd.DataFrame(datafile)
         
-        rawtrainingdata = pd.DataFrame(datafile).to_numpy()
-
+        rawtrainingdata = datafile.drop(columns=[5]).to_numpy()
         #create the labels
-        rawtraininglabels = pd.DataFrame(datafile).to_numpy()
+        rawtraininglabels = datafile[5].to_numpy()
         # [End pre-processing]
 
 

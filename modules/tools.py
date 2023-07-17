@@ -89,13 +89,90 @@ def string_split(str_for_split):
 
     return value_list
 
+def create_labels(df):
+
+    A = 0
+    C = 0
+    labels = np.array([])
+    
+    for i in range(0, (len(df))):
+
+
+        #find 1 percent and 2 percent above and below
+        #print(df[A])
+        one_low = df[A] * .99
+        two_low = df[A] * .98
+        one_high = df[A] * 1.01
+        two_high = df[A] * 1.02
+
+        #print(f'1 low: {one_low} | 2 low: {two_low} | 1 high: {one_high} | 2 high: {two_high}')
+        #initialize the label counter
+        label_counter = A
+
+        #this is to make sure that once it either enters the "gone up by one percent" or "gone down by 1 percent"
+        #it doesn't enter the other while loops
+        pathway = 0
+
+        try:
+            #look for the instance when the price increases or decreases by 1 percent
+            while df[label_counter] >= one_low and df[label_counter] <= one_high:
+                label_counter += 1
+                #print(df[label_counter])
+            #If the price moved up 1 pecent first, this while loop will trigger and check if it is a two to one, or a one to one trade
+            while df[label_counter] >= one_low and df[label_counter] <= two_high:
+                label_counter += 1
+                pathway = 1
+                #print(df[label_counter])
+            #Check if price has increased two percent
+            if df[label_counter] >= two_high:
+                labels = np.append(labels, 2)
+                pathway = 1
+                #print(df[label_counter])
+            #check if price has reversed back down to the one percent marker
+            if df[label_counter] <= one_low and pathway == 1:
+                labels = np.append(labels, 1)
+                #print(df[label_counter])
+            
+            #if the price moved down 1 pecent first, this will check if it is a two to one, or a one to one trade
+            while df[label_counter] <= one_high and df[label_counter] >= two_low and pathway != 1:
+                label_counter += 1
+                pathway = 2
+                #print(df[label_counter])
+        
+            #check if the price has continued down two percent
+            if df[label_counter] <= two_low and pathway != 1:
+                labels = np.append(labels, 0)
+                #print(df[label_counter])
+            #check if price reversed back up to the 1 percent above marker
+            if df[label_counter] >= one_high and pathway != 1:
+                labels = np.append(labels, 1)
+                #print(df[label_counter])
+            
+            #temporarily store the last label that was added to "labels=[]"
+            C = labels[-1]
+
+        except:
+            break
+        #increment the graph by one time interval
+        A += 1 
+
+    #Create an array with the last value before the classification algorithm stopped
+    array_append = []
+    while A < len(df):
+        array_append = np.append(array_append, C)
+        A += 1
+        
+
+    labels = np.append(labels, array_append)
+    return labels
+
 def pre_process(datafile):
     df = pd.read_csv(datafile, sep=',', index_col=0, header=None, names=["Date", 'Open', 'High', 'Low', 'Close', 'Volume'])
-
+    labels = create_labels(df['Close'])
     df['Open'] = df['Open'].pct_change()
     df['High'] = df['High'].pct_change()
     df['Low'] = df['Low'].pct_change()
     df['Close'] = df['Close'].pct_change()
     df['Volume'] = df['Volume'].pct_change()
-
+    df['Labels'] = labels
     return df[1:]

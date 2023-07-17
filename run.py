@@ -32,7 +32,7 @@ print(f'use device: {DEVICE}')
 datafile, window_size, pred_size, split, scaler, mode = str
 '''
 
-wandb.init(project='mark LIV', name="01")
+wandb.init(project='garb LIV', name="01")
 if torch.cuda.is_available():
     path = '/root/datasets/Stocks'
 else:
@@ -88,6 +88,7 @@ def main():
                         train_dataloader, test_dataloader = pipeline(df)
                         for i, (x,y) in enumerate(train_dataloader):
                             x, y = x.to(DEVICE), y.to(DEVICE)
+                            print(x.shape, y.shape)
                             with amp.autocast(dtype=torch.float16):
                                 y_pred = net(x)
                                 loss = loss_function(y_pred, y)
@@ -96,8 +97,8 @@ def main():
                                 gradscaler.step(optimizer=optimizer)
                                 gradscaler.update()
                                 optimizer.zero_grad()
-                            wandb.log({'Loss': loss})
-                            wandb.log({'Epoch': epochs})
+                        wandb.log({'Loss': loss})
+                        wandb.log({'Epoch': epochs})
 
                 if check == 1:
                     pre = y_pred.cpu().detach().numpy()[0,:,0]
