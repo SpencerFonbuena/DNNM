@@ -10,13 +10,13 @@ class Hyperparameters:
     else:
         num_workers = 1
     data_dim = 5
-    learning_rate = .0001
+    learning_rate = .00005
     win_size = 2
     factor = 10
     d_model = 512
     d_ff = 4*d_model
     n_heads = 96
-    e_layers = 40
+    e_layers = 8
     dropout = 0
     baseline = False
 

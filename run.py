@@ -109,6 +109,9 @@ def main():
                 plt.close()
                 #test(net=net, dataloader=test_dataloader, optimizer=optimizer, loss_function=loss_function)
         scheduler.step(loss.mean())
+        # [Save the model]
+        savepath = '/root/model_3.pth'
+        torch.save(net.state_dict(), savepath)
 def test(net, dataloader, optimizer, loss_function):
     net.eval()
     for epochs in range(10):
