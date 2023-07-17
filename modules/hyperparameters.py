@@ -3,7 +3,7 @@ class Hyperparameters:
     pred_size = 24
     lookback = 168
     seg_len = 6
-    batch_size = 2048
+    batch_size = 4000
     split = .95
     if torch.cuda.is_available():
         num_workers = 12
