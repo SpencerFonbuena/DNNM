@@ -1,6 +1,6 @@
 from torch.nn import Module
 import torch
-from torch.nn import CrossEntropyLoss
+from torch.nn import MSELoss
 import numpy as np
 import random
 
@@ -15,7 +15,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # selec
 class Myloss(Module):
     def __init__(self):
         super(Myloss, self).__init__()
-        self.loss_function = CrossEntropyLoss()
+        self.loss_function = MSELoss()
 
     def forward(self, y_pre, y_true):
         y_true = y_true.type(torch.float32).to(DEVICE)
