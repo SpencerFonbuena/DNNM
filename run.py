@@ -25,7 +25,6 @@ np.random.seed(seed)
 random.seed(seed)
 torch.manual_seed(seed)
 scaler = StandardScaler()
-
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # select device CPU or GPU
 print(f'use device: {DEVICE}')
 
@@ -70,6 +69,7 @@ def model():
     return net
 
 def main():
+    check = 0
     net = model()
     loss_function = Myloss()
     optimizer = optim.AdamW(net.parameters(), lr = hp.learning_rate)
@@ -84,6 +84,7 @@ def main():
                     df = pre_process(datafile=datafile)
                     df = scaler.fit_transform(df)
                     if len(df) >= 1000:
+                        check = 1
                         train_dataloader, test_dataloader = pipeline(df)
                         for i, (x,y) in enumerate(train_dataloader):
                             x, y = x.to(DEVICE), y.to(DEVICE)
@@ -98,15 +99,15 @@ def main():
                             wandb.log({'Loss': loss})
                             wandb.log({'Epoch': epochs})
 
- 
-                pre = y_pred.cpu().detach().numpy()[0,:,0]
-                ys = y.cpu().detach().numpy()[0,:,0]
-                fig, ax = plt.subplots()
-                ax.plot(pre, label='predictions')
-                ax.plot(ys, label ='actual')
-                plt.legend()
-                wandb.log({'train plot': wandb.Image(fig)})
-                plt.close()
+                if check == 1:
+                    pre = y_pred.cpu().detach().numpy()[0,:,0]
+                    ys = y.cpu().detach().numpy()[0,:,0]
+                    fig, ax = plt.subplots()
+                    ax.plot(pre, label='predictions')
+                    ax.plot(ys, label ='actual')
+                    plt.legend()
+                    wandb.log({'train plot': wandb.Image(fig)})
+                    plt.close()
                 #test(net=net, dataloader=test_dataloader, optimizer=optimizer, loss_function=loss_function)
         scheduler.step(loss.mean())
         # [Save the model]
