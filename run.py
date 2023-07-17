@@ -84,7 +84,7 @@ def main():
                     df = pre_process(datafile=datafile)
                     df = scaler.fit_transform(df)
                     check = 0
-                    if len(df) >= 1000:
+                    if len(df) >= 5000:
                         check = 1
                         train_dataloader, test_dataloader = pipeline(df)
                         for i, (x,y) in enumerate(train_dataloader):
