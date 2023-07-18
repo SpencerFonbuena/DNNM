@@ -80,10 +80,10 @@ def main():
         for datafolder in glob.glob(os.path.join(path, 'data*')):
             for datafile in glob.glob(os.path.join(datafolder, '*.txt')):
                 with open(os.path.join(os.getcwd(), datafile), 'r') as f:
-                    df = pre_process(datafile=datafile)
-                    df = scaler.fit_transform(df)
                     check = 0
                     if len(df) >= 5000:
+                        df = pre_process(datafile=datafile)
+                        df = scaler.fit_transform(df)
                         check = 1
                         train_dataloader, test_dataloader = pipeline(df)
                         for i, (x,y) in enumerate(train_dataloader):
@@ -92,10 +92,9 @@ def main():
                                 y_pred = net(x)
                                 loss = loss_function(y_pred, y)
                             gradscaler.scale(loss).backward()
-                            if i % 4 == 0:
-                                gradscaler.step(optimizer=optimizer)
-                                gradscaler.update()
-                                optimizer.zero_grad()
+                            gradscaler.step(optimizer=optimizer)
+                            gradscaler.update()
+                            optimizer.zero_grad()
                             wandb.log({'Loss': loss})
                             wandb.log({'Epoch': epochs})
 
