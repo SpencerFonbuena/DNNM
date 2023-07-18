@@ -81,8 +81,8 @@ def main():
             for datafile in glob.glob(os.path.join(datafolder, '*.txt')):
                 with open(os.path.join(os.getcwd(), datafile), 'r') as f:
                     check = 0
+                    df = pre_process(datafile=datafile)
                     if len(df) >= 5000:
-                        df = pre_process(datafile=datafile)
                         df = scaler.fit_transform(df)
                         check = 1
                         train_dataloader, test_dataloader = pipeline(df)
