@@ -92,9 +92,10 @@ def main():
                                 y_pred = net(x)
                                 loss = loss_function(y_pred, y)
                             gradscaler.scale(loss).backward()
-                            gradscaler.step(optimizer=optimizer)
-                            gradscaler.update()
-                            optimizer.zero_grad()
+                            if i % 5 == 0:
+                                gradscaler.step(optimizer=optimizer)
+                                gradscaler.update()
+                                optimizer.zero_grad()
                             wandb.log({'Loss': loss})
                             wandb.log({'Epoch': epochs})
 
