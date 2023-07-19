@@ -82,23 +82,25 @@ def main():
                 with open(os.path.join(os.getcwd(), datafile), 'r') as f:
                     check = 0
                     df = pre_process(datafile=datafile)
-                    if len(df) >= 5000:
-                        df = scaler.fit_transform(df)
-                        check = 1
-                        train_dataloader, test_dataloader = pipeline(df)
-                        for i, (x,y) in enumerate(train_dataloader):
-                            x, y = x.to(DEVICE), y.to(DEVICE)
-                            with amp.autocast(dtype=torch.float16):
-                                y_pred = net(x)
-                                loss = loss_function(y_pred, y)
-                            gradscaler.scale(loss).backward()
-                            if i % 5 == 0:
-                                gradscaler.step(optimizer=optimizer)
-                                gradscaler.update()
-                                optimizer.zero_grad()
-                            wandb.log({'Loss': loss})
-                            wandb.log({'Epoch': epochs})
-
+                    if len(df) >= 5000 and df.isnull().values.any() == False:
+                        try:
+                            df = scaler.fit_transform(df)
+                            check = 1
+                            train_dataloader, test_dataloader = pipeline(df)
+                            for i, (x,y) in enumerate(train_dataloader):
+                                x, y = x.to(DEVICE), y.to(DEVICE)
+                                with amp.autocast(dtype=torch.float16):
+                                    y_pred = net(x)
+                                    loss = loss_function(y_pred, y)
+                                gradscaler.scale(loss).backward()
+                                if i % 5 == 0:
+                                    gradscaler.step(optimizer=optimizer)
+                                    gradscaler.update()
+                                    optimizer.zero_grad()
+                                wandb.log({'Loss': loss})
+                                wandb.log({'Epoch': epochs})
+                        except:
+                            print(datafile)
                 if check == 1:
                     pre = y_pred.cpu().detach().numpy()[0,:,0]
                     ys = y.cpu().detach().numpy()[0,:,0]
