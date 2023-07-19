@@ -82,7 +82,7 @@ def main():
                 with open(os.path.join(os.getcwd(), datafile), 'r') as f:
                     check = 0
                     df = pre_process(datafile=datafile)
-                    if len(df) >= 5000 and df.isnull().values.any() == False:
+                    if len(df) >= 5000:
                         try:
                             df = scaler.fit_transform(df)
                             check = 1
@@ -93,7 +93,7 @@ def main():
                                     y_pred = net(x)
                                     loss = loss_function(y_pred, y)
                                 gradscaler.scale(loss).backward()
-                                if i % 5 == 0:
+                                if i % 4 == 0:
                                     gradscaler.step(optimizer=optimizer)
                                     gradscaler.update()
                                     optimizer.zero_grad()
