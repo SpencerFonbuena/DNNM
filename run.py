@@ -99,8 +99,9 @@ def main():
                                     optimizer.zero_grad()
                                 wandb.log({'Loss': loss})
                                 wandb.log({'Epoch': epochs})
-                        except:
+                        except Exception as error:
                             print(datafile)
+                            print(error)
                 if check == 1:
                     pre = y_pred.cpu().detach().numpy()[0,:,0]
                     ys = y.cpu().detach().numpy()[0,:,0]
